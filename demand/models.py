@@ -49,8 +49,8 @@ class Order(TimeStampedModel):
     expected_day_came_out = models.DateField(verbose_name="출고예정일")
     # 나중에 출고시에 추가함
     real_day_came_out = models.DateField(
-        balnk=True, null=True, verbose_name="실제출고일")
-    car_model = models.CharField(verbose_name="차종")
+        blank=True, null=True, verbose_name="실제출고일")
+    car_model = models.CharField(max_length=90, verbose_name="차종")
     abroad_type = models.CharField(
         choices=(("domestic", "국산"), ("imported", "수입")), max_length=10, verbose_name="국산/수입")
     number_of_repair_works = models.IntegerField(
@@ -79,7 +79,7 @@ class Insurance(TimeStampedModel):
     order = models.ForeignKey(
         Order, null=True, on_delete=models.CASCADE, verbose_name="주문", related_name="insurances")
     charged_company = models.ForeignKey(
-        ChargedCompany, related_name="orders", verbose_name="담당 업체명")
+        ChargedCompany, related_name="orders", verbose_name="담당 업체명", on_delete=models.CASCADE)
     insurance_type = models.CharField(choices=(
         ("자차", "자차"), ("대물", "대물"), ("일반", "일반")), max_length=10, verbose_name="차/대/일")
     charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정", "일반경정"), (
@@ -89,8 +89,8 @@ class Insurance(TimeStampedModel):
     fault_ratio = models.IntegerField(verbose_name="과실분")
 
     payment = models.OneToOneField(
-        Payment, null=True, blank=True, verbose_name="결제")
+        Payment, null=True, blank=True, verbose_name="결제", on_delete=models.CASCADE)
     charge = models.OneToOneField(
-        Charge, null=True, blank=True, verbose_name="청구")
+        Charge, null=True, blank=True, verbose_name="청구", on_delete=models.CASCADE)
 
     note = models.TextField(verbose_name="비고")

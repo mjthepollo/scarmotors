@@ -30,6 +30,26 @@ def home(request):
     return render(request, "home.html")
 
 
+@login_required
+def new_order(request):
+    pass
+
+
+@login_required
+def edit_order(request):
+    pass
+
+
+@login_required
+def finish_order(request):
+    pass
+
+
+@login_required
+def search_orders(request):
+    pass
+
+
 # @login_required
 # def change_goals(request):
 #     period = request.GET.get("period", "short")
