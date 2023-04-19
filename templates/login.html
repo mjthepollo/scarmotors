@@ -1,0 +1,7 @@
+{% extends "base.html" %} {% load static%} {% block css %} {{ block.super }}
+{% endblock css %} {% block content %}
+<form method="POST" id="login">
+  {% csrf_token %} {{login_form}}
+  <button class="btn btn-dark">LOGIN</button>
+</form>
+{% endblock content %}

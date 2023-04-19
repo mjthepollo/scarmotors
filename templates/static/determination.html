@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static%}
+{% block css %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'css/static.css' %}">
+{% endblock css %}
+{% block content %}
+<a class='h1 static_title' href='{% url "home" %}'>決心</a>
+{% for determination in determinations %}
+    <h3>{{determination.title}}</h3>
+    <p>{{determination.content|linebreaksbr}}</p>
+{% endfor %}
+{% endblock content %}
+{% block footer %}
+{% include "modules/footer.html" %}
+{% endblock footer %}

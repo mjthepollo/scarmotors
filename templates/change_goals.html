@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load formset_tags %}
+{% load static %}
+{% block css %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'css/change_goals.css' %}">
+{% endblock css %}
+{% block content %}
+<h2 class="title">{% if period == "short" %}단기목표{% elif period == "mid" %}중기목표{% else %}장기목표{% endif %}</h2>
+<form id="goals_formset" method="POST" data-formset-prefix="{{ goal_formset.prefix }}">
+    <a href="javascript:window.history.back();" class="go_left go_chevron"><img src="{% static 'images/left_chevron.svg' %}"></a>
+    {% csrf_token %}
+    {{goal_formset.management_form}}
+    <div data-formset-body>
+        {% for form in goal_formset %}
+        <div data-formset-form class="">
+            {{form.id}}
+            {{form.content}}
+            {{form.completion_rate}}
+            {% with form.instance as goal %}
+            <div class="goal {{goal.period}}_goal">
+                <div class="goal_color_bar" style="width:{{goal.completion_rate}}%"></div>
+                <div class="goal_empty_bar" style="width:calc(100% - {{goal.completion_rate}}%)"></div>
+            </div>
+            {% endwith %}
+        </div>
+        {% endfor %}
+    </div>
+    <script type="form-template" data-formset-empty-form>
+        {% escapescript %}
+        <div data-formset-form class="new_goal">
+            {{ goal_formset.empty_form.content}}
+            {{ goal_formset.empty_form.completion_rate}}
+        </div>
+        {% endescapescript %}
+    </script>
+
+    <!-- This button will add a new form when clicked -->
+    <input id="add_button" type="button" class="btn btn-success" value="Add another" data-formset-add>
+
+    <script>jQuery(function($) {
+        $("#goals_formset").formset({
+            animateForms: true,
+            reorderMode: 'dom',
+        });
+    });</script>
+    <button class="go_right go_chevron"><img src="{% static 'images/right_chevron.svg' %}"></button>
+</form>
+{% endblock content %}
+{% block inline_javascript %}
+<script src="{% static 'js/change_goals.js' %}"></script>
+{% endblock inline_javascript %}

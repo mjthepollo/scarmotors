@@ -1,0 +1,14 @@
+{% load static %}
+<div class="question">
+    <h2 class="question_content">Q{{forloop.counter}}. {{form.question.initial.content}}</h2>
+    <div class="content">
+        {% if forloop.first %}
+        <a href="javascript:window.history.back();" class="go_left go_chevron"><img src="{% static 'images/left_chevron.svg' %}"></a>
+        {% else %}
+        <button type="button" class="go_left go_chevron"><img src="{% static 'images/left_chevron.svg' %}"></button>
+        {% endif %}
+        {{form.content}}
+        <div style="display:none">{{form.question}}</div>
+        <button type="button" class="go_right go_chevron"><img src="{% static 'images/right_chevron.svg' %}"></button>
+    </div>
+</div>

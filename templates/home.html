@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+{% block css %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock css %}
+{% block content %}
+<h1>Hello WORLD!</h1>
+{% endblock content %}
+{% block footer%}
+{% include "modules/footer.html" %}
+{% endblock footer%}

@@ -1,0 +1,66 @@
+@import url("./modules/footer.css");
+
+* {
+  font-family: "NanumSquareRound";
+}
+.light {
+  font-family: "NanumSquareRoundLight";
+}
+.bold {
+  font-family: "NanumSquareRoundBold";
+}
+.extra_bold {
+  font-family: "NanumSquareRoundExtraBold";
+}
+
+body {
+  position: relative;
+
+  max-width: 100vw;
+  min-height: calc(var(--vh) * 100);
+}
+
+.blank_top {
+  width: 100%;
+  height: 120px;
+}
+
+.container {
+  box-sizing: border-box;
+  max-width: 1080px;
+}
+
+.container-lg {
+  box-sizing: border-box;
+  max-width: 1240px;
+}
+
+.subtitle {
+  margin-top: 40px;
+
+  font-size: 30px;
+}
+
+.alert-debug {
+  color: black;
+  background-color: white;
+
+  border-color: #d6e9c6;
+}
+
+.alert-error {
+  color: #b94a48;
+  background-color: #f2dede;
+
+  border-color: #eed3d7;
+}
+
+@media screen and (max-width: 1200px) {
+  .blank_top {
+    height: 60px;
+  }
+
+  .subtitle {
+    font-size: 25px;
+  }
+}

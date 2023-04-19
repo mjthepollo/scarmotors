@@ -1,0 +1,10 @@
+<div class="goal {{goal.period}}_goal">
+    {% if goal.content %}<div class="goal_content">{{goal.content}} ({{goal.completion_rate}}%)</div>{% endif%}
+    {% if goal.completion_rate %}
+    <div class="goal_color_bar" style="width:{{goal.completion_rate}}%;"></div>
+    <div class="goal_empty_bar" style="width:calc(100% - {{goal.completion_rate}}%);"></div>
+    {% else %}
+    <div class="goal_color_bar" style="width:0%"></div>
+    <div class="goal_empty_bar" style="width:100%"></div>
+    {% endif %}
+</div>

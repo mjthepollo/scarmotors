@@ -1,0 +1,28 @@
+main.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: calc(var(--vh) * 100);
+}
+
+.prayer {
+  width: 600px;
+
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 160%;
+  text-align: center;
+
+  color: black;
+
+  text-decoration: none;
+}
+
+.prayer:hover {
+  color: black;
+
+  text-decoration: underline;
+  text-decoration-thickness: 5%;
+  text-underline-position: under;
+}

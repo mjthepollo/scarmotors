@@ -1,0 +1,61 @@
+main.container {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: calc(var(--vh) * 100);
+}
+
+.go_chevron {
+  position: absolute;
+  top: calc(var(--vh) * 50 - 40px);
+
+  width: 50px;
+  padding: 0px;
+
+  outline: none;
+  border: none;
+
+  background-color: transparent;
+}
+
+.go_left {
+  left: -50px;
+}
+
+.go_right {
+  right: -50px;
+}
+.go_left img {
+  width: 30px;
+}
+
+.go_right img {
+  width: 30px;
+}
+
+@media screen and (max-width: 1200px) {
+  .go_chevron {
+    top: calc(var(--vh) * 50 - 15px);
+
+    width: 15px;
+  }
+
+  .go_left {
+    left: 5px;
+  }
+
+  .go_right {
+    right: 5px;
+  }
+  .go_left img {
+    width: 15px;
+  }
+
+  .go_right img {
+    width: 15px;
+  }
+}

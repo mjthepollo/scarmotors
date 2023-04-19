@@ -1,0 +1,52 @@
+@import url("./modules/goal.css");
+
+main.container {
+  min-height: calc(var(--vh) * 100);
+}
+
+#shsf {
+  position: absolute;
+  top: 40px;
+  left: 0px;
+
+  display: block;
+
+  width: 100%;
+
+  font-weight: 700;
+  font-size: 60px;
+  text-align: center;
+
+  color: black;
+
+  text-decoration: none;
+}
+
+.question {
+  margin-top: 40px;
+
+  font-size: 30px;
+}
+
+a.btn {
+  height: 60px;
+  margin-bottom: 30px;
+
+  font-size: 30px;
+}
+
+@media screen and (max-width: 1200px) {
+  #shsf {
+    font-size: 20px;
+  }
+
+  .question {
+    font-size: 25px;
+  }
+
+  a.btn {
+    height: 40px;
+
+    font-size: 20px;
+  }
+}

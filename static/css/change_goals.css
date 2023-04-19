@@ -1,0 +1,90 @@
+@import url("./center_form.css");
+@import url("./modules/goal.css");
+
+.title {
+  position: absolute;
+  top: 100px;
+  left: 0px;
+
+  width: 100%;
+
+  font-weight: 700;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+
+  text-align: center;
+
+  outline: none;
+  border: none;
+}
+
+/* input[type="range"] {
+  display: none;
+} */
+
+#goals_formset {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 1024px;
+  margin: auto;
+}
+
+div[data-formset-body]::-webkit-scrollbar {
+  display: none;
+}
+
+div[data-formset-body] {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  max-height: 800px;
+  height: 800px;
+  margin-bottom: 20px;
+
+  flex-wrap: wrap;
+  overflow-y: scroll;
+}
+
+div[data-formset-form] {
+  min-width: 100%;
+  margin-bottom: 20px;
+}
+
+#add_button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+@media screen and (max-width: 1200px) {
+  .title {
+    top: 50px;
+  }
+
+  #goals_formset {
+    width: calc(100vw - 60px);
+    margin: auto;
+    margin-top: 100px;
+    margin-bottom: 50px;
+  }
+
+  div[data-formset-body] {
+    max-height: 450px;
+    height: 450px;
+  }
+
+  div[data-formset-form] {
+    margin-bottom: 20px;
+  }
+
+  #add_button {
+    width: 100%;
+    margin-top: 20px;
+  }
+}

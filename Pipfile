@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+django-environ = "*"
+django-extensions = "*"
+argon2-cffi = "*"
+cffi = "*"
+setuptools = "*"
+uwsgi = "*"
+django-cors-headers = "*"
+django-formset-js-improved = "*"
+
+[dev-packages]
+pytest-django = "*"
+django-debug-toolbar = "*"
+pytest-sugar = "*"
+autopep8 = "*"
+
+[requires]
+python_version = "3.8"

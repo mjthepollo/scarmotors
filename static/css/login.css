@@ -1,0 +1,30 @@
+main.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: calc(var(--vh) * 100);
+}
+
+h2 {
+  font-weight: 700;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+form > input {
+  width: 280px;
+  height: 38px;
+
+  text-align: center;
+}
+
+form > button {
+  width: 280px;
+  margin-top: 10px;
+}
