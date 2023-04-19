@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load formset_tags %}
+{% load static %}
+{% block css %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock css %}
+{% block content %}
+<h1>New Order</h1>
+<form id="formset" metheod="POST" data-formset-prefix="{{insurance_formset.prefix}}">
+    {% csrf_token %}
+    <div id="order_form">
+        {{order_form}}
+    </div>
+    {{insurance_formset.management_form}}
+    <div data-formset-body id="insurance_formset">
+        {% for form in insurance_formset %}
+            {{form}}
+        {% endfor %}
+    </div>
+    <script type="form-template" data-formset-empty-form>
+        {% escapescript %}
+        <div data-formset-form class="new_insurance">
+            {{ insurance_formset.empty_form}}
+        </div>
+        {% endescapescript %}
+    </script>
+    <input id="add_button" type="button" class="btn btn-success" value="Add another" data-formset-add>
+    <script>jQuery(function($) {
+        $("#formset").formset({
+            animateForms: true,
+            reorderMode: 'dom',
+        });
+    });</script>
+</form>
+{% endblock content %}
+{% block footer%}
+{% include "modules/footer.html" %}
+{% endblock footer%}
+
+    <div data-formset-body>
+        {% for form in goal_formset %}
+        <div data-formset-form class="">
+            {{form.id}}
+            {{form.content}}
+            {{form.completion_rate}}
+            {% with form.instance as goal %}
+            <div class="goal {{goal.period}}_goal">
+                <div class="goal_color_bar" style="width:{{goal.completion_rate}}%"></div>
+                <div class="goal_empty_bar" style="width:calc(100% - {{goal.completion_rate}}%)"></div>
+            </div>
+            {% endwith %}
+        </div>
+        {% endfor %}
+    </div>
+    <script type="form-template" data-formset-empty-form>
+        {% escapescript %}
+        <div data-formset-form class="new_goal">
+            {{ goal_formset.empty_form.content}}
+            {{ goal_formset.empty_form.completion_rate}}
+        </div>
+        {% endescapescript %}
+    </script>
+
+    <!-- This button will add a new form when clicked -->
+    <input id="add_button" type="button" class="btn btn-success" value="Add another" data-formset-add>
+
+    <script>jQuery(function($) {
+        $("#goals_formset").formset({
+            animateForms: true,
+            reorderMode: 'dom',
+        });
+    });</script>
+    <button class="go_right go_chevron"><img src="{% static 'images/right_chevron.svg' %}"></button>
