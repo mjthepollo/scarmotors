@@ -6,3 +6,4 @@ uwsgi.ini
 *.pem
 
 src/
+*.xlsx
