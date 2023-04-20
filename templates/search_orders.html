@@ -1,0 +1,8 @@
+{% extends "base.html" %} {% load static%} {% block css %} {{ block.super }}
+{% endblock css %} {% block content %}
+<a href="{% url 'home' %}"><h1>S-CAR MOTORS</h1></a>
+<form method="GET" action="/edit_order/" id="search">
+    <input type="text" name="RO_number" placeholder="등록번호(M-NO)"/>
+  <button class="btn btn-dark">검색</button>
+</form>
+{% endblock content %}

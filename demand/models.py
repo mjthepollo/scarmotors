@@ -61,11 +61,32 @@ class Charge(TimeStampedModel):
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
     indemnity_amount = models.IntegerField(default=0, verbose_name="면책금")
 
+    def get_charge_amount(self):
+        return int((self.repair_amount + self.component_amount)*1.1) - self.indemnity_amount
+
     def __str__(self):
         if hasattr(self, "insurance"):
             insurance = self.insurance
             if hasattr(insurance, "order"):
                 return f"{insurance.order.__str__()} 청구"
+            else:
+                return f"주문없음({self.pk}_보험:{insurance.pk})"
+        else:
+            return f"보험없음({self.pk})"
+
+
+class Deposit(TimeStampedModel):
+    deposit_amount = models.IntegerField(verbose_name="입금액")
+    deposit_date = models.DateField(verbose_name="입금일")
+
+    def get_payment_rate(self):
+        self.insurance.charge.get_charge_amount()
+
+    def __str__(self):
+        if hasattr(self, "insurance"):
+            insurance = self.insurance
+            if hasattr(insurance, "order"):
+                return f"{insurance.order.__str__()} 입금"
             else:
                 return f"주문없음({self.pk}_보험:{insurance.pk})"
         else:
@@ -130,6 +151,8 @@ class Insurance(TimeStampedModel):
         Payment, null=True, blank=True, related_name="insurance", verbose_name="결제", on_delete=models.CASCADE)
     charge = models.OneToOneField(
         Charge, null=True, blank=True, related_name="insurance", verbose_name="청구", on_delete=models.CASCADE)
+    deposit = models.OneToOneField(
+        Deposit, null=True, blank=True, related_name="insurance", verbose_name="입금", on_delete=models.CASCADE)
 
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 

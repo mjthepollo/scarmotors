@@ -13,6 +13,8 @@ setuptools = "*"
 uwsgi = "*"
 django-cors-headers = "*"
 django-formset-js-improved = "*"
+openpyxl = "*"
+pandas = "*"
 
 [dev-packages]
 pytest-django = "*"

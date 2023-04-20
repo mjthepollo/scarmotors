@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from demand.models import (Charge, ChargedCompany, Insurance, InsuranceAgent,
-                           Order, Payment, Supporter)
+from demand.models import (Charge, ChargedCompany, Deposit, Insurance,
+                           InsuranceAgent, Order, Payment, Supporter)
 
 
 @admin.register(Supporter)
@@ -37,6 +37,12 @@ class ChargeAdmin(admin.ModelAdmin):
     list_display = ["charge_date", "repair_amount",
                     "component_amount", "indemnity_amount"]
     search_fields = ["charge_date",]
+
+
+@admin.register(Deposit)
+class DepositAdmin(admin.ModelAdmin):
+    list_display = ["deposit_date", "deposit_amount"]
+    search_fields = ["deposit_date"]
 
 
 @admin.register(Order)

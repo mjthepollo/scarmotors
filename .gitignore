@@ -4,3 +4,5 @@
 uwsgi.ini
 *DS_store
 *.pem
+
+src/

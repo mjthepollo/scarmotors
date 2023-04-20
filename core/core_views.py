@@ -124,4 +124,4 @@ def finish_order(request):
 
 @ login_required
 def search_orders(request):
-    pass
+    return render(request, "search_orders.html")

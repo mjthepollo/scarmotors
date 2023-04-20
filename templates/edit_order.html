@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock css %}
 {% block content %}
-<h1>입고 수정</h1>
+<a href="{% url 'home' %}"><h1>입고 수정</h1></a>
 <form id="formset" method="POST" data-formset-prefix="{{insurance_formset.prefix}}">
     {% csrf_token %}
     <div id="order_form">
