@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 
 from core.models import TimeStampedModel
@@ -9,15 +11,24 @@ class Supporter(TimeStampedModel):
     name = models.CharField(max_length=100, verbose_name="지원 업체명")
     active = models.BooleanField(default=True, verbose_name="활성화")
 
+    def __str__(self):
+        return self.name
+
 
 class ChargedCompany(TimeStampedModel):
     name = models.CharField(max_length=100, verbose_name="담당 업체명")
     active = models.BooleanField(default=True, verbose_name="활성화")
 
+    def __str__(self):
+        return self.name
+
 
 class InsuranceAgent(TimeStampedModel):
     name = models.CharField(max_length=100, verbose_name="보험 담당자명")
     active = models.BooleanField(default=True, verbose_name="활성화")
+
+    def __str__(self):
+        return self.name
 
 
 class Payment(TimeStampedModel):
@@ -34,12 +45,31 @@ class Payment(TimeStampedModel):
         blank=True, null=True, verbose_name="환불액")
     refund_date = models.DateField(blank=True, null=True, verbose_name="환불일")
 
+    def __str__(self):
+        if hasattr(self, "insurance"):
+            insurance = self.insurance
+            if hasattr(insurance, "order"):
+                return f"{insurance.order.__str__()} 결제"
+            else:
+                return f"주문없음({self.pk}_보험:{insurance.pk})"
+        return self.name
+
 
 class Charge(TimeStampedModel):
     charge_date = models.DateField(verbose_name="청구일")
     repair_amount = models.IntegerField(default=0, verbose_name="공임비")
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
     indemnity_amount = models.IntegerField(default=0, verbose_name="면책금")
+
+    def __str__(self):
+        if hasattr(self, "insurance"):
+            insurance = self.insurance
+            if hasattr(insurance, "order"):
+                return f"{insurance.order.__str__()} 청구"
+            else:
+                return f"주문없음({self.pk}_보험:{insurance.pk})"
+        else:
+            return f"보험없음({self.pk})"
 
 
 class Order(TimeStampedModel):
@@ -71,8 +101,16 @@ class Order(TimeStampedModel):
     def get_number_of_works(self):
         return self.number_of_exchange_works + self.number_of_repair_works
 
+    @classmethod
+    def get_RO_number(cls):
+        current_month = datetime.now().month
+        current_number = cls.objects.filter(
+            my_date_field__month=current_month).count()+1
+        return f"{current_month}-{current_number}"
+
     def set_RO_number(self):
-        pass
+        self.RO_number = Order.get_RO_number()
+        self.save()
 
 
 class Insurance(TimeStampedModel):
@@ -89,8 +127,11 @@ class Insurance(TimeStampedModel):
     fault_ratio = models.IntegerField(verbose_name="과실분")
 
     payment = models.OneToOneField(
-        Payment, null=True, blank=True, verbose_name="결제", on_delete=models.CASCADE)
+        Payment, null=True, blank=True, related_name="insurance", verbose_name="결제", on_delete=models.CASCADE)
     charge = models.OneToOneField(
-        Charge, null=True, blank=True, verbose_name="청구", on_delete=models.CASCADE)
+        Charge, null=True, blank=True, related_name="insurance", verbose_name="청구", on_delete=models.CASCADE)
 
     note = models.TextField(verbose_name="비고")
+
+    def __str__(self):
+        return f"{self.order.RO_number} {self.insurance_type} {self.charge_type}"

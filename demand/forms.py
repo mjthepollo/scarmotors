@@ -26,6 +26,10 @@ class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         fields = "__all__"
+        widgets = {
+            'payment_date': forms.DateInput(attrs={'type': 'date'}),
+            'refund_date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 
 class ChargeForm(forms.ModelForm):
@@ -36,8 +40,13 @@ class ChargeForm(forms.ModelForm):
 
 class NewOrderForm(forms.ModelForm):
     class Meta:
-        model = Payment
-        exclude = ["RO_number", "insurance_agent",]
+        model = Order
+        exclude = ["RO_number", "insurance_agent", "real_day_came_out"]
+        widgets = {
+            'day_came_in': forms.DateInput(attrs={'type': 'date'}),
+            'expected_day_came_out': forms.DateInput(attrs={'type': 'date'}),
+            'real_day_came_out': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 
 class InsuranceForm(forms.ModelForm):

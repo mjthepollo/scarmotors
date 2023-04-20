@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_user
 from django.contrib.auth.decorators import login_required
@@ -37,6 +39,38 @@ def home(request):
 
 @login_required
 def new_order(request):
+    order_form = NewOrderForm(initial={
+        'car_number': "TEST",
+        'day_came_in': date.today()})
+    insurance_form_factory = modelformset_factory(
+        Insurance, form=InsuranceForm, extra=1)
+    if request.method == "GET":
+        insurance_formset = insurance_form_factory()
+        return render(request, "new_order.html", context={
+            "order_form": order_form,
+            "insurance_formset": insurance_formset,
+        })
+    else:
+        RO_number = Order.get_RO_number()
+        order_form = NewOrderForm(request.POST)
+        insurance_formset = insurance_form_factory(request.POST)
+        if order_form.is_valid():
+            order = order_form.save()
+            if insurance_formset.is_valid():
+                insurnaces = insurance_formset.save(commit=False)
+                for insurance in insurnaces:
+                    insurance.order = order
+                    insurance.save()
+                return redirect(reverse("edit_order"))
+        else:
+            return render(request, "new_order.html", context={
+                "order_form": order_form,
+                "insurance_formset": insurance_formset,
+            })
+
+
+@login_required
+def edit_order(request):
     order_form = NewOrderForm()
     insurance_form_factory = modelformset_factory(
         Insurance, form=InsuranceForm, extra=1)
@@ -62,11 +96,6 @@ def new_order(request):
                 "order_form": order_form,
                 "insurance_formset": insurance_formset,
             })
-
-
-@login_required
-def edit_order(request):
-    pass
 
 
 @login_required
