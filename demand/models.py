@@ -48,11 +48,11 @@ class Payment(TimeStampedModel):
     def __str__(self):
         if hasattr(self, "insurance"):
             insurance = self.insurance
-            if hasattr(insurance, "order"):
+            if insurance.order != None:
                 return f"{insurance.order.RO_number} 결제"
             else:
                 return f"주문없음({self.pk}_보험:{insurance.pk})"
-        return self.name
+        return f"보험없음({self.pk})"
 
 
 class Charge(TimeStampedModel):
@@ -67,7 +67,7 @@ class Charge(TimeStampedModel):
     def __str__(self):
         if hasattr(self, "insurance"):
             insurance = self.insurance
-            if hasattr(insurance, "order"):
+            if insurance.order != None:
                 return f"{insurance.order.RO_number} 청구"
             else:
                 return f"주문없음({self.pk}_보험:{insurance.pk})"
@@ -80,12 +80,12 @@ class Deposit(TimeStampedModel):
     deposit_date = models.DateField(verbose_name="입금일")
 
     def get_payment_rate(self):
-        self.insurance.charge.get_charge_amount()
+        return round(self.deposit_amount/self.insurance.charge.get_charge_amount()*100)
 
     def __str__(self):
         if hasattr(self, "insurance"):
             insurance = self.insurance
-            if hasattr(insurance, "order"):
+            if insurance.order != None:
                 return f"{insurance.order.RO_number} 입금"
             else:
                 return f"주문없음({self.pk}_보험:{insurance.pk})"
@@ -147,7 +147,8 @@ class Insurance(TimeStampedModel):
     charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정", "일반경정"), (
         "일반판도", "일반판도"), ("렌트판도", "렌트판도"), ("렌트일반", "렌트일반"),
         ("인정매출", "인정매출")), max_length=20, verbose_name="구분")
-    receipt_number = models.CharField(max_length=20, verbose_name="접수번호")
+    receipt_number = models.CharField(
+        max_length=20, verbose_name="접수번호", unique=True)
     fault_ratio = models.IntegerField(verbose_name="과실분")
 
     payment = models.OneToOneField(
