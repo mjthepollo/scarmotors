@@ -105,7 +105,7 @@ class Order(TimeStampedModel):
     def get_RO_number(cls):
         current_month = datetime.now().month
         current_number = cls.objects.filter(
-            my_date_field__month=current_month).count()+1
+            created__month=current_month).count()
         return f"{current_month}-{current_number}"
 
     def set_RO_number(self):
@@ -131,7 +131,7 @@ class Insurance(TimeStampedModel):
     charge = models.OneToOneField(
         Charge, null=True, blank=True, related_name="insurance", verbose_name="청구", on_delete=models.CASCADE)
 
-    note = models.TextField(verbose_name="비고")
+    note = models.TextField(blank=True, null=True, verbose_name="비고")
 
     def __str__(self):
         return f"{self.order.RO_number} {self.insurance_type} {self.charge_type}"

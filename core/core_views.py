@@ -45,23 +45,32 @@ def new_order(request):
     insurance_form_factory = modelformset_factory(
         Insurance, form=InsuranceForm, extra=1)
     if request.method == "GET":
-        insurance_formset = insurance_form_factory()
+        insurance_formset = insurance_form_factory(
+            queryset=Insurance.objects.none())
         return render(request, "new_order.html", context={
             "order_form": order_form,
             "insurance_formset": insurance_formset,
         })
     else:
-        RO_number = Order.get_RO_number()
         order_form = NewOrderForm(request.POST)
-        insurance_formset = insurance_form_factory(request.POST)
+        insurance_formset = insurance_form_factory(
+            request.POST, queryset=Insurance.objects.none())
         if order_form.is_valid():
             order = order_form.save()
             if insurance_formset.is_valid():
-                insurnaces = insurance_formset.save(commit=False)
+                insurnaces = insurance_formset.save()
                 for insurance in insurnaces:
                     insurance.order = order
                     insurance.save()
-                return redirect(reverse("edit_order"))
+                order.RO_number = Order.get_RO_number()
+                order.save()
+                return redirect(reverse("edit_order")+"?RO_number="+order.RO_number)
+            else:
+                order.delete()
+                return render(request, "new_order.html", context={
+                    "order_form": order_form,
+                    "insurance_formset": insurance_formset,
+                })
         else:
             return render(request, "new_order.html", context={
                 "order_form": order_form,
@@ -71,38 +80,48 @@ def new_order(request):
 
 @login_required
 def edit_order(request):
-    order_form = NewOrderForm()
+    RO_number = request.GET.get("RO_number")
+    order = Order.objects.get(RO_number=RO_number)
+    order_form = NewOrderForm(instance=order)
     insurance_form_factory = modelformset_factory(
-        Insurance, form=InsuranceForm, extra=1)
+        Insurance, form=InsuranceForm, extra=0)
     if request.method == "GET":
-        insurance_formset = insurance_form_factory()
-        return render(request, "new_order.html", context={
+        insurance_formset = insurance_form_factory(
+            queryset=order.insurances.all())
+        return render(request, "edit_order.html", context={
             "order_form": order_form,
             "insurance_formset": insurance_formset,
         })
     else:
-        order_form = NewOrderForm(request.POST)
-        insurance_formset = insurance_form_factory(request.POST)
+        order_form = NewOrderForm(request.POST, instance=order)
+        insurance_formset = insurance_form_factory(
+            request.POST, queryset=order.insurances.all())
         if order_form.is_valid():
             order = order_form.save()
             if insurance_formset.is_valid():
-                insurnaces = insurance_formset.save(commit=False)
+                insurnaces = insurance_formset.save()
                 for insurance in insurnaces:
                     insurance.order = order
                     insurance.save()
-                return redirect(reverse("edit_order"))
+                order.save()
+                return redirect(reverse("home"))
+            else:
+                return render(request, "edit_order.html", context={
+                    "order_form": order_form,
+                    "insurance_formset": insurance_formset,
+                })
         else:
-            return render(request, "new_order.html", context={
+            return render(request, "edit_order.html", context={
                 "order_form": order_form,
                 "insurance_formset": insurance_formset,
             })
 
 
-@login_required
+@ login_required
 def finish_order(request):
     pass
 
 
-@login_required
+@ login_required
 def search_orders(request):
     pass

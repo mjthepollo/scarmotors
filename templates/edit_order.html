@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load formset_tags %}
+{% load static %}
+{% block css %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock css %}
+{% block content %}
+<h1>입고 수정</h1>
+<form id="formset" method="POST" data-formset-prefix="{{insurance_formset.prefix}}">
+    {% csrf_token %}
+    <div id="order_form">
+        {{order_form}}
+    </div>
+    {{insurance_formset.management_form}}
+    <div data-formset-body id="insurance_formset">
+        <div data-formset-form>
+        {% for form in insurance_formset %}
+            {{form}}
+        {% endfor %}
+        </div>
+    </div>
+    <script type="form-template" data-formset-empty-form>
+        {% escapescript %}
+        <div data-formset-form class="new_insurance">
+            {{ insurance_formset.empty_form}}
+        </div>
+        {% endescapescript %}
+    </script>
+    <input id="add_button" type="button" class="btn btn-success" value="Add another" data-formset-add>
+    <script>jQuery(function($) {
+        $("#formset").formset({
+            animateForms: true,
+            reorderMode: 'dom',
+        });
+    });</script>
+    <button>완료</button>
+</form>
+{% endblock content %}
+{% block footer%}
+{% include "modules/footer.html" %}
+{% endblock footer%}
