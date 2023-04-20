@@ -49,7 +49,7 @@ class Payment(TimeStampedModel):
         if hasattr(self, "insurance"):
             insurance = self.insurance
             if hasattr(insurance, "order"):
-                return f"{insurance.order.__str__()} 결제"
+                return f"{insurance.order.RO_number} 결제"
             else:
                 return f"주문없음({self.pk}_보험:{insurance.pk})"
         return self.name
@@ -68,7 +68,7 @@ class Charge(TimeStampedModel):
         if hasattr(self, "insurance"):
             insurance = self.insurance
             if hasattr(insurance, "order"):
-                return f"{insurance.order.__str__()} 청구"
+                return f"{insurance.order.RO_number} 청구"
             else:
                 return f"주문없음({self.pk}_보험:{insurance.pk})"
         else:
@@ -86,7 +86,7 @@ class Deposit(TimeStampedModel):
         if hasattr(self, "insurance"):
             insurance = self.insurance
             if hasattr(insurance, "order"):
-                return f"{insurance.order.__str__()} 입금"
+                return f"{insurance.order.RO_number} 입금"
             else:
                 return f"주문없음({self.pk}_보험:{insurance.pk})"
         else:
@@ -132,6 +132,9 @@ class Order(TimeStampedModel):
     def set_RO_number(self):
         self.RO_number = Order.get_RO_number()
         self.save()
+
+    def __str__(self):
+        return f"{self.car_number}/{self.phone_number}"
 
 
 class Insurance(TimeStampedModel):
