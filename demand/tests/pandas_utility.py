@@ -1,12 +1,19 @@
 
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 from django.test import TestCase
 
 from demand.models import (Charge, ChargedCompany, Deposit, Insurance,
                            InsuranceAgent, Order, Payment, Supporter)
-from demand.utility import (END, get_effective_data_frame,
-                            get_effective_row_numbers, load_data)
+from demand.utility import (END,
+                            check_effective_line_numbers_have_same_car_number,
+                            check_effective_line_numbers_have_unique_RO_number,
+                            get_effective_data_frame,
+                            get_effective_line_numbers,
+                            get_effective_row_numbers, input_to_date,
+                            load_data, string_to_date)
 
 
 class UtilityTest(TestCase):
@@ -18,6 +25,20 @@ class UtilityTest(TestCase):
         self.original_df2 = load_data("src/230417.xlsx", "23년 본사 상반기")
         self.effective_df2 = get_effective_data_frame(
             "src/230417.xlsx", "23년 본사 상반기")
+
+    def test_string_to_date(self):
+        assert string_to_date(
+            "2019-01-01") == datetime.date(datetime(2019, 1, 1))
+        assert string_to_date(
+            "2019.01.01") == datetime.date(datetime(2019, 1, 1))
+
+    def test_input_to_date(self):
+        date_string = "2019.01.01"
+        timestamp = pd.Timestamp('2019-01-01')
+        date = datetime.date(datetime(2019, 1, 1))
+        assert input_to_date(date_string) == date
+        assert input_to_date(timestamp) == date
+        assert input_to_date(date) == date
 
     def test_load_data(self):
         assert type(pd.DataFrame()) == type(self.original_df1)
@@ -34,3 +55,12 @@ class UtilityTest(TestCase):
         assert get_effective_row_numbers(self.original_df2) == num_rows2
         assert "부품매출" == list(self.effective_df1.columns)[-1]
         assert "부품매출" == list(self.effective_df2.columns)[-1]
+
+    def test_get_effective_line_numbers(self):
+        check_effective_line_numbers_have_unique_RO_number(self.effective_df1)
+        check_effective_line_numbers_have_unique_RO_number(self.effective_df2)
+        check_effective_line_numbers_have_same_car_number(self.effective_df1)
+        check_effective_line_numbers_have_same_car_number(self.effective_df2)
+        assert len(get_effective_line_numbers(self.effective_df1)) == 157+24
+        assert len(get_effective_line_numbers(
+            self.effective_df2)) == 156+145+184+99

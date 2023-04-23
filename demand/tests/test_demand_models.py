@@ -3,7 +3,9 @@ from datetime import datetime
 from django.test import TestCase
 
 from demand.models import (Charge, ChargedCompany, Deposit, Insurance,
-                           InsuranceAgent, Order, Payment, Supporter)
+                           InsuranceAgent, Order, Payment, Supporter, WashCar,
+                           Wasted)
+from demand.utility import string_to_date
 
 
 class ModelTest(TestCase):
@@ -15,25 +17,25 @@ class ModelTest(TestCase):
         self.insurance_agent = InsuranceAgent.objects.create(
             name="test_insurance_agent")
 
-        payment_date = datetime.strptime("2023-04-20", '%Y-%m-%d').date()
-        refund_date = datetime.strptime("2023-04-20", '%Y-%m-%d').date()
+        payment_date = string_to_date("2023-04-20")
+        refund_date = string_to_date("2023-04-20")
         self.payment = Payment.objects.create(indemnity_amount=100000,
                                               discount_amount=10000, payment_type="카드",
                                               payment_info="신한카드", payment_date=payment_date,
                                               refund_amount=10000, refund_date=refund_date)
 
-        charge_date = datetime.strptime("2023-04-20", '%Y-%m-%d').date()
+        charge_date = string_to_date("2023-04-20")
         self.charge = Charge.objects.create(charge_date=charge_date,
                                             repair_amount=100000, component_amount=20000,
                                             indemnity_amount=10000)
 
-        deposit_date = datetime.strptime("2023-04-20", '%Y-%m-%d').date()
+        deposit_date = string_to_date("2023-04-20")
         self.deposit = Deposit.objects.create(deposit_date=deposit_date,
                                               deposit_amount=100000)
-        day_came_in = datetime.strptime("2023-04-20", '%Y-%m-%d').date()
+        day_came_in = string_to_date("2023-04-20")
         expected_day_came_out = datetime.strptime(
             "2023-04-25", '%Y-%m-%d').date()
-        real_day_came_out = datetime.strptime("2023-04-27", '%Y-%m-%d').date()
+        real_day_came_out = string_to_date("2023-04-27")
         self.order = Order.objects.create(
             RO_number="4-1234", car_number="12가1234", day_came_in=day_came_in,
             expected_day_came_out=expected_day_came_out, real_day_came_out=real_day_came_out,
@@ -50,9 +52,38 @@ class ModelTest(TestCase):
             note="test 비고"
         )
 
+        self.wash_car_deposit = Deposit.objects.create(deposit_date=deposit_date,
+                                                       deposit_amount=100000)
+        self.wasted_car_deposit = Deposit.objects.create(deposit_date=deposit_date,
+                                                         deposit_amount=100000)
+        self.wash_car_charge = Charge.objects.create(charge_date=charge_date,
+                                                     repair_amount=100000, component_amount=20000,
+                                                     indemnity_amount=10000)
+        self.wash_car_charge = Charge.objects.create(charge_date=charge_date,
+                                                     repair_amount=100000, component_amount=20000,
+                                                     indemnity_amount=10000)
+
+        self.wash_car_payment = Payment.objects.create(indemnity_amount=100000,
+                                                       discount_amount=10000, payment_type="카드",
+                                                       payment_info="삼성카드", payment_date=payment_date,
+                                                       refund_amount=10000, refund_date=refund_date)
+        self.wasted_car_payment = Payment.objects.create(indemnity_amount=100000,
+                                                         discount_amount=10000, payment_type="카드",
+                                                         payment_info="현대카드", payment_date=payment_date,
+                                                         refund_amount=10000, refund_date=refund_date)
+
+        self.wash_car = WashCar.objects.create(
+            payment=self.wash_car_payment, deposit=self.wash_car_deposit,
+            charge=self.wash_car_charge, note="test 비고"
+        )
+        self.wasted = Wasted.objects.create(
+            payment=self.wasted_car_payment, deposit=self.wasted_car_deposit,
+            charge=self.wash_car_charge, note="test 비고"
+        )
+
     def setUpAbsentCase(self):
-        payment_date = datetime.strptime("2023-04-19", '%Y-%m-%d').date()
-        refund_date = datetime.strptime("2023-04-19", '%Y-%m-%d').date()
+        payment_date = string_to_date("2023-04-19")
+        refund_date = string_to_date("2023-04-19")
         self.no_insurance_payment = Payment.objects.create(indemnity_amount=100000,
                                                            discount_amount=10000, payment_type="카드",
                                                            payment_info="신한카드", payment_date=payment_date,
@@ -62,7 +93,7 @@ class ModelTest(TestCase):
                                                        payment_info="신한카드", payment_date=payment_date,
                                                        refund_amount=10000, refund_date=refund_date)
 
-        charge_date = datetime.strptime("2023-04-19", '%Y-%m-%d').date()
+        charge_date = string_to_date("2023-04-19")
         self.no_insurance_charge = Charge.objects.create(charge_date=charge_date,
                                                          repair_amount=100000, component_amount=20000,
                                                          indemnity_amount=10000)
@@ -70,7 +101,7 @@ class ModelTest(TestCase):
                                                      repair_amount=100000, component_amount=20000,
                                                      indemnity_amount=10000)
 
-        deposit_date = datetime.strptime("2023-04-19", '%Y-%m-%d').date()
+        deposit_date = string_to_date("2023-04-19")
         self.no_insurance_deposit = Deposit.objects.create(deposit_date=deposit_date,
                                                            deposit_amount=100000)
         self.no_order_deposit = Deposit.objects.create(deposit_date=deposit_date,
