@@ -10,7 +10,7 @@ from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
 from demand.utility import (check_car_number,
                             check_effective_line_numbers_have_same_car_number,
                             check_effective_line_numbers_have_unique_RO_number,
-                            get_effective_data_frame,
+                            check_wash_car, get_effective_data_frame,
                             get_effective_line_numbers,
                             get_effective_row_numbers, input_to_date,
                             load_data, string_to_date)

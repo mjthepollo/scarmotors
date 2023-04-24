@@ -10,7 +10,7 @@ from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
 from demand.utility import (END,
                             check_effective_line_numbers_have_same_car_number,
                             check_effective_line_numbers_have_unique_RO_number,
-                            get_effective_data_frame,
+                            check_wash_car, get_effective_data_frame,
                             get_effective_line_numbers,
                             get_effective_row_numbers, input_to_date,
                             load_data, string_to_date)
@@ -41,6 +41,12 @@ class DataLoadTest(TestCase):
         assert get_effective_row_numbers(self.original_df2) == num_rows2
         assert "부품매출" == list(self.effective_df1.columns)[-1]
         assert "부품매출" == list(self.effective_df2.columns)[-1]
+
+    def test_check_wash_car(self):
+        assert not check_wash_car(self.effective_df1, 1)
+        assert not check_wash_car(self.effective_df1, 10)
+        assert check_wash_car(self.effective_df2, 659)
+        assert check_wash_car(self.effective_df2, 671)
 
     def test_get_effective_line_numbers(self):
         check_effective_line_numbers_have_unique_RO_number(self.effective_df1)

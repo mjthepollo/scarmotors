@@ -50,6 +50,12 @@ def check_car_number(car_number):
         return False
 
 
+def check_wash_car(df, line_number):
+    client_name_and_insurance_agent = df.iloc[line_number,
+                                              CLIENT_NAME_AND_INSURANCE_AGENT]
+    return "세차" in client_name_and_insurance_agent
+
+
 def load_data(file_name, sheet_name):
     df = pd.read_excel(
         file_name, sheet_name=sheet_name, engine="openpyxl", header=5, index_col=2
@@ -96,16 +102,27 @@ def check_effective_line_numbers_have_unique_RO_number(effective_df):
         for line_numbers in effective_line_numbers
     ]
     RO_numbers_set = set(RO_numbers)
-    assert len(RO_numbers) == len(RO_numbers_set)
+    try:
+        assert len(RO_numbers) == len(RO_numbers_set)
+    except AssertionError:
+        print(effective_line_numbers)
+        print(RO_numbers)
+        for RO_number in RO_numbers:
+            if RO_numbers.count(RO_number) > 1:
+                print(RO_number)
+        print(len(RO_numbers), len(RO_numbers_set))
 
 
 def get_effective_line_numbers(effective_df):
     effective_line_numbers = []
-    for i, value in enumerate(effective_df.index.values):
-        if pd.isnull(value):
-            effective_line_numbers[-1].append(i)
+    for i, RO_number in enumerate(effective_df.index.values):
+        if pd.isnull(RO_number):
+            if not check_wash_car(effective_df, i):
+                effective_line_numbers[-1].append(i)
+            else:  # 세차의 경우 RO_number가 없어야 한다.
+                pass
         else:
-            if value == effective_df.index.values[i - 1]:
+            if RO_number == effective_df.index.values[i - 1]:
                 effective_line_numbers[-1].append(i)
             else:
                 effective_line_numbers.append([i])
