@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime
 
 import numpy as np
@@ -39,6 +40,14 @@ def input_to_date(input_date):
         return string_to_date(input_date)
     else:
         raise Exception("ERROR : WRONG INPUT TYPE")
+
+
+def check_car_number(car_number):
+    pattern = r"^\d{1,3}[가-힣]{1}\d{3,4}$"
+    if re.match(pattern, car_number):
+        return True
+    else:
+        return False
 
 
 def load_data(file_name, sheet_name):
