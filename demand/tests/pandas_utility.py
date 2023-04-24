@@ -64,3 +64,9 @@ class UtilityTest(TestCase):
         assert len(get_effective_line_numbers(self.effective_df1)) == 157+24
         assert len(get_effective_line_numbers(
             self.effective_df2)) == 156+145+184+99
+
+    def test_make_order_from_effective_df(self):
+        pass
+
+    def test_make_order_from_first_line_number(self):
+        pass

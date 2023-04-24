@@ -46,13 +46,13 @@ class Payment(TimeStampedModel):
     refund_date = models.DateField(blank=True, null=True, verbose_name="환불일")
 
     def __str__(self):
-        if hasattr(self, "insurance"):
-            insurance = self.insurance
-            if insurance.order != None:
-                return f"{insurance.order.RO_number} 결제"
+        if hasattr(self, "order"):
+            order = self.order
+            if order.register != None:
+                return f"{order.register.RO_number} 결제"
             else:
-                return f"주문없음({self.pk}_보험:{insurance.pk})"
-        return f"보험없음({self.pk})"
+                return f"등록없음({self.pk}_주문:{order.pk})"
+        return f"주문없음({self.pk})"
 
 
 class Charge(TimeStampedModel):
@@ -65,14 +65,14 @@ class Charge(TimeStampedModel):
         return int((self.repair_amount + self.component_amount)*1.1) - self.indemnity_amount
 
     def __str__(self):
-        if hasattr(self, "insurance"):
-            insurance = self.insurance
-            if insurance.order != None:
-                return f"{insurance.order.RO_number} 청구"
+        if hasattr(self, "order"):
+            order = self.order
+            if order.register != None:
+                return f"{order.register.RO_number} 청구"
             else:
-                return f"주문없음({self.pk}_보험:{insurance.pk})"
+                return f"등록없음({self.pk}_주문:{order.pk})"
         else:
-            return f"보험없음({self.pk})"
+            return f"주문없음({self.pk})"
 
 
 class Deposit(TimeStampedModel):
@@ -80,54 +80,20 @@ class Deposit(TimeStampedModel):
     deposit_date = models.DateField(verbose_name="입금일")
 
     def get_payment_rate(self):
-        return round(self.deposit_amount/self.insurance.charge.get_charge_amount()*100)
+        return round(self.deposit_amount/self.order.charge.get_charge_amount()*100)
 
     def __str__(self):
-        if hasattr(self, "insurance"):
-            insurance = self.insurance
-            if insurance.order != None:
-                return f"{insurance.order.RO_number} 입금"
+        if hasattr(self, "order"):
+            order = self.order
+            if order.register != None:
+                return f"{order.register.RO_number} 입금"
             else:
-                return f"주문없음({self.pk}_보험:{insurance.pk})"
-        else:
-            return f"보험없음({self.pk})"
-
-
-class WashCar(TimeStampedModel):
-    payment = models.OneToOneField(
-        Payment, null=True, blank=True, related_name="washcar", verbose_name="결제", on_delete=models.CASCADE)
-    charge = models.OneToOneField(
-        Charge, null=True, blank=True, related_name="washcar", verbose_name="청구", on_delete=models.CASCADE)
-    deposit = models.OneToOneField(
-        Deposit, null=True, blank=True, related_name="washcar", verbose_name="입금", on_delete=models.CASCADE)
-
-    note = models.TextField(blank=True, null=True, verbose_name="비고")
-
-    def __str__(self):
-        if hasattr(self, "order"):
-            return f"{self.order.RO_number} 세차"
+                return f"등록없음({self.pk}_주문:{order.pk})"
         else:
             return f"주문없음({self.pk})"
 
 
-class Wasted(TimeStampedModel):
-    payment = models.OneToOneField(
-        Payment, null=True, blank=True, related_name="wasted", verbose_name="결제", on_delete=models.CASCADE)
-    charge = models.OneToOneField(
-        Charge, null=True, blank=True, related_name="wasted", verbose_name="청구", on_delete=models.CASCADE)
-    deposit = models.OneToOneField(
-        Deposit, null=True, blank=True, related_name="wasted", verbose_name="입금", on_delete=models.CASCADE)
-
-    note = models.TextField(blank=True, null=True, verbose_name="비고")
-
-    def __str__(self):
-        if hasattr(self, "order"):
-            return f"{self.order.RO_number} 폐차"
-        else:
-            return f"주문없음({self.pk})"
-
-
-class Order(TimeStampedModel):
+class Register(TimeStampedModel):
     RO_number = models.CharField(verbose_name="RO번호", max_length=10)
     car_number = models.CharField(verbose_name="차량번호", max_length=20)
     day_came_in = models.DateField(verbose_name="입고일")
@@ -146,7 +112,7 @@ class Order(TimeStampedModel):
         null=True, blank=True,
         default=0, verbose_name="교환 작업판수")
     supporter = models.ForeignKey(
-        Supporter, verbose_name="입고지원", blank=True, null=True, on_delete=models.SET_NULL, related_name="orders")
+        Supporter, verbose_name="입고지원", blank=True, null=True, on_delete=models.SET_NULL, related_name="registers")
     client_name = models.CharField(verbose_name="고객명", max_length=30)
     insurance_agent = models.ForeignKey(
         InsuranceAgent, related_name="orders", null=True, on_delete=models.SET_NULL, verbose_name="보험 담당자")
@@ -154,10 +120,8 @@ class Order(TimeStampedModel):
     rentcar_company_name = models.CharField(
         blank=True, null=True, max_length=100, verbose_name="렌트 업체명")
     unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
-    wash_car = models.OneToOneField(
-        WashCar, null=True, blank=True, related_name="order", verbose_name="세차", on_delete=models.CASCADE)
-    wasted = models.OneToOneField(
-        Wasted, null=True, blank=True, related_name="order", verbose_name="폐차", on_delete=models.CASCADE)
+    wash_car = models.BooleanField(default=False, verbose_name="세차")
+    wasted = models.BooleanField(default=False, verbose_name="폐차")
     note = models.TextField(
         blank=True, null=True, verbose_name="메모")
 
@@ -172,19 +136,19 @@ class Order(TimeStampedModel):
         return f"{current_month}-{current_number}"
 
     def set_RO_number(self):
-        self.RO_number = Order.get_RO_number()
+        self.RO_number = Register.get_RO_number()
         self.save()
 
     def __str__(self):
         return f"{self.car_number}/{self.phone_number}"
 
 
-class Insurance(TimeStampedModel):
-    order = models.ForeignKey(
-        Order, null=True, on_delete=models.CASCADE, verbose_name="주문", related_name="insurances")
+class Order(TimeStampedModel):
+    register = models.ForeignKey(
+        Register, null=True, on_delete=models.CASCADE, verbose_name="등록", related_name="orders")
     charged_company = models.ForeignKey(
         ChargedCompany, related_name="orders", verbose_name="담당 업체명", on_delete=models.CASCADE)
-    insurance_type = models.CharField(choices=(
+    order_type = models.CharField(choices=(
         ("자차", "자차"), ("대물", "대물"), ("일반", "일반")), max_length=10, verbose_name="차/대/일")
     charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정", "일반경정"), (
         "일반판도", "일반판도"), ("렌트판도", "렌트판도"), ("렌트일반", "렌트일반"),
@@ -194,13 +158,13 @@ class Insurance(TimeStampedModel):
     fault_ratio = models.IntegerField(verbose_name="과실분")
 
     payment = models.OneToOneField(
-        Payment, null=True, blank=True, related_name="insurance", verbose_name="결제", on_delete=models.CASCADE)
+        Payment, null=True, blank=True, related_name="order", verbose_name="결제", on_delete=models.CASCADE)
     charge = models.OneToOneField(
-        Charge, null=True, blank=True, related_name="insurance", verbose_name="청구", on_delete=models.CASCADE)
+        Charge, null=True, blank=True, related_name="order", verbose_name="청구", on_delete=models.CASCADE)
     deposit = models.OneToOneField(
-        Deposit, null=True, blank=True, related_name="insurance", verbose_name="입금", on_delete=models.CASCADE)
+        Deposit, null=True, blank=True, related_name="order", verbose_name="입금", on_delete=models.CASCADE)
 
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
     def __str__(self):
-        return f"{self.order.RO_number} {self.insurance_type} {self.charge_type}"
+        return f"{self.register.RO_number} {self.order_type} {self.charge_type}"

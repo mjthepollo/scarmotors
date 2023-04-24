@@ -11,10 +11,10 @@ from core import core_views
 urlpatterns = [
     path("", core_views.home, name="home"),
     path("login/", core_views.login, name="login"),
-    path("new_order/", core_views.new_order, name="new_order"),
-    path("edit_order/", core_views.edit_order, name="edit_order"),
-    path("finish_order/", core_views.finish_order, name="finish_order"),
-    path("search_orders/", core_views.search_orders, name="search_orders"),
+    path("new_register/", core_views.new_register, name="new_register"),
+    path("edit_register/", core_views.edit_register, name="edit_register"),
+    path("finish_register/", core_views.finish_register, name="finish_register"),
+    path("search_registers/", core_views.search_registers, name="search_registers"),
     path("demand/", include("demand.urls", namespace="demand")),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),

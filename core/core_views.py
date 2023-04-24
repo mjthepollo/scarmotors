@@ -9,10 +9,10 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from demand.forms import (ChargedCompanyForm, ChargeForm, InsuranceAgentForm,
-                          InsuranceForm, NewOrderForm, PaymentForm,
+                          NewRegisterForm, OrderForm, PaymentForm,
                           SupporterForm)
-from demand.models import (Charge, ChargedCompany, Insurance, InsuranceAgent,
-                           Order, Payment, Supporter)
+from demand.models import (Charge, ChargedCompany, InsuranceAgent, Order,
+                           Payment, Register, Supporter)
 from users.models import User
 
 
@@ -38,93 +38,93 @@ def home(request):
 
 
 @login_required
-def new_order(request):
-    order_form = NewOrderForm(initial={
+def new_register(request):
+    register_form = NewRegisterForm(initial={
         'car_number': "TEST",
         'day_came_in': date.today()})
-    insurance_form_factory = modelformset_factory(
-        Insurance, form=InsuranceForm, extra=1)
+    order_form_factory = modelformset_factory(
+        Order, form=OrderForm, extra=1)
     if request.method == "GET":
-        insurance_formset = insurance_form_factory(
-            queryset=Insurance.objects.none())
-        return render(request, "new_order.html", context={
-            "order_form": order_form,
-            "insurance_formset": insurance_formset,
+        order_formset = order_form_factory(
+            queryset=Order.objects.none())
+        return render(request, "new_register.html", context={
+            "register_form": register_form,
+            "order_formset": order_formset,
         })
     else:
-        order_form = NewOrderForm(request.POST)
-        insurance_formset = insurance_form_factory(
-            request.POST, queryset=Insurance.objects.none())
-        if order_form.is_valid():
-            order = order_form.save()
-            if insurance_formset.is_valid():
-                insurnaces = insurance_formset.save()
-                for insurance in insurnaces:
-                    insurance.order = order
-                    insurance.save()
-                order.RO_number = Order.get_RO_number()
-                order.save()
-                return redirect(reverse("edit_order")+"?RO_number="+order.RO_number)
+        register_form = NewRegisterForm(request.POST)
+        order_formset = order_form_factory(
+            request.POST, queryset=Order.objects.none())
+        if register_form.is_valid():
+            register = register_form.save()
+            if order_formset.is_valid():
+                orders = order_formset.save()
+                for order in orders:
+                    order.register = register
+                    order.save()
+                register.RO_number = Register.get_RO_number()
+                register.save()
+                return redirect(reverse("edit_register")+"?RO_number="+Register.RO_number)
             else:
-                order.delete()
-                return render(request, "new_order.html", context={
-                    "order_form": order_form,
-                    "insurance_formset": insurance_formset,
+                register.delete()
+                return render(request, "new_register.html", context={
+                    "register_form": register_form,
+                    "order_formset": order_formset,
                 })
         else:
-            return render(request, "new_order.html", context={
-                "order_form": order_form,
-                "insurance_formset": insurance_formset,
+            return render(request, "new_register.html", context={
+                "register_form": register_form,
+                "order_formset": order_formset,
             })
 
 
 @login_required
-def edit_order(request):
+def edit_register(request):
     RO_number = request.GET.get("RO_number")
-    order = Order.objects.get(RO_number=RO_number)
-    order_form = NewOrderForm(instance=order)
-    insurance_form_factory = modelformset_factory(
-        Insurance, form=InsuranceForm, extra=0)
+    register = Register.objects.get(RO_number=RO_number)
+    register_form = NewRegisterForm(instance=register)
+    order_form_factory = modelformset_factory(
+        Order, form=OrderForm, extra=0)
     if request.method == "GET":
-        insurance_formset = insurance_form_factory(
-            queryset=order.insurances.all())
-        return render(request, "edit_order.html", context={
-            "order_form": order_form,
-            "insurance_formset": insurance_formset,
+        order_formset = order_form_factory(
+            queryset=register.orders.all())
+        return render(request, "edit_register.html", context={
+            "register_form": register_form,
+            "order_formset": order_formset,
         })
     else:
-        order_form = NewOrderForm(request.POST, instance=order)
-        insurance_formset = insurance_form_factory(
-            request.POST, queryset=order.insurances.all())
-        if order_form.is_valid():
-            order = order_form.save()
-            if insurance_formset.is_valid():
-                insurnaces = insurance_formset.save()
-                for insurance in insurnaces:
-                    insurance.order = order
-                    insurance.save()
-                order.save()
+        register_form = NewRegisterForm(request.POST, instance=register)
+        order_formset = order_form_factory(
+            request.POST, queryset=register.orders.all())
+        if register_form.is_valid():
+            register = register_form.save()
+            if order_formset.is_valid():
+                orders = order_formset.save()
+                for order in orders:
+                    order.register = register
+                    order.save()
+                register.save()
                 return redirect(reverse("home"))
             else:
-                return render(request, "edit_order.html", context={
-                    "order_form": order_form,
-                    "insurance_formset": insurance_formset,
+                return render(request, "edit_register.html", context={
+                    "register_form": register_form,
+                    "order_formset": order_formset,
                 })
         else:
-            return render(request, "edit_order.html", context={
-                "order_form": order_form,
-                "insurance_formset": insurance_formset,
+            return render(request, "edit_register.html", context={
+                "register_form": register_form,
+                "order_formset": order_formset,
             })
 
 
 @ login_required
-def finish_order(request):
+def finish_register(request):
     pass
 
 
 @ login_required
-def search_orders(request):
-    return render(request, "search_orders.html")
+def search_registers(request):
+    return render(request, "search_registers.html")
 # 차량번호 검색
 # RO 번호 검색
 #

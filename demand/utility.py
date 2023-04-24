@@ -3,8 +3,8 @@ from datetime import date, datetime
 import numpy as np
 import pandas as pd
 
-from demand.models import (Charge, ChargedCompany, Deposit, Insurance,
-                           InsuranceAgent, Order, Payment, Supporter, WashCar,
+from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                           Order, Payment, Register, Supporter, WashCar,
                            Wasted)
 
 END = 56
@@ -104,10 +104,17 @@ def get_effective_line_numbers(effective_df):
     return effective_line_numbers
 
 
+def get_clinet_name_and_insurance_agent_name(first_line):
+    if "/" in first_line[CLIENT_NAME_AND_INSURANCE_AGENT]:
+        return first_line[CLIENT_NAME_AND_INSURANCE_AGENT].split("/")
+    elif "담당" == first_line[CLIENT_NAME_AND_INSURANCE_AGENT][-2:]:
+        return "", first_line[CLIENT_NAME_AND_INSURANCE_AGENT][:-2]
+
+
 def make_order_from_first_line_number(first_line):
     supporter = Supporter.objects.get_or_create(name=first_line[SUPPORTER])
-    client_name, insurance_agent_name = first_line[CLIENT_NAME_AND_INSURANCE_AGENT].split(
-        "/")
+    client_name, insurance_agent_name = get_clinet_name_and_insurance_agent_name(
+        first_line)
     insurance_agent = InsuranceAgent.objects.get_or_create(
         name=insurance_agent_name)
     return Order.objects.create(

@@ -1,7 +1,7 @@
 from django import forms
 
-from demand.models import (Charge, ChargedCompany, Deposit, Insurance,
-                           InsuranceAgent, Order, Payment, Supporter)
+from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                           Order, Payment, Register, Supporter)
 
 
 class SupporterForm(forms.ModelForm):
@@ -38,7 +38,7 @@ class ChargeForm(forms.ModelForm):
         fields = "__all__"
 
 
-class NewOrderForm(forms.ModelForm):
+class NewRegisterForm(forms.ModelForm):
     class Meta:
         model = Order
         exclude = ["RO_number", "real_day_came_out"]
@@ -49,10 +49,10 @@ class NewOrderForm(forms.ModelForm):
         }
 
 
-class InsuranceForm(forms.ModelForm):
+class OrderForm(forms.ModelForm):
     class Meta:
-        model = Insurance
-        exclude = ["order", "payment", "charge"]
+        model = Order
+        exclude = ["register", "payment", "charge"]
 
 
 class DepositForm(forms.ModelForm):
