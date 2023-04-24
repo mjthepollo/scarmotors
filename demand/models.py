@@ -36,13 +36,13 @@ class Payment(TimeStampedModel):
         blank=True, null=True, verbose_name="면책금")
     discount_amount = models.IntegerField(
         blank=True, null=True, verbose_name="할인금")
+    refund_amount = models.IntegerField(
+        blank=True, null=True, verbose_name="환불액")
     payment_type = models.CharField(blank=True, null=True, max_length=30, choices=(
         ("카드", "카드"), ("현금", "현금"), ("은행", "은행")), verbose_name="결제형태")
     payment_info = models.CharField(
-        blank=True, null=True, max_length=60, verbose_name="카드/은행")
+        blank=True, null=True, max_length=60, verbose_name="은행사/카드사")
     payment_date = models.DateField(blank=True, null=True, verbose_name="결제일")
-    refund_amount = models.IntegerField(
-        blank=True, null=True, verbose_name="환불액")
     refund_date = models.DateField(blank=True, null=True, verbose_name="환불일")
 
     def __str__(self):
@@ -63,10 +63,17 @@ class Charge(TimeStampedModel):
     charge_date = models.DateField(verbose_name="청구일")
     repair_amount = models.IntegerField(default=0, verbose_name="공임비")
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
-    indemnity_amount = models.IntegerField(default=0, verbose_name="면책금")
+
+    def get_indemnity_amount(self):
+        if hasattr(self, "order"):
+            return self.order.payment.indemnity_amount
+        elif hasattr(self, "extra_sales"):
+            return self.extra_sales.payment.indemnity_amount
+        else:
+            raise Exception("Charge에 order나 extra_sales가 없습니다.")
 
     def get_charge_amount(self):
-        return int((self.repair_amount + self.component_amount)*1.1) - self.indemnity_amount
+        return int((self.repair_amount + self.component_amount)*1.1) - self.get_indemnity_amount()
 
     def __str__(self):
         if hasattr(self, "order"):
@@ -123,15 +130,16 @@ class Register(TimeStampedModel):
         default=0, verbose_name="교환 작업판수")
     supporter = models.ForeignKey(
         Supporter, verbose_name="입고지원", blank=True, null=True, on_delete=models.SET_NULL, related_name="registers")
-    client_name = models.CharField(verbose_name="고객명", max_length=30)
+    client_name = models.CharField(
+        blank=True, null=True, verbose_name="고객명", max_length=30)
     insurance_agent = models.ForeignKey(
         InsuranceAgent, related_name="orders", null=True, on_delete=models.SET_NULL, verbose_name="보험 담당자")
     phone_number = models.CharField(verbose_name="전화번호", max_length=15)
-    rentcar_company_name = models.CharField(
-        blank=True, null=True, max_length=100, verbose_name="렌트 업체명")
     unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
     wash_car = models.BooleanField(default=False, verbose_name="세차")
     wasted = models.BooleanField(default=False, verbose_name="폐차")
+    rentcar_company_name = models.CharField(
+        blank=True, null=True, max_length=100, verbose_name="렌트 업체명")
     note = models.TextField(
         blank=True, null=True, verbose_name="메모")
 
@@ -158,11 +166,11 @@ class Order(TimeStampedModel):
         Register, null=True, on_delete=models.CASCADE, verbose_name="등록", related_name="orders")
     charged_company = models.ForeignKey(
         ChargedCompany, related_name="orders", verbose_name="담당 업체명", on_delete=models.CASCADE)
-    order_type = models.CharField(choices=(
-        ("자차", "자차"), ("대물", "대물"), ("일반", "일반")), max_length=10, verbose_name="차/대/일")
     charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정", "일반경정"), (
         "일반판도", "일반판도"), ("렌트판도", "렌트판도"), ("렌트일반", "렌트일반"),
         ("인정매출", "인정매출")), max_length=20, verbose_name="구분")
+    order_type = models.CharField(choices=(
+        ("자차", "자차"), ("대물", "대물"), ("일반", "일반")), max_length=10, verbose_name="차/대/일")
     receipt_number = models.CharField(
         max_length=20, verbose_name="접수번호", unique=True)
     fault_ratio = models.IntegerField(verbose_name="과실분")

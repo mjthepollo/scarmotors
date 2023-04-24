@@ -7,13 +7,12 @@ from django.test import TestCase
 
 from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
                            Order, Payment, Register, Supporter)
-from demand.utility import (END,
-                            check_effective_line_numbers_have_same_car_number,
-                            check_effective_line_numbers_have_unique_RO_number,
-                            check_wash_car, get_effective_data_frame,
-                            get_effective_line_numbers,
-                            get_effective_row_numbers, input_to_date,
-                            load_data, string_to_date)
+from demand.utility import (
+    END, check_line_numbers_for_registers_have_same_car_number,
+    check_line_numbers_for_registers_have_unique_RO_number, check_wash_car,
+    get_client_name_and_insurance_agent_name, get_effective_data_frame,
+    get_effective_row_numbers, get_line_numbers_for_registers, input_to_date,
+    load_data, string_to_date)
 
 
 class DataLoadTest(TestCase):
@@ -49,10 +48,15 @@ class DataLoadTest(TestCase):
         assert check_wash_car(self.effective_df2, 671)
 
     def test_get_effective_line_numbers(self):
-        check_effective_line_numbers_have_unique_RO_number(self.effective_df1)
-        check_effective_line_numbers_have_unique_RO_number(self.effective_df2)
-        check_effective_line_numbers_have_same_car_number(self.effective_df1)
-        check_effective_line_numbers_have_same_car_number(self.effective_df2)
-        assert len(get_effective_line_numbers(self.effective_df1)) == 157+24
-        assert len(get_effective_line_numbers(
+        check_line_numbers_for_registers_have_same_car_number(
+            self.effective_df1)
+        check_line_numbers_for_registers_have_same_car_number(
+            self.effective_df2)
+        check_line_numbers_for_registers_have_unique_RO_number(
+            self.effective_df1)
+        check_line_numbers_for_registers_have_unique_RO_number(
+            self.effective_df2)
+        assert len(get_line_numbers_for_registers(
+            self.effective_df1)) == 157+24
+        assert len(get_line_numbers_for_registers(
             self.effective_df2)) == 156+145+184+99

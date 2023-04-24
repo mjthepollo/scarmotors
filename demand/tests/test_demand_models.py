@@ -18,19 +18,18 @@ class ModelTest(TestCase):
 
         payment_date = string_to_date("2023-04-20")
         refund_date = string_to_date("2023-04-20")
-        self.payment = Payment.objects.create(indemnity_amount=100000,
+        self.payment = Payment.objects.create(indemnity_amount=50000,
                                               discount_amount=10000, payment_type="카드",
                                               payment_info="신한카드", payment_date=payment_date,
                                               refund_amount=10000, refund_date=refund_date)
 
         charge_date = string_to_date("2023-04-20")
         self.charge = Charge.objects.create(charge_date=charge_date,
-                                            repair_amount=100000, component_amount=20000,
-                                            indemnity_amount=10000)
+                                            repair_amount=100000, component_amount=20000)
 
         deposit_date = string_to_date("2023-04-20")
         self.deposit = Deposit.objects.create(deposit_date=deposit_date,
-                                              deposit_amount=100000)
+                                              deposit_amount=41000)
         day_came_in = string_to_date("2023-04-20")
         expected_day_came_out = datetime.strptime(
             "2023-04-25", '%Y-%m-%d').date()
@@ -65,11 +64,9 @@ class ModelTest(TestCase):
 
         charge_date = string_to_date("2023-04-19")
         self.no_order_charge = Charge.objects.create(charge_date=charge_date,
-                                                     repair_amount=100000, component_amount=20000,
-                                                     indemnity_amount=10000)
+                                                     repair_amount=100000, component_amount=20000)
         self.no_register_charge = Charge.objects.create(charge_date=charge_date,
-                                                        repair_amount=100000, component_amount=20000,
-                                                        indemnity_amount=10000)
+                                                        repair_amount=100000, component_amount=20000)
 
         deposit_date = string_to_date("2023-04-19")
         self.no_order_deposit = Deposit.objects.create(deposit_date=deposit_date,
@@ -89,13 +86,12 @@ class ModelTest(TestCase):
         refund_date = string_to_date("2023-03-19")
         charge_date = string_to_date("2023-03-19")
         deposit_date = string_to_date("2023-03-19")
-        self.extra_sales_payment = Payment.objects.create(indemnity_amount=100000,
+        self.extra_sales_payment = Payment.objects.create(indemnity_amount=50000,
                                                           discount_amount=10000, payment_type="카드",
                                                           payment_info="삼성카드", payment_date=payment_date,
                                                           refund_amount=10000, refund_date=refund_date)
         self.extra_sales_charge = Charge.objects.create(charge_date=charge_date,
-                                                        repair_amount=100000, component_amount=20000,
-                                                        indemnity_amount=10000)
+                                                        repair_amount=100000, component_amount=20000)
         self.extra_sales_deposit = Deposit.objects.create(deposit_date=deposit_date,
                                                           deposit_amount=100000)
 
@@ -153,10 +149,10 @@ class ModelTest(TestCase):
         self.assertEqual(str(self.order), "4-1234 자차 보험")
 
     def test_get_charge_amount(self):
-        self.assertEqual(self.charge.get_charge_amount(), 122000)
+        self.assertEqual(self.charge.get_charge_amount(), 82000)
 
     def test_get_payment_rate(self):
-        self.assertEqual(self.deposit.get_payment_rate(), 82)
+        self.assertEqual(self.deposit.get_payment_rate(), 50)
 
     def test_get_number_of_works(self):
         self.assertEqual(self.register.get_number_of_works(), 3)
