@@ -52,7 +52,8 @@ class Payment(TimeStampedModel):
                 return f"{order.register.RO_number} 결제"
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
-        return f"주문없음({self.pk})"
+        else:
+            return f"주문없음({self.pk})"
 
 
 class Charge(TimeStampedModel):

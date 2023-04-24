@@ -4,8 +4,7 @@ import numpy as np
 import pandas as pd
 
 from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
-                           Order, Payment, Register, Supporter, WashCar,
-                           Wasted)
+                           Order, Payment, Register, Supporter)
 
 END = 56
 DAY_CAME_IN = 2

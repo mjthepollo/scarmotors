@@ -80,7 +80,7 @@ class ModelTest(TestCase):
             charged_company=self.charged_company,
             order_type="자차", charge_type="보험",
             receipt_number="23-2345", fault_ratio=80,
-            payment=self.no_order_payment, charge=self.no_order_charge, deposit=self.no_order_deposit,
+            payment=self.no_register_payment, charge=self.no_register_charge, deposit=self.no_register_deposit,
             note="test 비고"
         )
 
@@ -96,32 +96,32 @@ class ModelTest(TestCase):
     def test_payment_str(self):
         self.setUpAbsentCase()
         self.assertEqual(str(self.payment), "4-1234 결제")
+        self.assertEqual(str(self.no_register_payment),
+                         f"등록없음({self.no_register_payment.pk}_주문:{self.no_register_order.pk})")
         self.assertEqual(str(self.no_order_payment),
-                         f"주문없음({self.no_order_payment.pk}_보험:{self.no_order_insurance.pk})")
-        self.assertEqual(str(self.no_insurance_payment),
-                         f"보험없음({self.no_insurance_payment.pk})")
+                         f"주문없음({self.no_order_payment.pk})")
 
     def test_charge_str(self):
         self.setUpAbsentCase()
         self.assertEqual(str(self.charge), "4-1234 청구")
+        self.assertEqual(str(self.no_register_charge),
+                         f"등록없음({self.no_register_charge.pk}_주문:{self.no_register_order.pk})")
         self.assertEqual(str(self.no_order_charge),
-                         f"주문없음({self.no_order_charge.pk}_보험:{self.no_order_insurance.pk})")
-        self.assertEqual(str(self.no_insurance_charge),
-                         f"보험없음({self.no_insurance_charge.pk})")
+                         f"주문없음({self.no_order_charge.pk})")
 
     def test_deposit_str(self):
         self.setUpAbsentCase()
         self.assertEqual(str(self.deposit), "4-1234 입금")
+        self.assertEqual(str(self.no_register_deposit),
+                         f"등록없음({self.no_register_deposit.pk}_주문:{self.no_register_order.pk})")
         self.assertEqual(str(self.no_order_deposit),
-                         f"주문없음({self.no_order_deposit.pk}_보험:{self.no_order_insurance.pk})")
-        self.assertEqual(str(self.no_order_deposit),
-                         f"보험없음({self.no_order_deposit.pk})")
+                         f"주문없음({self.no_order_deposit.pk})")
+
+    def test_register_str(self):
+        self.assertEqual(str(self.register), "12가1234/010-1234-5678")
 
     def test_order_str(self):
-        self.assertEqual(str(self.order), "12가1234/010-1234-5678")
-
-    def test_insurance_str(self):
-        self.assertEqual(str(self.insurance), "4-1234 자차 보험")
+        self.assertEqual(str(self.order), "4-1234 자차 보험")
 
     def test_get_charge_amount(self):
         self.assertEqual(self.charge.get_charge_amount(), 122000)
@@ -130,7 +130,7 @@ class ModelTest(TestCase):
         self.assertEqual(self.deposit.get_payment_rate(), 82)
 
     def test_get_number_of_works(self):
-        self.assertEqual(self.order.get_number_of_works(), 3)
+        self.assertEqual(self.register.get_number_of_works(), 3)
 
     def test_get_RO_number(self):
-        self.assertEqual(Order.get_RO_number(), "4-1")
+        self.assertEqual(Register.get_RO_number(), "4-1")
