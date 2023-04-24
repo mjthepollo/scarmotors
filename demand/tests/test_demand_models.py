@@ -2,8 +2,8 @@ from datetime import datetime
 
 from django.test import TestCase
 
-from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
-                           Order, Payment, Register, Supporter)
+from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
+                           InsuranceAgent, Order, Payment, Register, Supporter)
 from demand.utility import string_to_date
 
 
@@ -84,6 +84,26 @@ class ModelTest(TestCase):
             note="test 비고"
         )
 
+    def setUpExtraCase(self):
+        payment_date = string_to_date("2023-03-19")
+        refund_date = string_to_date("2023-03-19")
+        charge_date = string_to_date("2023-03-19")
+        deposit_date = string_to_date("2023-03-19")
+        self.extra_sales_payment = Payment.objects.create(indemnity_amount=100000,
+                                                          discount_amount=10000, payment_type="카드",
+                                                          payment_info="삼성카드", payment_date=payment_date,
+                                                          refund_amount=10000, refund_date=refund_date)
+        self.extra_sales_charge = Charge.objects.create(charge_date=charge_date,
+                                                        repair_amount=100000, component_amount=20000,
+                                                        indemnity_amount=10000)
+        self.extra_sales_deposit = Deposit.objects.create(deposit_date=deposit_date,
+                                                          deposit_amount=100000)
+
+        self.extra_sales = ExtraSales.objects.create(
+            payment=self.extra_sales_payment, charge=self.extra_sales_charge, deposit=self.extra_sales_deposit,
+            note="기타매출"
+        )
+
     def test_supporter_str(self):
         self.assertEqual(str(self.supporter), "test_supporter")
 
@@ -95,27 +115,36 @@ class ModelTest(TestCase):
 
     def test_payment_str(self):
         self.setUpAbsentCase()
+        self.setUpExtraCase()
         self.assertEqual(str(self.payment), "4-1234 결제")
         self.assertEqual(str(self.no_register_payment),
                          f"등록없음({self.no_register_payment.pk}_주문:{self.no_register_order.pk})")
         self.assertEqual(str(self.no_order_payment),
                          f"주문없음({self.no_order_payment.pk})")
+        self.assertEqual(str(self.extra_sales_payment),
+                         f"기타매출({self.extra_sales.pk}) 결제")
 
     def test_charge_str(self):
         self.setUpAbsentCase()
+        self.setUpExtraCase()
         self.assertEqual(str(self.charge), "4-1234 청구")
         self.assertEqual(str(self.no_register_charge),
                          f"등록없음({self.no_register_charge.pk}_주문:{self.no_register_order.pk})")
         self.assertEqual(str(self.no_order_charge),
                          f"주문없음({self.no_order_charge.pk})")
+        self.assertEqual(str(self.extra_sales_charge),
+                         f"기타매출({self.extra_sales.pk}) 청구")
 
     def test_deposit_str(self):
         self.setUpAbsentCase()
+        self.setUpExtraCase()
         self.assertEqual(str(self.deposit), "4-1234 입금")
         self.assertEqual(str(self.no_register_deposit),
                          f"등록없음({self.no_register_deposit.pk}_주문:{self.no_register_order.pk})")
         self.assertEqual(str(self.no_order_deposit),
                          f"주문없음({self.no_order_deposit.pk})")
+        self.assertEqual(str(self.extra_sales_deposit),
+                         f"기타매출({self.extra_sales.pk}) 입금")
 
     def test_register_str(self):
         self.assertEqual(str(self.register), "12가1234/010-1234-5678")

@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from django.test import TestCase
 
-from demand.models import (Charge, ChargedCompany, Deposit, Insurance,
-                           InsuranceAgent, Order, Payment, Supporter)
+from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                           Order, Payment, Register, Supporter)
 from demand.utility import (END,
                             check_effective_line_numbers_have_same_car_number,
                             check_effective_line_numbers_have_unique_RO_number,
@@ -16,7 +16,7 @@ from demand.utility import (END,
                             load_data, string_to_date)
 
 
-class UtilityTest(TestCase):
+class DataLoadTest(TestCase):
 
     def setUp(self):
         self.original_df1 = load_data("src/basic.xlsx", "23년 본사 상반기")
@@ -25,20 +25,6 @@ class UtilityTest(TestCase):
         self.original_df2 = load_data("src/230417.xlsx", "23년 본사 상반기")
         self.effective_df2 = get_effective_data_frame(
             "src/230417.xlsx", "23년 본사 상반기")
-
-    def test_string_to_date(self):
-        assert string_to_date(
-            "2019-01-01") == datetime.date(datetime(2019, 1, 1))
-        assert string_to_date(
-            "2019.01.01") == datetime.date(datetime(2019, 1, 1))
-
-    def test_input_to_date(self):
-        date_string = "2019.01.01"
-        timestamp = pd.Timestamp('2019-01-01')
-        date = datetime.date(datetime(2019, 1, 1))
-        assert input_to_date(date_string) == date
-        assert input_to_date(timestamp) == date
-        assert input_to_date(date) == date
 
     def test_load_data(self):
         assert type(pd.DataFrame()) == type(self.original_df1)
@@ -64,9 +50,3 @@ class UtilityTest(TestCase):
         assert len(get_effective_line_numbers(self.effective_df1)) == 157+24
         assert len(get_effective_line_numbers(
             self.effective_df2)) == 156+145+184+99
-
-    def test_make_order_from_effective_df(self):
-        pass
-
-    def test_make_order_from_first_line_number(self):
-        pass

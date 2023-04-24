@@ -53,7 +53,10 @@ class Payment(TimeStampedModel):
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
         else:
-            return f"주문없음({self.pk})"
+            if hasattr(self, "extra_sales"):
+                return f"기타매출({self.extra_sales.pk}) 결제"
+            else:
+                return f"주문없음({self.pk})"
 
 
 class Charge(TimeStampedModel):
@@ -73,7 +76,10 @@ class Charge(TimeStampedModel):
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
         else:
-            return f"주문없음({self.pk})"
+            if hasattr(self, "extra_sales"):
+                return f"기타매출({self.extra_sales.pk}) 청구"
+            else:
+                return f"주문없음({self.pk})"
 
 
 class Deposit(TimeStampedModel):
@@ -91,7 +97,10 @@ class Deposit(TimeStampedModel):
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
         else:
-            return f"주문없음({self.pk})"
+            if hasattr(self, "extra_sales"):
+                return f"기타매출({self.extra_sales.pk}) 입금"
+            else:
+                return f"주문없음({self.pk})"
 
 
 class Register(TimeStampedModel):
@@ -169,3 +178,16 @@ class Order(TimeStampedModel):
 
     def __str__(self):
         return f"{self.register.RO_number} {self.order_type} {self.charge_type}"
+
+
+class ExtraSales(TimeStampedModel):
+    payment = models.OneToOneField(
+        Payment, null=True, blank=True, related_name="extra_sales", verbose_name="결제", on_delete=models.CASCADE)
+    charge = models.OneToOneField(
+        Charge, null=True, blank=True, related_name="extra_sales", verbose_name="청구", on_delete=models.CASCADE)
+    deposit = models.OneToOneField(
+        Deposit, null=True, blank=True, related_name="extra_sales", verbose_name="입금", on_delete=models.CASCADE)
+    note = models.TextField(blank=True, null=True, verbose_name="비고")
+
+    def __str__(self):
+        return f"{self.note}, "
