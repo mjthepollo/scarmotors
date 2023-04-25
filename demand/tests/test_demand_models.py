@@ -93,12 +93,15 @@ class ModelTest(TestCase):
         self.extra_sales_charge = Charge.objects.create(charge_date=charge_date,
                                                         wage_amount=100000, component_amount=20000)
         self.extra_sales_deposit = Deposit.objects.create(deposit_date=deposit_date,
-                                                          deposit_amount=100000)
+                                                          deposit_amount=80000)
 
         self.extra_sales = ExtraSales.objects.create(
             payment=self.extra_sales_payment, charge=self.extra_sales_charge, deposit=self.extra_sales_deposit,
             note="기타매출"
         )
+
+    def test_get_work_days(self):
+        self.assertEqual(self.register.get_work_days(), 7)
 
     def test_supporter_str(self):
         self.assertEqual(str(self.supporter), "test_supporter")
@@ -149,10 +152,14 @@ class ModelTest(TestCase):
         self.assertEqual(str(self.order), "4-1234 자차 보험")
 
     def test_get_charge_amount(self):
-        self.assertEqual(self.charge.get_charge_amount(), 82000)
+        self.setUpExtraCase()
+        self.assertEqual(self.order.get_charge_amount(), 55600)
+        self.assertEqual(self.extra_sales.get_charge_amount(), 82000)
 
     def test_get_payment_rate(self):
-        self.assertEqual(self.deposit.get_payment_rate(), 50)
+        self.setUpExtraCase()
+        self.assertEqual(self.order.get_payment_rate(), 74)
+        self.assertEqual(self.extra_sales.get_payment_rate(), 98)
 
     def test_get_number_of_works(self):
         self.assertEqual(self.register.get_number_of_works(), 3)

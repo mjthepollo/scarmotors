@@ -79,7 +79,17 @@ class Charge(TimeStampedModel):
         return self.wage_amount+self.component_amount
 
     def get_charge_amount(self):
-        return int((self.get_repair_amount())*1.1) - self.get_indemnity_amount()
+        if hasattr(self, "order"):
+            sales = self.order
+        elif hasattr(self, "extra_sales"):
+            sales = self.extra_sales
+        if not sales:
+            raise Exception("Charge에 order나 extra_sales가 없습니다.")
+        charge_amount = sales.get_chargable_amount() - self.get_indemnity_amount()
+        if charge_amount > 0:
+            return charge_amount
+        else:
+            return 0
 
     def __str__(self):
         if hasattr(self, "order"):
@@ -150,6 +160,9 @@ class Register(TimeStampedModel):
     note = models.TextField(
         blank=True, null=True, verbose_name="메모")
 
+    def get_work_days(self):
+        return (self.real_day_came_out - self.day_came_in).days
+
     def get_number_of_works(self):
         return self.number_of_exchange_works + self.number_of_repair_works
 
@@ -192,12 +205,14 @@ class Order(TimeStampedModel):
 
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
+    def get_charge_amount(self):
+        return self.charge.get_charge_amount()
+
+    def get_payment_rate(self):
+        return round(self.deposit.deposit_amount/self.get_charge_amount()*100)
+
     def get_chargable_amount(self):
         if self.charge:
-            print("COMPONENT_AMOUNT: ", self.charge.component_amount)
-            print("WAGE_AMOUNT: ", self.charge.wage_amount)
-            print("INDEMNITY_AMOUNT: ", self.charge.get_indemnity_amount())
-            print(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
             return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
         else:
             None
@@ -214,6 +229,18 @@ class ExtraSales(TimeStampedModel):
     deposit = models.OneToOneField(
         Deposit, null=True, blank=True, related_name="extra_sales", verbose_name="입금", on_delete=models.CASCADE)
     note = models.TextField(blank=True, null=True, verbose_name="비고")
+
+    def get_charge_amount(self):
+        return self.charge.get_charge_amount()
+
+    def get_payment_rate(self):
+        return round(self.deposit.deposit_amount/self.get_charge_amount()*100)
+
+    def get_chargable_amount(self):
+        if self.charge:
+            return round(self.charge.get_repair_amount()*1.1)
+        else:
+            None
 
     def __str__(self):
         return f"{self.note}, "

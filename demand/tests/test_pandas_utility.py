@@ -16,8 +16,8 @@ from demand.utility import (check_car_number, check_wash_car,
                             input_to_date, input_to_phone_number, int_or_none,
                             load_data, make_complete_register_for_line_numbers,
                             make_order_payment_charge_and_deposit_with_line,
-                            make_register_from_first_line_number, str_or_none,
-                            string_to_date)
+                            make_register_from_first_line_number, print_fields,
+                            str_or_none, string_to_date)
 
 
 class UtilityTest(TestCase):
@@ -141,42 +141,18 @@ class UtilityTest(TestCase):
             assert object_to_tuple == test_answers[i]
         assert Register.objects.count() == 5
 
+    def check_chargable_amount(self, chargable_amount_list):
+        for i, register in enumerate(self.registers):
+            if chargable_amount_list[i]:
+                assert register.orders.first().get_chargable_amount() - \
+                    chargable_amount_list[i] < 10
+            else:
+                assert register.orders.first().get_chargable_amount() == None
+
     def test_make_order_payment_charge_and_deposit_wtih_line(self):
         for i in range(len(self.first_lines)):
             make_order_payment_charge_and_deposit_with_line(
                 self.first_lines[i], self.registers[i])
-        for register in self.registers:
-            payment = register.orders.first().payment
-            charge = register.orders.first().charge
-            deposit = register.orders.first().deposit
-            if payment:
-                print("PAYMENT",
-                      payment.indemnity_amount,
-                      payment.discount_amount,
-                      payment.refund_amount,
-                      payment.payment_type,
-                      payment.payment_info,
-                      payment.payment_date,
-                      payment.refund_date,
-                      )
-            if charge:
-                print("CHARGE",
-                      charge.charge_date,
-                      charge.wage_amount,
-                      charge.component_amount,
-                      )
-            if deposit:
-                print("DEPOSIT",
-                      deposit.deposit_date,
-                      deposit.deposit_amount,
-                      )
 
-        assert self.registers[0].orders.first(
-        ).get_chargable_amount() - 248741 < 10
-        assert self.registers[1].orders.first(
-        ).get_chargable_amount() - 624999 < 10
-        assert self.registers[2].orders.first().get_chargable_amount() == None
-        assert self.registers[3].orders.first(
-        ).get_chargable_amount() - 2555500 < 10
-        assert self.registers[4].orders.first(
-        ).get_chargable_amount() - 10000 < 10
+        chargable_amount_list = [248741, 624999, None, 2555500, 10000]
+        self.check_chargable_amount(chargable_amount_list)

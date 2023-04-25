@@ -8,7 +8,7 @@ from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
                            InsuranceAgent, Order, Payment, Register, Supporter)
 
 HEADER = 5
-END = 57
+
 RO_NUMBER = 2
 DAY_CAME_IN = 3
 EXPECTED_DAY_CAME_OUT = 4
@@ -44,6 +44,21 @@ CHARGE_AMOUNT = 35
 DEPOSIT_DATE = 37
 DEPOSIT_AMOUNT = 38
 NOTE = 46
+STATUS = 47
+END = 57
+
+
+def print_fields(obj):
+    except_fields = ["updated", "created", "id"]
+    model = obj._meta.model
+    fields = model._meta.fields
+    field_names = [field.name for field in fields]
+    print(model.__name__)
+    obj_dict = {}
+    for field_name in field_names:
+        if not field_name in except_fields:
+            obj_dict[field_name] = str(obj.__dict__[field_name])
+    print(obj_dict)
 
 
 def int_or_none(input_data):

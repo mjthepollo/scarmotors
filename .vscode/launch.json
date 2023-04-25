@@ -1,0 +1,11 @@
+{
+  "name": "Python: Pytest",
+  "type": "python",
+  "request": "launch",
+  "module": "pytest",
+  "args": [],
+  "cwd": "${workspaceFolder}",
+  "env": {
+    "PYTHONPATH": "${workspaceFolder}:${workspaceFolder}/app"
+  }
+}
