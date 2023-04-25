@@ -201,10 +201,7 @@ def check_line_numbers_for_registers_have_same_car_number(effective_df):
 
 def check_line_numbers_for_registers_have_unique_RO_number(effective_df):
     line_numbers_for_registers = get_line_numbers_for_registers(effective_df)
-    RO_numbers = [
-        effective_df.index.values[line_numbers[0]]
-        for line_numbers in line_numbers_for_registers
-    ]
+    RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
     RO_numbers_set = set(RO_numbers)
     try:
         assert len(RO_numbers) == len(RO_numbers_set)
@@ -218,19 +215,30 @@ def check_line_numbers_for_registers_have_unique_RO_number(effective_df):
 
 
 def get_line_numbers_for_registers(effective_df):
+    RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
     line_numbers_for_registers = []
-    for i, RO_number in enumerate(effective_df.index.values):
+    for i, RO_number in enumerate(RO_numbers):
         if pd.isnull(RO_number):
             if not check_wash_car(effective_df, i):
                 line_numbers_for_registers[-1].append(i)
             else:  # 세차의 경우 RO_number가 없어야 한다.
                 pass
         else:
-            if RO_number == effective_df.index.values[i - 1]:
+            if RO_number == RO_numbers[i - 1]:
                 line_numbers_for_registers[-1].append(i)
             else:
                 line_numbers_for_registers.append([i])
     return line_numbers_for_registers
+
+
+def get_line_numbers_for_extra_sales(effective_df):
+    line_numbers_for_extra_sales = []
+    RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
+    for i, RO_number in enumerate(RO_numbers):
+        if pd.isnull(RO_number):
+            if check_wash_car(effective_df, i):  # 현재는 세차만 고려한다.
+                line_numbers_for_extra_sales.append(i)
+    return line_numbers_for_extra_sales
 
 # -------------- tested by data_load_test finish--------------#
 
@@ -248,15 +256,67 @@ def get_client_name_and_insurance_agent_name(first_line):
         return None, None
 
 
+def create_order_from_line(line, register):
+    charged_company, _ = ChargedCompany.objects.get_or_create(
+        name=line[CHARGED_COMPANY])
+    fault_ratio = fault_ratio_to_int(line[FAULT_RATIO])
+    return Order.objects.create(
+        register=register,
+        charged_company=charged_company,
+        charge_type=line[CHARGE_TYPE],
+        order_type=line[ORDER_TYPE],
+        receipt_number=str_or_none(line[RECEIPT_NUMBER]),
+        fault_ratio=fault_ratio,
+    )
+
+
+def create_deposit_from_line(line, sales):
+    if line[DEPOSIT_DATE]:
+        deposit = Deposit.objects.create(
+            deposit_amount=int_or_none(line[DEPOSIT_AMOUNT]),
+            deposit_date=input_to_date(line[DEPOSIT_DATE]),
+        )
+        sales.deposit = deposit
+        sales.save()
+    else:
+        deposit = None
+    return deposit
+
+
+def create_charge_from_line(line, sales):
+    if line[CHARGE_DATE]:
+        charge = Charge.objects.create(
+            charge_date=input_to_date(line[CHARGE_DATE]),
+            wage_amount=zero_if_none(int_or_none(line[WAGE_AMOUNT])),
+            component_amount=zero_if_none(int_or_none(line[COMPONENT_AMOUNT])),
+        )
+        sales.charge = charge
+        sales.save()
+    else:
+        charge = None
+    return charge
+
+
+def create_payment_from_line(line, sales):
+    if line[INDEMNITY_AMOUNT]:
+        payment = Payment.objects.create(
+            indemnity_amount=int_or_none(line[INDEMNITY_AMOUNT]),
+            discount_amount=int_or_none(line[DISCOUNT_AMOUNT]),
+            refund_amount=int_or_none(line[REFUND_AMOUNT]),
+            payment_type=line[PAYMENT_TYPE],
+            payment_info=line[PAYMENT_INFO],
+            payment_date=input_to_date(input_to_date(line[PAYMENT_DATE])),
+            refund_date=get_refund_date(line)
+        )
+        sales.payment = payment
+        sales.save()
+    else:
+        payment = None
+    return payment
+
+
 def make_extra_sales_from_line(line):
     pass
-
-
-def make_extra_sales_from_effective_df(df):
-    for i in range(len(df)):
-        if check_wash_car(df, i):
-            line = df.iloc[i, :].values.tolist()
-            make_extra_sales_from_line(line)
 
 
 def make_register_from_first_line_number(first_line):
@@ -290,47 +350,10 @@ def make_register_from_first_line_number(first_line):
 
 
 def make_order_payment_charge_and_deposit_with_line(line, register):
-    charged_company, _ = ChargedCompany.objects.get_or_create(
-        name=line[CHARGED_COMPANY])
-    fault_ratio = fault_ratio_to_int(line[FAULT_RATIO])
-    order = Order.objects.create(
-        register=register,
-        charged_company=charged_company,
-        charge_type=line[CHARGE_TYPE],
-        order_type=line[ORDER_TYPE],
-        receipt_number=str_or_none(line[RECEIPT_NUMBER]),
-        fault_ratio=fault_ratio,
-    )
-    if line[INDEMNITY_AMOUNT]:
-        payment = Payment.objects.create(
-            indemnity_amount=int_or_none(line[INDEMNITY_AMOUNT]),
-            discount_amount=int_or_none(line[DISCOUNT_AMOUNT]),
-            refund_amount=int_or_none(line[REFUND_AMOUNT]),
-            payment_type=line[PAYMENT_TYPE],
-            payment_info=line[PAYMENT_INFO],
-            payment_date=input_to_date(input_to_date(line[PAYMENT_DATE])),
-            refund_date=get_refund_date(line)
-        )
-    else:
-        payment = None
-    if line[CHARGE_DATE]:
-        charge = Charge.objects.create(
-            charge_date=input_to_date(line[CHARGE_DATE]),
-            wage_amount=zero_if_none(int_or_none(line[WAGE_AMOUNT])),
-            component_amount=zero_if_none(int_or_none(line[COMPONENT_AMOUNT])),
-        )
-    else:
-        charge = None
-    if line[DEPOSIT_DATE]:
-        deposit = Deposit.objects.create(
-            deposit_amount=int_or_none(line[DEPOSIT_AMOUNT]),
-            deposit_date=input_to_date(line[DEPOSIT_DATE]),
-        )
-    else:
-        deposit = None
-    order.payment = payment
-    order.charge = charge
-    order.deposit = deposit
+    order = create_order_from_line(line, register)
+    create_charge_from_line(line, order)
+    create_deposit_from_line(line, order)
+    create_payment_from_line(line, order)
     order.save()
     return order
 
@@ -345,5 +368,9 @@ def make_complete_register_for_line_numbers(df, line_numbers):
 
 def make_order_from_effective_df(df):
     line_numbers_for_registers = get_line_numbers_for_registers(df)
+    line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(df)
     for line_numbers_for_register in line_numbers_for_registers:
-        make_complete_register_from_df(df, line_numbers_for_register)
+        make_complete_register_for_line_numbers(df, line_numbers_for_register)
+    for line_number in line_numbers_for_extra_sales:
+        line = df.iloc[line_number, :].values.tolist()
+        make_extra_sales_from_line(line)

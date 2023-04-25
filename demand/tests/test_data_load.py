@@ -10,9 +10,9 @@ from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
 from demand.utility import (
     END, check_line_numbers_for_registers_have_same_car_number,
     check_line_numbers_for_registers_have_unique_RO_number, check_wash_car,
-    get_client_name_and_insurance_agent_name, get_effective_data_frame,
-    get_effective_row_numbers, get_line_numbers_for_registers, input_to_date,
-    load_data, string_to_date)
+    get_effective_data_frame, get_effective_row_numbers,
+    get_line_numbers_for_extra_sales, get_line_numbers_for_registers,
+    input_to_date, load_data, string_to_date)
 
 
 class DataLoadTest(TestCase):
@@ -60,3 +60,8 @@ class DataLoadTest(TestCase):
             self.effective_df1)) == 157+24
         assert len(get_line_numbers_for_registers(
             self.effective_df2)) == 156+145+184+99
+
+    def test_get_line_numbers_for_extra_sales(self):
+        assert get_line_numbers_for_extra_sales(self.effective_df1) == []
+        assert get_line_numbers_for_extra_sales(
+            self.effective_df2) == [659, 671]
