@@ -322,24 +322,23 @@ def make_extra_sales_from_line(line):
     if insurance_agent_name:
         insurance_agent, _ = InsuranceAgent.objects.get_or_create(
             name=insurance_agent_name)
-    return ExtraSales.objects.create(
+    extra_sales = ExtraSales.objects.create(
         car_number=line[CAR_NUMBER],
         day_came_in=input_to_date(line[DAY_CAME_IN]),
         expected_day_came_out=input_to_date(line[EXPECTED_DAY_CAME_OUT]),
         real_day_came_out=input_to_date(line[REAL_DAY_CAME_OUT]),
         car_model=str(line[CAR_MODEL]),
         abroad_type=line[ABROAD_TYPE],
-        number_of_repair_works=zero_if_none(
-            line[NUMBER_OF_REPAIRS_WORKS]),
-        number_of_exchange_works=zero_if_none(
-            line[NUMBER_OF_EXCHANGE_WORKS]),
         supporter=supporter,
-        client_name=client_name,
         insurance_agent=insurance_agent,
+        client_name=client_name,
         phone_number=input_to_phone_number(line[PHONE_NUMBER]),
-        rentcar_company_name=line[RENT_CAR_COMPANY_NAME],
         note=line[NOTE],
     )
+    create_charge_from_line(line, extra_sales)
+    create_deposit_from_line(line, extra_sales)
+    create_payment_from_line(line, extra_sales)
+    return extra_sales
 
 
 def make_register_from_first_line_number(first_line):
