@@ -239,7 +239,9 @@ class ExtraSales(TimeStampedModel):
         null=True, blank=True,
         default=0, verbose_name="교환 작업판수")
     supporter = models.ForeignKey(
-        Supporter, verbose_name="입고지원", blank=True, null=True, on_delete=models.SET_NULL, related_name="extra_sales")
+        Supporter, verbose_name="입고지원", blank=True, null=True, on_delete=models.SET_NULL, related_name="all_extra_sales")
+    insurance_agent = models.ForeignKey(
+        InsuranceAgent, related_name="all_extra_sales", null=True, on_delete=models.SET_NULL, verbose_name="보험 담당자")
     client_name = models.CharField(
         blank=True, null=True, verbose_name="고객명", max_length=30)
     phone_number = models.CharField(

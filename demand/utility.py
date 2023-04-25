@@ -316,18 +316,41 @@ def create_payment_from_line(line, sales):
 
 
 def make_extra_sales_from_line(line):
-    pass
-
-
-def make_register_from_first_line_number(first_line):
     supporter, _ = Supporter.objects.get_or_create(name=first_line[SUPPORTER])
     client_name, insurance_agent_name = get_client_name_and_insurance_agent_name(
         first_line)
     if insurance_agent_name:
         insurance_agent, _ = InsuranceAgent.objects.get_or_create(
+    return Register.objects.create(
+        RO_number=first_line[RO_NUMBER],
+        car_number=first_line[CAR_NUMBER],
+        day_came_in=input_to_date(first_line[DAY_CAME_IN]),
+        expected_day_came_out=input_to_date(first_line[EXPECTED_DAY_CAME_OUT]),
+        real_day_came_out=input_to_date(first_line[REAL_DAY_CAME_OUT]),
+        car_model=str(first_line[CAR_MODEL]),
+        abroad_type=first_line[ABROAD_TYPE],
+        number_of_repair_works=zero_if_none(
+            first_line[NUMBER_OF_REPAIRS_WORKS]),
+        number_of_exchange_works=zero_if_none(
+            first_line[NUMBER_OF_EXCHANGE_WORKS]),
+        supporter=supporter,
+        client_name=client_name,
+        insurance_agent=insurance_agent,
+        phone_number=input_to_phone_number(first_line[PHONE_NUMBER]),
+        rentcar_company_name=first_line[RENT_CAR_COMPANY_NAME],
+        note=first_line[NOTE],
+    )
+
+
+def make_register_from_first_line_number(first_line):
+    supporter, _=Supporter.objects.get_or_create(name=first_line[SUPPORTER])
+    client_name, insurance_agent_name=get_client_name_and_insurance_agent_name(
+        first_line)
+    if insurance_agent_name:
+        insurance_agent, _=InsuranceAgent.objects.get_or_create(
             name=insurance_agent_name)
     else:
-        insurance_agent = None
+        insurance_agent=None
     return Register.objects.create(
         RO_number=first_line[RO_NUMBER],
         car_number=first_line[CAR_NUMBER],
@@ -350,7 +373,7 @@ def make_register_from_first_line_number(first_line):
 
 
 def make_order_payment_charge_and_deposit_with_line(line, register):
-    order = create_order_from_line(line, register)
+    order=create_order_from_line(line, register)
     create_charge_from_line(line, order)
     create_deposit_from_line(line, order)
     create_payment_from_line(line, order)
@@ -359,18 +382,18 @@ def make_order_payment_charge_and_deposit_with_line(line, register):
 
 
 def make_complete_register_for_line_numbers(df, line_numbers):
-    first_line = df.iloc[line_numbers[0], :].values.tolist()
-    register = make_register_from_first_line_number(first_line)
+    first_line=df.iloc[line_numbers[0], :].values.tolist()
+    register=make_register_from_first_line_number(first_line)
     for line_number in line_numbers:
-        line = df.iloc[line_number, :].values.tolist()
+        line=df.iloc[line_number, :].values.tolist()
         make_extra_sales_from_line(line, register)
 
 
 def make_order_from_effective_df(df):
-    line_numbers_for_registers = get_line_numbers_for_registers(df)
-    line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(df)
+    line_numbers_for_registers=get_line_numbers_for_registers(df)
+    line_numbers_for_extra_sales=get_line_numbers_for_extra_sales(df)
     for line_numbers_for_register in line_numbers_for_registers:
         make_complete_register_for_line_numbers(df, line_numbers_for_register)
     for line_number in line_numbers_for_extra_sales:
-        line = df.iloc[line_number, :].values.tolist()
+        line=df.iloc[line_number, :].values.tolist()
         make_extra_sales_from_line(line)
