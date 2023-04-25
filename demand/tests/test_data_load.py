@@ -17,13 +17,18 @@ from demand.utility import (
 
 class DataLoadTest(TestCase):
 
-    def setUp(self):
-        self.original_df1 = load_data("src/basic.xlsx", "23년 본사 상반기")
-        self.effective_df1 = get_effective_data_frame(
+    @classmethod
+    def setUpClass(cls):
+        super(DataLoadTest, cls).setUpClass()
+        cls.original_df1 = load_data("src/basic.xlsx", "23년 본사 상반기")
+        cls.effective_df1 = get_effective_data_frame(
             "src/basic.xlsx", "23년 본사 상반기")
-        self.original_df2 = load_data("src/230417.xlsx", "23년 본사 상반기")
-        self.effective_df2 = get_effective_data_frame(
+        cls.original_df2 = load_data("src/230417.xlsx", "23년 본사 상반기")
+        cls.effective_df2 = get_effective_data_frame(
             "src/230417.xlsx", "23년 본사 상반기")
+
+    def setUp(self):
+        pass
 
     def test_load_data(self):
         assert type(pd.DataFrame()) == type(self.original_df1)

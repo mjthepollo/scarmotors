@@ -214,25 +214,26 @@ def check_line_numbers_for_registers_have_same_car_number(effective_df):
 
 
 def check_line_numbers_for_registers_have_unique_RO_number(effective_df):
+    raw_RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
     line_numbers_for_registers = get_line_numbers_for_registers(effective_df)
-    RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
+    RO_numbers = [raw_RO_numbers[line_numbers_for_register[0]]
+                  for line_numbers_for_register in line_numbers_for_registers]
     RO_numbers_set = set(RO_numbers)
     try:
         assert len(RO_numbers) == len(RO_numbers_set)
     except AssertionError:
-        print(line_numbers_for_registers)
-        print(RO_numbers)
         for RO_number in RO_numbers:
             if RO_numbers.count(RO_number) > 1:
                 print(RO_number)
-        print(len(RO_numbers), len(RO_numbers_set))
+        # print(len(RO_numbers), len(RO_numbers_set))
+        raise AssertionError
 
 
 def get_line_numbers_for_registers(effective_df):
     RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
     line_numbers_for_registers = []
     for i, RO_number in enumerate(RO_numbers):
-        if pd.isnull(RO_number):
+        if not RO_number:
             if not check_wash_car(effective_df, i):
                 line_numbers_for_registers[-1].append(i)
             else:  # 세차의 경우 RO_number가 없어야 한다.
