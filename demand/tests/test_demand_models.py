@@ -25,7 +25,7 @@ class ModelTest(TestCase):
 
         charge_date = string_to_date("2023-04-20")
         self.charge = Charge.objects.create(charge_date=charge_date,
-                                            repair_amount=100000, component_amount=20000)
+                                            wage_amount=100000, component_amount=20000)
 
         deposit_date = string_to_date("2023-04-20")
         self.deposit = Deposit.objects.create(deposit_date=deposit_date,
@@ -64,9 +64,9 @@ class ModelTest(TestCase):
 
         charge_date = string_to_date("2023-04-19")
         self.no_order_charge = Charge.objects.create(charge_date=charge_date,
-                                                     repair_amount=100000, component_amount=20000)
+                                                     wage_amount=100000, component_amount=20000)
         self.no_register_charge = Charge.objects.create(charge_date=charge_date,
-                                                        repair_amount=100000, component_amount=20000)
+                                                        wage_amount=100000, component_amount=20000)
 
         deposit_date = string_to_date("2023-04-19")
         self.no_order_deposit = Deposit.objects.create(deposit_date=deposit_date,
@@ -91,7 +91,7 @@ class ModelTest(TestCase):
                                                           payment_info="삼성카드", payment_date=payment_date,
                                                           refund_amount=10000, refund_date=refund_date)
         self.extra_sales_charge = Charge.objects.create(charge_date=charge_date,
-                                                        repair_amount=100000, component_amount=20000)
+                                                        wage_amount=100000, component_amount=20000)
         self.extra_sales_deposit = Deposit.objects.create(deposit_date=deposit_date,
                                                           deposit_amount=100000)
 

@@ -27,9 +27,8 @@ ORDER_TYPE = 18
 RECEIPT_NUMBER = 19
 FAULT_RATIO = 20
 CHARGE_DATE = 22
-REPAIR_AMOUNT = 23
-EXCHANGE_AMOUNT = 24
-COMPONENT_AMOUNT = 25
+WAGE_AMOUNT = 23
+COMPONENT_AMOUNT = 24
 INDEMNITY_AMOUNT = 29
 DISCOUNT_AMOUNT = 30
 REFUND_AMOUNT = 31
@@ -298,8 +297,8 @@ def make_order_payment_charge_and_deposit_with_line(line, register):
     if line[CHARGE_DATE]:
         charge = Charge.objects.create(
             charge_date=input_to_date(line[CHARGE_DATE]),
-            repair_amount=int_or_none(line[REPAIR_AMOUNT]),
-            component_amount=int_or_none(line[COMPONENT_AMOUNT]),
+            wage_amount=zero_if_none(int_or_none(line[WAGE_AMOUNT])),
+            component_amount=zero_if_none(int_or_none(line[COMPONENT_AMOUNT])),
         )
     else:
         charge = None

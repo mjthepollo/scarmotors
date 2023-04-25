@@ -61,19 +61,25 @@ class Payment(TimeStampedModel):
 
 class Charge(TimeStampedModel):
     charge_date = models.DateField(verbose_name="청구일")
-    repair_amount = models.IntegerField(default=0, verbose_name="공임비")
+    wage_amount = models.IntegerField(default=0, verbose_name="공임비")
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
 
     def get_indemnity_amount(self):
         if hasattr(self, "order"):
-            return self.order.payment.indemnity_amount
+            if self.order.payment:
+                return self.order.payment.indemnity_amount
+            else:
+                return 0
         elif hasattr(self, "extra_sales"):
             return self.extra_sales.payment.indemnity_amount
         else:
             raise Exception("Charge에 order나 extra_sales가 없습니다.")
 
+    def get_wage_amount(self):
+        return self.wage_amount+self.component_amount
+
     def get_charge_amount(self):
-        return int((self.repair_amount + self.component_amount)*1.1) - self.get_indemnity_amount()
+        return int((self.get_wage_amount())*1.1) - self.get_indemnity_amount()
 
     def __str__(self):
         if hasattr(self, "order"):
@@ -185,6 +191,15 @@ class Order(TimeStampedModel):
         Deposit, null=True, blank=True, related_name="order", verbose_name="입금", on_delete=models.CASCADE)
 
     note = models.TextField(blank=True, null=True, verbose_name="비고")
+
+    def get_chargable_amount(self):
+        if self.charge:
+            print("COMPONENT_AMOUNT: ", self.charge.component_amount)
+            print("wage_amount: ", self.charge.wage_amount)
+            print("INDEMNITY_AMOUNT: ", self.charge.get_indemnity_amount())
+            return int(self.charge.get_charge_amount()*self.fault_ratio/100)
+        else:
+            None
 
     def __str__(self):
         return f"{self.register.RO_number} {self.order_type} {self.charge_type}"

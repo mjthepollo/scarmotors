@@ -34,7 +34,7 @@ class PaymentAdmin(admin.ModelAdmin):
 
 @admin.register(Charge)
 class ChargeAdmin(admin.ModelAdmin):
-    list_display = ["charge_date", "repair_amount", "component_amount"]
+    list_display = ["charge_date", "wage_amount", "component_amount"]
     search_fields = ["charge_date",]
 
 

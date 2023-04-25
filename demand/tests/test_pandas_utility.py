@@ -146,9 +146,12 @@ class UtilityTest(TestCase):
             make_order_payment_charge_and_deposit_with_line(
                 self.first_lines[i], self.registers[i])
         for register in self.registers:
-            print(register)
-            print(register.orders.all()[0])
-            print(register.orders.all()[0].pk)
-            print(register.orders.all()[0].deposit)
-            print(register.orders.all()[0].payment)
-            print(register.orders.all()[0].charge)
+            print(register.orders.first().get_chargable_amount())
+        assert self.registers[0].orders.first(
+        ).get_chargable_amount() == 248741
+        assert self.registers[1].orders.first(
+        ).get_chargable_amount() == 624999
+        assert self.registers[2].orders.first().get_chargable_amount() == None
+        assert self.registers[3].orders.first(
+        ).get_chargable_amount() == 2555500
+        assert self.registers[4].orders.first().get_chargable_amount() == 10000
