@@ -75,11 +75,11 @@ class Charge(TimeStampedModel):
         else:
             raise Exception("Charge에 order나 extra_sales가 없습니다.")
 
-    def get_wage_amount(self):
+    def get_repair_amount(self):
         return self.wage_amount+self.component_amount
 
     def get_charge_amount(self):
-        return int((self.get_wage_amount())*1.1) - self.get_indemnity_amount()
+        return int((self.get_repair_amount())*1.1) - self.get_indemnity_amount()
 
     def __str__(self):
         if hasattr(self, "order"):
@@ -195,9 +195,10 @@ class Order(TimeStampedModel):
     def get_chargable_amount(self):
         if self.charge:
             print("COMPONENT_AMOUNT: ", self.charge.component_amount)
-            print("wage_amount: ", self.charge.wage_amount)
+            print("WAGE_AMOUNT: ", self.charge.wage_amount)
             print("INDEMNITY_AMOUNT: ", self.charge.get_indemnity_amount())
-            return int(self.charge.get_charge_amount()*self.fault_ratio/100)
+            print(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
+            return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
         else:
             None
 
