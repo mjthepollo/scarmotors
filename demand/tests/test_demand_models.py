@@ -96,6 +96,7 @@ class ModelTest(TestCase):
                                                           deposit_amount=80000)
 
         self.extra_sales = ExtraSales.objects.create(
+            day_came_in=string_to_date("2023-03-20"),
             payment=self.extra_sales_payment, charge=self.extra_sales_charge, deposit=self.extra_sales_deposit,
             note="기타매출"
         )
@@ -150,6 +151,10 @@ class ModelTest(TestCase):
 
     def test_order_str(self):
         self.assertEqual(str(self.order), "4-1234 자차 보험")
+
+    def test_extra_sales_str(self):
+        self.setUpExtraCase()
+        self.assertEqual(str(self.extra_sales), "(2023-03-20)입고: 기타매출")
 
     def test_get_charge_amount(self):
         self.setUpExtraCase()

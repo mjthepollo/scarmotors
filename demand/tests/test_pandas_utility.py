@@ -5,9 +5,11 @@ import numpy as np
 import pandas as pd
 from django.test import TestCase
 
-from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
-                           InsuranceAgent, Order, Payment, Register, Supporter)
-from demand.utility import (check_car_number, check_wash_car,
+from demand.models import (STATUS_DICT, Charge, ChargedCompany, Deposit,
+                           ExtraSales, InsuranceAgent, Order, Payment,
+                           Register, Supporter)
+from demand.utility import (FACTORY_TURNOVER, STATUS, TURNOVER,
+                            check_car_number, check_wash_car,
                             fault_ratio_to_int,
                             get_client_name_and_insurance_agent_name,
                             get_line_numbers_for_registers, get_refund_date,
@@ -16,7 +18,7 @@ from demand.utility import (check_car_number, check_wash_car,
                             make_order_from_effective_df,
                             make_order_payment_charge_and_deposit_with_line,
                             make_register_from_first_line_number, print_fields,
-                            str_or_none, string_to_date)
+                            str_or_none, string_to_date, zero_if_none)
 
 
 class UtilityTest(TestCase):
@@ -152,8 +154,8 @@ class UtilityTest(TestCase):
     def check_chargable_amount(self, chargable_amount_list):
         for i, register in enumerate(self.registers):
             if chargable_amount_list[i]:
-                assert register.orders.first().get_chargable_amount() - \
-                    chargable_amount_list[i] < 10
+                assert abs(register.orders.first().get_chargable_amount() -
+                           chargable_amount_list[i]) < 10
             else:
                 assert register.orders.first().get_chargable_amount() == None
 
@@ -179,3 +181,39 @@ class UtilityTest(TestCase):
         assert Deposit.objects.count() == 3
         assert Charge.objects.count() == 6+2  # by REGISTERs 6, EXTRA SALES 2
         assert Payment.objects.count() == 4+2  # by REGISTERs 4, EXTRA SALES 2
+
+    def test_turnover(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            assert abs(zero_if_none(self.lines[line_number][TURNOVER]) - ExtraSales.objects.all()[
+                i].get_turnover()) < 10
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            assert abs(zero_if_none(self.lines[line_number][TURNOVER]) - Order.objects.all()[
+                i].get_turnover()) < 10
+
+    def test_factory_turnover(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            assert abs(zero_if_none(self.lines[line_number][FACTORY_TURNOVER]) - ExtraSales.objects.all()[
+                i].get_factory_turnover()) < 10
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            assert abs(zero_if_none(self.lines[line_number][FACTORY_TURNOVER]) - Order.objects.all()[
+                i].get_factory_turnover()) < 10
+
+    def test_status(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            assert self.lines[line_number][STATUS] == ExtraSales.objects.all()[
+                i].get_status()
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            assert self.lines[line_number][STATUS] == Order.objects.all()[
+                i].get_status()
