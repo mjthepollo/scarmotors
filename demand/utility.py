@@ -38,6 +38,7 @@ PAYMENT_DATE = 34
 # REFUND_DATE = pass
 DEPOSIT_DATE = 37
 DEPOSIT_AMOUNT = 38
+NOTE = 46
 RENT_CAR_COMPANY_NAME = 28
 
 
@@ -46,6 +47,17 @@ def string_to_date(string):
         return datetime.strptime(string, "%Y-%m-%d").date()
     elif "." in string:
         return datetime.strptime(string, "%Y.%m.%d").date()
+
+
+def input_to_phone_number(input_phone_number):
+    if not input_phone_number:
+        return None
+    elif isinstance(input_phone_number, str):
+        return input_phone_number.replace("-", "")
+    elif isinstance(input_phone_number, int):
+        return "0"+str(input_phone_number)
+    else:
+        raise Exception("ERROR : WRONG INPUT TYPE")
 
 
 def fault_ratio_to_int(string):
@@ -63,7 +75,6 @@ def fault_ratio_to_int(string):
 
 
 def input_to_date(input_date):
-    print(input_date, type(input_date))
     # timestamp is subcalss of date!
     if isinstance(input_date, pd.Timestamp):
         return input_date.date()
@@ -73,6 +84,13 @@ def input_to_date(input_date):
         return string_to_date(input_date)
     else:
         raise Exception("ERROR : WRONG INPUT TYPE")
+
+
+def zero_if_none(num):
+    if num is None:
+        return 0
+    else:
+        return num
 
 
 def get_refund_date(line):
@@ -175,11 +193,11 @@ def get_client_name_and_insurance_agent_name(first_line):
         if "/" in client_name_and_insurance_agent:
             return tuple(client_name_and_insurance_agent.split("/"))
         elif "담당" == client_name_and_insurance_agent[-2:]:
-            return "", client_name_and_insurance_agent[:-2]
+            return None, client_name_and_insurance_agent[:-2]
         else:
-            return "", client_name_and_insurance_agent
+            return None, client_name_and_insurance_agent
     else:
-        return "", ""
+        return None, None
 
 
 def make_extra_sales_from_line(line):
@@ -209,13 +227,16 @@ def make_register_from_first_line_number(first_line):
         real_day_came_out=input_to_date(first_line[REAL_DAY_CAME_OUT]),
         car_model=str(first_line[CAR_MODEL]),
         abroad_type=first_line[ABROAD_TYPE],
-        number_of_repair_works=first_line[NUMBER_OF_REPAIRS_WORKS],
-        number_of_exchange_works=first_line[NUMBER_OF_EXCHANGE_WORKS],
+        number_of_repair_works=zero_if_none(
+            first_line[NUMBER_OF_REPAIRS_WORKS]),
+        number_of_exchange_works=zero_if_none(
+            first_line[NUMBER_OF_EXCHANGE_WORKS]),
         supporter=supporter,
         client_name=client_name,
         insurance_agent=insurance_agent,
-        phone_number=str(first_line[PHONE_NUMBER]),
+        phone_number=input_to_phone_number(first_line[PHONE_NUMBER]),
         rentcar_company_name=first_line[RENT_CAR_COMPANY_NAME],
+        note=first_line[NOTE],
     )
 
 

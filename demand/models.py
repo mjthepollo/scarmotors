@@ -134,7 +134,8 @@ class Register(TimeStampedModel):
         blank=True, null=True, verbose_name="고객명", max_length=30)
     insurance_agent = models.ForeignKey(
         InsuranceAgent, related_name="orders", null=True, on_delete=models.SET_NULL, verbose_name="보험 담당자")
-    phone_number = models.CharField(verbose_name="전화번호", max_length=15)
+    phone_number = models.CharField(
+        null=True, blank=True, verbose_name="전화번호", max_length=15)
     unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
     wash_car = models.BooleanField(default=False, verbose_name="세차")
     wasted = models.BooleanField(default=False, verbose_name="폐차")

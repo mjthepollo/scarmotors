@@ -13,7 +13,7 @@ from demand.utility import (check_car_number, check_wash_car,
                             get_effective_data_frame,
                             get_effective_row_numbers,
                             get_line_numbers_for_registers, get_refund_date,
-                            input_to_date, load_data,
+                            input_to_date, input_to_phone_number, load_data,
                             make_complete_register_for_line_numbers,
                             make_order_payment_charge_and_deposit_with_line,
                             make_register_from_first_line_number,
@@ -23,7 +23,7 @@ from demand.utility import (check_car_number, check_wash_car,
 class UtilityTest(TestCase):
     def setUp(self):
         # mock up DF 만들어두기
-        self.lines = [['0123', None, '1-1', pd.Timestamp('2023-01-02 00:00:00'), pd.Timestamp('2023-01-09 00:00:00'), datetime(2023, 1, 13, 0, 0), 11.0, '60저0130', '320D', '수입', None, 1.0, 1.0, '이성도(타)', '김석종/구본준', 1031370900, '보험', 'DB', '자차', '22-7881890', 0.4, 1.0, 230123.0, 565320.0, None, 565320.0, 56532.0, 248740.80000000002, '무상7889', 392000.0, None, None, '카드', '우리', pd.Timestamp('2023-01-13 00:00:00'), 0.0, None, None, None, None, 0.0, None, 392000.0, 35636.36363636365, 356363.63636363635, None, None, '완료', None, None, 1.0, 356363.63636363635, 0.0, 356363.63636363635, 0.0, 356363.63636363635, 0.0],
+        self.lines = [['0123', None, '1-1', pd.Timestamp('2023-01-02 00:00:00'), pd.Timestamp('2023-01-09 00:00:00'), datetime(2023, 1, 13, 0, 0), 11.0, '60저0130', '320D', '수입', None, 1.0, 1.0, '이성도(타)', '김석종/구본준', 1031370900, '보험', 'DB', '자차', '22-7881890', 0.4, 1.0, 230123.0, 565320.0, None, 565320.0, 56532.0, 248740.80000000002, '무상7889', 392000.0, None, None, '카드', '우리', pd.Timestamp('2023-01-13 00:00:00'), 0.0, None, None, None, None, 0.0, None, 392000.0, 35636.36363636365, 356363.63636363635, None, "TEST", '완료', None, None, 1.0, 356363.63636363635, 0.0, 356363.63636363635, 0.0, 356363.63636363635, 0.0],
                       ['0123', None, None, pd.Timestamp('2023-01-02 00:00:00'), pd.Timestamp('2023-01-09 00:00:00'), None, 7.0, '60저0130', '320D', '수입', None, None, 0.0, '이성도(타)', '김석종/구본준', 1031370900, '보험', 'DB', '자차', '22-7881806', 0.6, 1.0, 230123.0, 565320.0, None, 565320.0, 56532.0, 373111.2, None,
                        None, None, None, None, None, None, 373111.2, 1.0, 230119.0, 347821.0, 0.9322180626043924, 0.0, 0.06778193739560756, 347821.0, 31620.09090909094, 316200.90909090906, None, None, '완료', None, None, 1.0, 316200.90909090906, 0.0, 316200.90909090906, 0.0, 316200.90909090906, 0.0],
                       ['0106', None, '1-21', pd.Timestamp('2023-01-03 00:00:00'), pd.Timestamp('2023-01-05 00:00:00'), datetime(2023, 1, 6, 0, 0), 3.0, '13버6789', '투싼', '국산', None, 2.0, 2.0, '이소정(직원)', '구본준담당', 1034361547, '보험', 'DB', '대물', '22-7868188', 1.0, 1.0, 230106.0, 539919.0, 28262.0, 568181.0, 56818.100000000006,
@@ -44,6 +44,11 @@ class UtilityTest(TestCase):
             "2019-01-01") == datetime.date(datetime(2019, 1, 1))
         assert string_to_date(
             "2019.01.01") == datetime.date(datetime(2019, 1, 1))
+
+    def test_input_to_phone_number(self):
+        assert input_to_phone_number(None) == None
+        assert input_to_phone_number("010-9403-4783") == "01094034783"
+        assert input_to_phone_number(1094034783) == "01094034783"
 
     def test_fault_ratio_percent_to_int(self):
         assert 0 == fault_ratio_to_int("")
@@ -77,11 +82,11 @@ class UtilityTest(TestCase):
     def test_get_client_name_and_insuranc_agent_name(self):
         assert ("김석종", "구본준") == get_client_name_and_insurance_agent_name(
             self.lines[0])
-        assert ("", "구본준") == get_client_name_and_insurance_agent_name(
+        assert (None, "구본준") == get_client_name_and_insurance_agent_name(
             self.lines[2])
-        assert ("", "윤석영") == get_client_name_and_insurance_agent_name(
+        assert (None, "윤석영") == get_client_name_and_insurance_agent_name(
             self.lines[5])
-        assert ("", "") == get_client_name_and_insurance_agent_name(
+        assert (None, None) == get_client_name_and_insurance_agent_name(
             self.lines[7])
 
     def test_make_register_from_effective_df(self):
@@ -90,6 +95,30 @@ class UtilityTest(TestCase):
     def test_make_register_from_first_line_number(self):
         first_lines = [self.lines[line_numbers_for_register[0]]
                        for line_numbers_for_register in self.line_numbers_for_registers]
+        test_objects = [("60저0130", "2023-01-02", "2023-01-09", "2023-01-13", "320D", "수입", 0, 1, "이성도(타)", "김석종", "구본준", "01031370900", "무상7889", "TEST"),
+                        ("13버6789", "2023-01-03", "2023-01-05", "2023-01-06", "투싼",
+                         "국산", 0, 2, "이소정(직원)", None, "구본준", "01034361547", "에스렌트", None),
+                        ("241마5742", "2023-01-12", "2023-01-20", "2023-01-19", "QM6",
+                         "국산", 1, 2, "이성도(타)", "김윤희", "구본준", "01048104691", "반디", None),
+                        ("60구2264", "2023-01-17", "2023-01-27", "2023-01-31", "렉서스LS460",
+                         "수입", 3, 0, "장영수", None, "윤석영", "01094034783", "무상4760", None),
+                        ("193허2950", "2023-01-20", "2023-01-20", "2023-01-20", "K5", "국산", 0, 0, "고객", None, None, None, None, None),]
         for first_line in first_lines:
             make_register_from_first_line_number(first_line)
+        for i, register in enumerate(Register.objects.all()):
+            object_to_tuple = (register.car_number,
+                               str(register.day_came_in),
+                               str(register.expected_day_came_out),
+                               str(register.real_day_came_out),
+                               register.car_model,
+                               register.abroad_type,
+                               register.number_of_repair_works,
+                               register.number_of_exchange_works,
+                               str(register.supporter) if register.supporter else None,
+                               register.client_name,
+                               str(register.insurance_agent) if register.insurance_agent else None,
+                               register.phone_number,
+                               register.rentcar_company_name,
+                               register.note)
+            assert object_to_tuple == test_objects[i]
         assert Register.objects.count() == 5
