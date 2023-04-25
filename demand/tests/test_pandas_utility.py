@@ -8,9 +8,10 @@ from django.test import TestCase
 from demand.models import (STATUS_DICT, Charge, ChargedCompany, Deposit,
                            ExtraSales, InsuranceAgent, Order, Payment,
                            Register, Supporter)
-from demand.utility import (FACTORY_TURNOVER, STATUS, TURNOVER,
-                            check_car_number, check_wash_car,
-                            fault_ratio_to_int,
+from demand.utility import (CHARGABLE_AMOUNT, CHARGE_AMOUNT, FACTORY_TURNOVER,
+                            INTEGRATED_TURNOVER, NOT_PAID_TURNOVER,
+                            PAID_TURNOVER, STATUS, TURNOVER, check_car_number,
+                            check_wash_car, fault_ratio_to_int,
                             get_client_name_and_insurance_agent_name,
                             get_line_numbers_for_registers, get_refund_date,
                             input_to_date, input_to_phone_number, int_or_none,
@@ -182,6 +183,68 @@ class UtilityTest(TestCase):
         assert Charge.objects.count() == 6+2  # by REGISTERs 6, EXTRA SALES 2
         assert Payment.objects.count() == 4+2  # by REGISTERs 4, EXTRA SALES 2
 
+    def test_chargable_amount(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            extra_sales = ExtraSales.objects.all()[i]
+            chargable_amount = extra_sales.get_chargable_amount()
+            chargable_amount_value = self.lines[line_number][CHARGABLE_AMOUNT]
+            if extra_sales.charge:
+                assert abs(chargable_amount_value - chargable_amount) < 10
+            else:
+                if isinstance(chargable_amount_value, (float, int)):
+                    assert chargable_amount_value == 0.0
+                    assert chargable_amount == None
+                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
+                    raise AssertionError
+
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            order = Order.objects.all()[i]
+            chargable_amount = order.get_chargable_amount()
+            chargable_amount_value = self.lines[line_number][CHARGABLE_AMOUNT]
+            if order.charge:
+                assert abs(chargable_amount_value - chargable_amount) < 10
+            else:
+                if isinstance(chargable_amount_value, (float, int)):
+                    assert chargable_amount_value == 0.0
+                    assert chargable_amount == None
+                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
+                    raise AssertionError
+
+    def test_charge_amount(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            extra_sales = ExtraSales.objects.all()[i]
+            charge_amount = extra_sales.get_charge_amount()
+            if extra_sales.charge:
+                assert abs(self.lines[line_number]
+                           [CHARGE_AMOUNT] - charge_amount) < 10
+            else:
+                if isinstance(self.lines[line_number][CHARGE_AMOUNT], (float, int)):
+                    assert self.lines[line_number][CHARGE_AMOUNT] == 0.0
+                    assert charge_amount == None
+                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
+                    raise AssertionError
+
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            order = Order.objects.all()[i]
+            charge_amount = order.get_charge_amount()
+            if order.charge:
+                assert abs(self.lines[line_number]
+                           [CHARGE_AMOUNT] - charge_amount) < 10
+            else:
+                if isinstance(self.lines[line_number][CHARGE_AMOUNT], (float, int)):
+                    assert self.lines[line_number][CHARGE_AMOUNT] == 0.0
+                    assert charge_amount == None
+                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
+                    raise AssertionError
+
     def test_turnover(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
@@ -205,6 +268,30 @@ class UtilityTest(TestCase):
         for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
             assert abs(zero_if_none(self.lines[line_number][FACTORY_TURNOVER]) - Order.objects.all()[
                 i].get_factory_turnover()) < 10
+
+    def test_paid_turnover(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            assert abs(zero_if_none(self.lines[line_number][PAID_TURNOVER]) - ExtraSales.objects.all()[
+                i].get_paid_turnover()) < 10
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            assert abs(zero_if_none(self.lines[line_number][PAID_TURNOVER]) - Order.objects.all()[
+                i].get_paid_turnover()) < 10
+
+    def test_not_paid_turnover(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            assert abs(zero_if_none(self.lines[line_number][NOT_PAID_TURNOVER]) - ExtraSales.objects.all()[
+                i].get_not_paid_turnover()) < 10
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            assert abs(zero_if_none(self.lines[line_number][NOT_PAID_TURNOVER]) - Order.objects.all()[
+                i].get_not_paid_turnover()) < 10
 
     def test_status(self):
         Register.objects.all().delete()

@@ -84,11 +84,16 @@ class Charge(TimeStampedModel):
     def get_charge_amount(self):
         if hasattr(self, "order"):
             sales = self.order
+            refund_amount = self.order.payment.refund_amount if self.order.payment else 0
+            refund_amount = refund_amount if refund_amount else 0
         elif hasattr(self, "extra_sales"):
             sales = self.extra_sales
+            refund_amount = self.extra_sales.payment.refund_amount if self.extra_sales.payment else 0
         if not sales:
             raise Exception("Charge에 order나 extra_sales가 없습니다.")
-        charge_amount = sales.get_chargable_amount() - self.get_indemnity_amount()
+        refund_amount = refund_amount if refund_amount else 0
+        charge_amount = sales.get_chargable_amount() - self.get_indemnity_amount() + \
+            refund_amount
         if charge_amount > 0:
             return charge_amount
         else:
@@ -211,7 +216,16 @@ class Order(TimeStampedModel):
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
     def get_charge_amount(self):
-        return self.charge.get_charge_amount()
+        if self.charge:
+            return self.charge.get_charge_amount()
+        else:
+            return None
+
+    def get_chargable_amount(self):
+        if self.charge:
+            return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
+        else:
+            None
 
     def get_turnover(self):
         deposit_amount = self.deposit.deposit_amount if self.deposit else 0
@@ -225,18 +239,21 @@ class Order(TimeStampedModel):
             indemnity_amount = 0
         return deposit_amount+indemnity_amount-discount_amount-refund_amount
 
+    def get_paid_turnover(self):
+        return self.get_factory_turnover() if self.get_factory_turnover() > 0 else 0
+
+    def get_not_paid_turnover(self):
+        if self.get_status() == STATUS_DICT["NO_COMPLETE"]:
+            return round(self.get_charge_amount()*0.95)
+        else:
+            return 0
+
     def get_factory_turnover(self):
         return int(self.get_turnover()/1.1)
 
     def get_payment_rate(self):
         deposit_amount = self.deposit.deposit_amount if self.deposit else 0
         return round(deposit_amount/self.get_charge_amount()*100)
-
-    def get_chargable_amount(self):
-        if self.charge:
-            return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
-        else:
-            None
 
     def get_status(self):
         receive = self.deposit or self.payment
@@ -291,12 +308,15 @@ class ExtraSales(TimeStampedModel):
         Deposit, null=True, blank=True, related_name="extra_sales", verbose_name="입금", on_delete=models.CASCADE)
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
-    def get_charge_amount(self):
-        return self.charge.get_charge_amount()
-
     def get_payment_rate(self):
         deposit_amount = self.deposit.deposit_amount if self.deposit else 0
         return round(deposit_amount/self.get_charge_amount()*100)
+
+    def get_charge_amount(self):
+        if self.charge:
+            return self.charge.get_charge_amount()
+        else:
+            return None
 
     def get_chargable_amount(self):
         if self.charge:
@@ -318,6 +338,15 @@ class ExtraSales(TimeStampedModel):
 
     def get_factory_turnover(self):
         return int(self.get_turnover()/1.1)
+
+    def get_paid_turnover(self):
+        return self.get_factory_turnover() if self.get_factory_turnover() > 0 else 0
+
+    def get_not_paid_turnover(self):
+        if self.get_status() == STATUS_DICT["NO_COMPLETE"]:
+            return round(self.get_charge_amount()*0.95)
+        else:
+            return 0
 
     def get_status(self):
         receive = self.deposit or self.payment
