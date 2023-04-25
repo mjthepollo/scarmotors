@@ -222,15 +222,18 @@ class Order(TimeStampedModel):
 
 
 class ExtraSales(TimeStampedModel):
-    car_number = models.CharField(verbose_name="차량번호", max_length=20)
-    day_came_in = models.DateField(verbose_name="입고일")
+    car_number = models.CharField(
+        verbose_name="차량번호", blank=True, null=True, max_length=20)
+    day_came_in = models.DateField(verbose_name="입고일", blank=True, null=True)
     expected_day_came_out = models.DateField(
         blank=True, null=True, verbose_name="출고예정일")
     # 나중에 출고시에 추가함
     real_day_came_out = models.DateField(
         blank=True, null=True, verbose_name="실제출고일")
-    car_model = models.CharField(max_length=90, verbose_name="차종")
+    car_model = models.CharField(
+        blank=True, null=True, max_length=90, verbose_name="차종")
     abroad_type = models.CharField(
+        blank=True, null=True,
         choices=(("domestic", "국산"), ("imported", "수입")), max_length=10, verbose_name="국산/수입")
     number_of_repair_works = models.IntegerField(
         null=True, blank=True,
