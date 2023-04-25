@@ -9,6 +9,7 @@ from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
 
 HEADER = 5
 END = 57
+RO_NUMBER = 2
 DAY_CAME_IN = 3
 EXPECTED_DAY_CAME_OUT = 4
 REAL_DAY_CAME_OUT = 5
@@ -42,11 +43,33 @@ NOTE = 46
 RENT_CAR_COMPANY_NAME = 28
 
 
+def int_or_none(input_data):
+    if not input_data:
+        return None
+    else:
+        return int(input_data)
+
+
+def str_or_none(input_data):
+    if not input_data:
+        return None
+    else:
+        return str(input_data)
+
+
 def string_to_date(string):
-    if "-" in string:
-        return datetime.strptime(string, "%Y-%m-%d").date()
-    elif "." in string:
-        return datetime.strptime(string, "%Y.%m.%d").date()
+    if isinstance(string, str):
+        pattern = r"^\d{2}\d{2}\d{2}$"
+        if string.count("-") == 2:
+            return datetime.strptime(string, "%Y-%m-%d").date()
+        elif string.count(".") == 2:
+            return datetime.strptime(string, "%Y.%m.%d").date()
+        elif re.match(pattern, string):
+            return datetime.strptime(string, "%y%m%d").date()
+        else:
+            raise Exception("ERROR : WRONG INPUT TYPE - FORMAT")
+    else:
+        raise Exception("ERROR : WRONG INPUT TYPE, NOT STRING!")
 
 
 def input_to_phone_number(input_phone_number):
@@ -60,16 +83,18 @@ def input_to_phone_number(input_phone_number):
         raise Exception("ERROR : WRONG INPUT TYPE")
 
 
-def fault_ratio_to_int(string):
-    if not string:
-        return 0
-    elif isinstance(string, str):
-        if "%" in string:
-            return int(string[:-1])
+def fault_ratio_to_int(input_data):
+    if not input_data:
+        return None
+    elif isinstance(input_data, str):
+        if "%" in input_data:
+            return int(input_data[:-1])
         else:
-            return int(string)
-    elif isinstance(string, int):
-        return string
+            return int(input_data)
+    elif isinstance(input_data, int):
+        return input_data
+    elif isinstance(input_data, float):
+        return int(input_data*100)
     else:
         raise Exception("FAULT RATIO ERROR")
 
@@ -82,7 +107,12 @@ def input_to_date(input_date):
         return input_date
     elif isinstance(input_date, str):
         return string_to_date(input_date)
+    elif isinstance(input_date, float):
+        return string_to_date(str(int(input_date)))
+    elif isinstance(input_date, int):
+        return string_to_date(str(input_date))
     else:
+        print("Date string is not in the correct format.")
         raise Exception("ERROR : WRONG INPUT TYPE")
 
 
@@ -221,6 +251,7 @@ def make_register_from_first_line_number(first_line):
     else:
         insurance_agent = None
     return Register.objects.create(
+        RO_number=first_line[RO_NUMBER],
         car_number=first_line[CAR_NUMBER],
         day_came_in=input_to_date(first_line[DAY_CAME_IN]),
         expected_day_came_out=input_to_date(first_line[EXPECTED_DAY_CAME_OUT]),
@@ -241,38 +272,49 @@ def make_register_from_first_line_number(first_line):
 
 
 def make_order_payment_charge_and_deposit_with_line(line, register):
-    charged_company = ChargedCompany.objects.get_or_create(
+    charged_company, _ = ChargedCompany.objects.get_or_create(
         name=line[CHARGED_COMPANY])
     fault_ratio = fault_ratio_to_int(line[FAULT_RATIO])
-    Order.objects.create(
+    order = Order.objects.create(
         register=register,
         charged_company=charged_company,
         charge_type=line[CHARGE_TYPE],
         order_type=line[ORDER_TYPE],
-        receipt_number=str(line[RECEIPT_NUMBER]),
+        receipt_number=str_or_none(line[RECEIPT_NUMBER]),
         fault_ratio=fault_ratio,
     )
     if line[INDEMNITY_AMOUNT]:
-        Payment.objects.create(
-            indemnity_amount=int(line[INDEMNITY_AMOUNT]),
-            discount_amount=int(line[DISCOUNT_AMOUNT]),
-            refund_amount=int(line[REFUND_AMOUNT]),
+        payment = Payment.objects.create(
+            indemnity_amount=int_or_none(line[INDEMNITY_AMOUNT]),
+            discount_amount=int_or_none(line[DISCOUNT_AMOUNT]),
+            refund_amount=int_or_none(line[REFUND_AMOUNT]),
             payment_type=line[PAYMENT_TYPE],
             payment_info=line[PAYMENT_INFO],
             payment_date=input_to_date(input_to_date(line[PAYMENT_DATE])),
             refund_date=get_refund_date(line)
         )
+    else:
+        payment = None
     if line[CHARGE_DATE]:
-        Charge.objects.create(
+        charge = Charge.objects.create(
             charge_date=input_to_date(line[CHARGE_DATE]),
-            repair_amount=int(line[REPAIR_AMOUNT]),
-            component_amount=int(line[COMPONENT_AMOUNT]),
+            repair_amount=int_or_none(line[REPAIR_AMOUNT]),
+            component_amount=int_or_none(line[COMPONENT_AMOUNT]),
         )
+    else:
+        charge = None
     if line[DEPOSIT_DATE]:
-        Deposit.objects.create(
-            deposit_amount=int(line[DEPOSIT_AMOUNT]),
-            deposit_day=input_to_date(line[DEPOSIT_DATE]),
+        deposit = Deposit.objects.create(
+            deposit_amount=int_or_none(line[DEPOSIT_AMOUNT]),
+            deposit_date=input_to_date(line[DEPOSIT_DATE]),
         )
+    else:
+        deposit = None
+    order.payment = payment
+    order.charge = charge
+    order.deposit = deposit
+    order.save()
+    return order
 
 
 def make_complete_register_for_line_numbers(df, line_numbers):

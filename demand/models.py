@@ -170,11 +170,12 @@ class Order(TimeStampedModel):
     charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정", "일반경정"), (
         "일반판도", "일반판도"), ("렌트판도", "렌트판도"), ("렌트일반", "렌트일반"),
         ("인정매출", "인정매출")), max_length=20, verbose_name="구분")
-    order_type = models.CharField(choices=(
+    order_type = models.CharField(null=True, blank=True, choices=(
         ("자차", "자차"), ("대물", "대물"), ("일반", "일반")), max_length=10, verbose_name="차/대/일")
     receipt_number = models.CharField(
         max_length=20, verbose_name="접수번호", unique=True)
-    fault_ratio = models.IntegerField(verbose_name="과실분")
+    fault_ratio = models.IntegerField(
+        null=True, blank=True, verbose_name="과실분")
 
     payment = models.OneToOneField(
         Payment, null=True, blank=True, related_name="order", verbose_name="결제", on_delete=models.CASCADE)

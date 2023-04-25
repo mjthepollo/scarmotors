@@ -13,10 +13,10 @@ from demand.utility import (check_car_number, check_wash_car,
                             get_effective_data_frame,
                             get_effective_row_numbers,
                             get_line_numbers_for_registers, get_refund_date,
-                            input_to_date, input_to_phone_number, load_data,
-                            make_complete_register_for_line_numbers,
+                            input_to_date, input_to_phone_number, int_or_none,
+                            load_data, make_complete_register_for_line_numbers,
                             make_order_payment_charge_and_deposit_with_line,
-                            make_register_from_first_line_number,
+                            make_register_from_first_line_number, str_or_none,
                             string_to_date)
 
 
@@ -38,12 +38,30 @@ class UtilityTest(TestCase):
                        16363.636363636362, 180000.0, None, 180000.0, None, None, '카드', '삼성', pd.Timestamp('2023-01-31 00:00:00'), 0.0, None, None, None, None, 0.0, None, 180000.0, 16363.636363636382, 163636.36363636362, None, None, '완료', '일반경정비', None, 1.0, 163636.36363636362, 0.0, 163636.36363636362, 0.0, 163636.36363636362, 0.0],
                       ['0120', None, '1-101', pd.Timestamp('2023-01-20 00:00:00'), pd.Timestamp('2023-01-20 00:00:00'), datetime(2023, 1, 20, 0, 0), 0.0, '193허2950', 'K5', '국산', None, None, 0.0, '고객', None, None, '일반경정비', '일반경정비', None, '타이어펑크수리', 1.0, 1.0, 230120.0, 9090.90909090909, None, 9090.90909090909, 909.090909090909, 10000.0, None, 10000.0, None, None, '카드', '삼성', pd.Timestamp('2023-01-20 00:00:00'), 0.0, None, None, None, None, 0.0, None, 10000.0, 909.0909090909099, 9090.90909090909, None, None, '완료', '일반경정비', None, 1.0, 9090.90909090909, 0.0, 9090.90909090909, 0.0, 9090.90909090909, 0.0]]
         self.line_numbers_for_registers = [[0, 1], [2], [3, 4], [5, 6], [7]]
+        self.first_lines = [self.lines[line_numbers_for_register[0]]
+                            for line_numbers_for_register in self.line_numbers_for_registers]
+        self.registers = []
+        for first_line in self.first_lines:
+            register = make_register_from_first_line_number(first_line)
+            self.registers.append(register)
+
+    def test_int_or_none(self):
+        assert int_or_none(10) == 10
+        assert int_or_none("10") == 10
+        assert int_or_none("") == None
+        assert int_or_none(None) == None
+
+    def test_str_or_none(self):
+        assert str_or_none(10) == "10"
+        assert str_or_none("10") == "10"
+        assert str_or_none("") == None
+        assert str_or_none(None) == None
 
     def test_string_to_date(self):
-        assert string_to_date(
-            "2019-01-01") == datetime.date(datetime(2019, 1, 1))
-        assert string_to_date(
-            "2019.01.01") == datetime.date(datetime(2019, 1, 1))
+        date = datetime.date(datetime(2019, 1, 1))
+        assert string_to_date("2019-01-01") == date
+        assert string_to_date("2019.01.01") == date
+        assert string_to_date("190101") == date
 
     def test_input_to_phone_number(self):
         assert input_to_phone_number(None) == None
@@ -51,19 +69,22 @@ class UtilityTest(TestCase):
         assert input_to_phone_number(1094034783) == "01094034783"
 
     def test_fault_ratio_percent_to_int(self):
-        assert 0 == fault_ratio_to_int("")
+        assert None == fault_ratio_to_int("")
         assert 15 == fault_ratio_to_int("15%")
         assert 15 == fault_ratio_to_int("15")
         assert 15 == fault_ratio_to_int(15)
+        assert 15 == fault_ratio_to_int(0.15)
 
     def test_input_to_date(self):
         string_date = "2019-01-01"
         date = datetime.date(datetime(2019, 1, 1))
         time_stamp = pd.Timestamp(string_date)
-        assert datetime.date(datetime(2019, 1, 1)
-                             ) == input_to_date(string_date)
-        assert datetime.date(datetime(2019, 1, 1)) == input_to_date(date)
-        assert datetime.date(datetime(2019, 1, 1)) == input_to_date(time_stamp)
+        assert date == input_to_date(string_date)
+        assert date == input_to_date(date)
+        assert date == input_to_date(time_stamp)
+        assert date == input_to_date("190101")
+        assert date == input_to_date(190101)
+        assert date == input_to_date(190101.0)
 
     def test_get_refund_date(self):
         assert get_refund_date(self.lines[0]) == None
@@ -93,20 +114,17 @@ class UtilityTest(TestCase):
         pass
 
     def test_make_register_from_first_line_number(self):
-        first_lines = [self.lines[line_numbers_for_register[0]]
-                       for line_numbers_for_register in self.line_numbers_for_registers]
-        test_objects = [("60저0130", "2023-01-02", "2023-01-09", "2023-01-13", "320D", "수입", 0, 1, "이성도(타)", "김석종", "구본준", "01031370900", "무상7889", "TEST"),
-                        ("13버6789", "2023-01-03", "2023-01-05", "2023-01-06", "투싼",
+        test_answers = [("1-1", "60저0130", "2023-01-02", "2023-01-09", "2023-01-13", "320D", "수입", 0, 1, "이성도(타)", "김석종", "구본준", "01031370900", "무상7889", "TEST"),
+                        ("1-21", "13버6789", "2023-01-03", "2023-01-05", "2023-01-06", "투싼",
                          "국산", 0, 2, "이소정(직원)", None, "구본준", "01034361547", "에스렌트", None),
-                        ("241마5742", "2023-01-12", "2023-01-20", "2023-01-19", "QM6",
+                        ("1-79", "241마5742", "2023-01-12", "2023-01-20", "2023-01-19", "QM6",
                          "국산", 1, 2, "이성도(타)", "김윤희", "구본준", "01048104691", "반디", None),
-                        ("60구2264", "2023-01-17", "2023-01-27", "2023-01-31", "렉서스LS460",
+                        ("1-100", "60구2264", "2023-01-17", "2023-01-27", "2023-01-31", "렉서스LS460",
                          "수입", 3, 0, "장영수", None, "윤석영", "01094034783", "무상4760", None),
-                        ("193허2950", "2023-01-20", "2023-01-20", "2023-01-20", "K5", "국산", 0, 0, "고객", None, None, None, None, None),]
-        for first_line in first_lines:
-            make_register_from_first_line_number(first_line)
+                        ("1-101", "193허2950", "2023-01-20", "2023-01-20", "2023-01-20", "K5", "국산", 0, 0, "고객", None, None, None, None, None),]
         for i, register in enumerate(Register.objects.all()):
-            object_to_tuple = (register.car_number,
+            object_to_tuple = (register.RO_number,
+                               register.car_number,
                                str(register.day_came_in),
                                str(register.expected_day_came_out),
                                str(register.real_day_came_out),
@@ -120,5 +138,17 @@ class UtilityTest(TestCase):
                                register.phone_number,
                                register.rentcar_company_name,
                                register.note)
-            assert object_to_tuple == test_objects[i]
+            assert object_to_tuple == test_answers[i]
         assert Register.objects.count() == 5
+
+    def test_make_order_payment_charge_and_deposit_wtih_line(self):
+        for i in range(len(self.first_lines)):
+            make_order_payment_charge_and_deposit_with_line(
+                self.first_lines[i], self.registers[i])
+        for register in self.registers:
+            print(register)
+            print(register.orders.all()[0])
+            print(register.orders.all()[0].pk)
+            print(register.orders.all()[0].deposit)
+            print(register.orders.all()[0].payment)
+            print(register.orders.all()[0].charge)
