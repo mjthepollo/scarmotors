@@ -194,31 +194,28 @@ def make_extra_sales_from_effective_df(df):
 
 
 def make_register_from_first_line_number(first_line):
-    supporter = Supporter.objects.get_or_create(name=first_line[SUPPORTER])
+    supporter, _ = Supporter.objects.get_or_create(name=first_line[SUPPORTER])
     client_name, insurance_agent_name = get_client_name_and_insurance_agent_name(
         first_line)
     if insurance_agent_name:
-        insurance_agent = InsuranceAgent.objects.get_or_create(
+        insurance_agent, _ = InsuranceAgent.objects.get_or_create(
             name=insurance_agent_name)
     else:
         insurance_agent = None
     return Register.objects.create(
         car_number=first_line[CAR_NUMBER],
-        day_came_in=string_to_date(
-            input_to_date(first_line[DAY_CAME_IN])),
-        expected_day_came_out=string_to_date(
-            input_to_date(first_line[EXPECTED_DAY_CAME_OUT])),
-        real_day_came_out=string_to_date(
-            input_to_date(first_line[REAL_DAY_CAME_OUT])),
+        day_came_in=input_to_date(first_line[DAY_CAME_IN]),
+        expected_day_came_out=input_to_date(first_line[EXPECTED_DAY_CAME_OUT]),
+        real_day_came_out=input_to_date(first_line[REAL_DAY_CAME_OUT]),
         car_model=str(first_line[CAR_MODEL]),
         abroad_type=first_line[ABROAD_TYPE],
-        number_of_repairs_works=first_line[NUMBER_OF_REPAIRS_WORKS],
+        number_of_repair_works=first_line[NUMBER_OF_REPAIRS_WORKS],
         number_of_exchange_works=first_line[NUMBER_OF_EXCHANGE_WORKS],
         supporter=supporter,
         client_name=client_name,
         insurance_agent=insurance_agent,
         phone_number=str(first_line[PHONE_NUMBER]),
-        rent_car_company_name=first_line[RENT_CAR_COMPANY_NAME],
+        rentcar_company_name=first_line[RENT_CAR_COMPANY_NAME],
     )
 
 
