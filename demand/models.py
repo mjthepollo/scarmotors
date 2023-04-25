@@ -49,7 +49,8 @@ class Payment(TimeStampedModel):
         if hasattr(self, "order"):
             order = self.order
             if order.register != None:
-                return f"{order.register.RO_number} 결제"
+                order_index = list(order.register.orders.all()).index(order)
+                return f"RO({order.register.RO_number}) 주문[{order_index}] 결제"
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
         else:
@@ -95,7 +96,8 @@ class Charge(TimeStampedModel):
         if hasattr(self, "order"):
             order = self.order
             if order.register != None:
-                return f"{order.register.RO_number} 청구"
+                order_index = list(order.register.orders.all()).index(order)
+                return f"RO({order.register.RO_number}) 주문[{order_index}] 청구"
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
         else:
@@ -116,7 +118,8 @@ class Deposit(TimeStampedModel):
         if hasattr(self, "order"):
             order = self.order
             if order.register != None:
-                return f"{order.register.RO_number} 입금"
+                order_index = list(order.register.orders.all()).index(order)
+                return f"RO({order.register.RO_number}) 주문[{order_index}] 입금"
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
         else:
@@ -192,7 +195,7 @@ class Order(TimeStampedModel):
     order_type = models.CharField(null=True, blank=True, choices=(
         ("자차", "자차"), ("대물", "대물"), ("일반", "일반")), max_length=10, verbose_name="차/대/일")
     receipt_number = models.CharField(
-        max_length=20, verbose_name="접수번호", unique=True)
+        max_length=20, verbose_name="접수번호", null=True, blank=True, unique=True)
     fault_ratio = models.IntegerField(
         null=True, blank=True, verbose_name="과실분")
 

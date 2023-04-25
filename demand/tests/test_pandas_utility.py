@@ -13,6 +13,7 @@ from demand.utility import (check_car_number, check_wash_car,
                             get_line_numbers_for_registers, get_refund_date,
                             input_to_date, input_to_phone_number, int_or_none,
                             make_extra_sales_from_line,
+                            make_order_from_effective_df,
                             make_order_payment_charge_and_deposit_with_line,
                             make_register_from_first_line_number, print_fields,
                             str_or_none, string_to_date)
@@ -41,7 +42,8 @@ class UtilityTest(TestCase):
                       [412.0, None, None, pd.Timestamp('2023-04-12 00:00:00'), pd.Timestamp('2023-04-12 00:00:00'), datetime(2023, 4, 12, 0, 0), 0.0, '307누8223', 'IG', '국산', None, None, 0.0, None, '세차실장', '010-5407-9545', '일반경정비', '일반경정비', None, '부분 유리막코팅', 1.0, 4.0, 230412.0, None,
                        90000.0, 90000.0, 9000.0, 99000.00000000001, None, 99000.0, None, None, '카드', '롯데', pd.Timestamp('2023-04-12 00:00:00'), 0.0, None, None, None, None, 0, None, 99000.0, 9000.0, 90000.0, None, None, '완료', '일반경정비', None, 1.0, 90000.0, 0.0, 90000.0, 0.0, 0.0, 90000.0]
                       ]
-        self.df = pd.DataFrame(self.lines)
+        self.df = pd.DataFrame(self.lines).replace(
+            {pd.NaT: None, np.nan: None}, inplace=False)
         self.line_numbers_for_registers = [[0, 1], [2], [3, 4], [5, 6], [7]]
         self.line_numbers_for_extra_sales = [8, 9]
         self.first_lines = [self.lines[line_numbers_for_register[0]]
@@ -166,7 +168,14 @@ class UtilityTest(TestCase):
     def test_make_order_from_effective_df(self):
         for line_number in self.line_numbers_for_extra_sales:
             make_extra_sales_from_line(self.lines[line_number])
-        assert Extra
+        assert ExtraSales.objects.count() == 2
 
     def test_make_order_from_effective_df(self):
-        make_order_from_
+        Register.objects.all().delete()
+        make_order_from_effective_df(self.df)
+        assert Register.objects.count() == 5
+        assert ExtraSales.objects.count() == 2
+        assert Order.objects.count() == 8
+        assert Deposit.objects.count() == 3
+        assert Charge.objects.count() == 6+2  # by REGISTERs 6, EXTRA SALES 2
+        assert Payment.objects.count() == 4+2  # by REGISTERs 4, EXTRA SALES 2

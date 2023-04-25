@@ -50,14 +50,26 @@ END = 57
 
 def print_fields(obj):
     except_fields = ["updated", "created", "id"]
+    foreign_fields = []
+    for key in obj.__dict__:
+        if "_id" in key:
+            foreign_fields.append(key[:-3])
     model = obj._meta.model
     fields = model._meta.fields
     field_names = [field.name for field in fields]
-    print(model.__name__)
     obj_dict = {}
     for field_name in field_names:
         if not field_name in except_fields:
-            obj_dict[field_name] = str(obj.__dict__[field_name])
+            if field_name in foreign_fields:
+                foreign_id = obj.__dict__[field_name+"_id"]
+                related_model = obj._meta.get_field(field_name).related_model
+                if foreign_id:
+                    foreign_key = related_model.objects.get(id=foreign_id)
+                    obj_dict[field_name] = str(foreign_key)
+                else:
+                    obj_dict[field_name] = None
+            else:
+                obj_dict[field_name] = str_or_none(obj.__dict__[field_name])
     print(obj_dict)
 
 
@@ -129,6 +141,8 @@ def input_to_date(input_date):
         return string_to_date(str(int(input_date)))
     elif isinstance(input_date, int):
         return string_to_date(str(input_date))
+    elif input_date is None:
+        return None
     else:
         print("Date string is not in the correct format.")
         raise Exception("ERROR : WRONG INPUT TYPE")
@@ -316,7 +330,10 @@ def create_payment_from_line(line, sales):
 
 
 def make_extra_sales_from_line(line):
-    supporter, _ = Supporter.objects.get_or_create(name=line[SUPPORTER])
+    if line[SUPPORTER]:
+        supporter, _ = Supporter.objects.get_or_create(name=line[SUPPORTER])
+    else:
+        supporter = None
     client_name, insurance_agent_name = get_client_name_and_insurance_agent_name(
         line)
     if insurance_agent_name:
@@ -385,7 +402,7 @@ def make_complete_register_for_line_numbers(df, line_numbers):
     register = make_register_from_first_line_number(first_line)
     for line_number in line_numbers:
         line = df.iloc[line_number, :].values.tolist()
-        make_extra_sales_from_line(line, register)
+        make_order_payment_charge_and_deposit_with_line(line, register)
 
 
 def make_order_from_effective_df(df):
