@@ -10,14 +10,9 @@ from core import core_views
 
 urlpatterns = [
     path("", core_views.home, name="home"),
-    path("new_register/", core_views.new_register, name="new_register"),
-    path("edit_register/", core_views.edit_register, name="edit_register"),
-    path("finish_register/", core_views.finish_register, name="finish_register"),
-    path("search_registers/", core_views.search_registers, name="search_registers"),
-    path("demand/", include("demand.urls", namespace="demand")),
-    # Django Admin, use {% url 'admin:index' %}
     path("login/", core_views.login, name="login"),
     path("logout/", core_views.logout, name="logout"),
+    path("demand/", include("demand.urls", namespace="demand")),
     path(settings.ADMIN_URL, admin.site.urls),
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)\
