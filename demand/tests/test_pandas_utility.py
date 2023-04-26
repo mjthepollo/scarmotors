@@ -18,7 +18,7 @@ from demand.utility import (CHARGABLE_AMOUNT, CHARGE_AMOUNT,
                             get_line_numbers_for_registers, get_refund_date,
                             input_to_date, input_to_phone_number, int_or_none,
                             make_extra_sales_from_line,
-                            make_order_from_effective_df,
+                            make_models_from_effective_df,
                             make_order_payment_charge_and_deposit_with_line,
                             make_register_from_first_line_number, print_fields,
                             str_or_none, string_to_date, zero_if_none)
@@ -167,14 +167,14 @@ class UtilityTest(TestCase):
         chargable_amount_list = [248741, 624999, None, 2555500, 10000]
         self.check_chargable_amount(chargable_amount_list)
 
-    def test_make_order_from_effective_df(self):
+    def test_make_models_from_effective_df(self):
         for line_number in self.line_numbers_for_extra_sales:
             make_extra_sales_from_line(self.lines[line_number])
         assert ExtraSales.objects.count() == 2
 
-    def test_make_order_from_effective_df(self):
+    def test_make_models_from_effective_df(self):
         Register.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
         assert Register.objects.count() == 5
         assert ExtraSales.objects.count() == 2
         assert Order.objects.count() == 8
@@ -185,7 +185,7 @@ class UtilityTest(TestCase):
     def test_chargable_amount(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             extra_sales = ExtraSales.objects.all()[i]
@@ -216,7 +216,7 @@ class UtilityTest(TestCase):
     def test_charge_amount(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             extra_sales = ExtraSales.objects.all()[i]
@@ -247,7 +247,7 @@ class UtilityTest(TestCase):
     def test_not_paid_amount(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             extra_sales = ExtraSales.objects.all()[i]
@@ -264,7 +264,7 @@ class UtilityTest(TestCase):
     def test_payment_rate(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             extra_sales = ExtraSales.objects.all()[i]
             payment_rate = extra_sales.get_payment_rate()
@@ -288,7 +288,7 @@ class UtilityTest(TestCase):
     def test_turnover(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             assert abs(zero_if_none(self.lines[line_number][TURNOVER]) - ExtraSales.objects.all()[
@@ -300,7 +300,7 @@ class UtilityTest(TestCase):
     def test_factory_turnover(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             assert abs(zero_if_none(self.lines[line_number][FACTORY_TURNOVER]) - ExtraSales.objects.all()[
@@ -312,7 +312,7 @@ class UtilityTest(TestCase):
     def test_paid_turnover(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             assert abs(zero_if_none(self.lines[line_number][PAID_TURNOVER]) - ExtraSales.objects.all()[
@@ -324,7 +324,7 @@ class UtilityTest(TestCase):
     def test_not_paid_turnover(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             assert abs(zero_if_none(self.lines[line_number][NOT_PAID_TURNOVER]) - ExtraSales.objects.all()[
@@ -336,7 +336,7 @@ class UtilityTest(TestCase):
     def test_integrated_turnover(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             assert abs(zero_if_none(self.lines[line_number][INTEGRATED_TURNOVER]) - ExtraSales.objects.all()[
@@ -348,7 +348,7 @@ class UtilityTest(TestCase):
     def test_component_turnover(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             assert abs(zero_if_none(self.lines[line_number][COMPONENT_TURNOVER]) - ExtraSales.objects.all()[
@@ -360,7 +360,7 @@ class UtilityTest(TestCase):
     def test_wage_turnover(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             assert abs(zero_if_none(self.lines[line_number][WAGE_TURNOVER]) - ExtraSales.objects.all()[
@@ -372,7 +372,7 @@ class UtilityTest(TestCase):
     def test_status(self):
         Register.objects.all().delete()
         ExtraSales.objects.all().delete()
-        make_order_from_effective_df(self.df)
+        make_models_from_effective_df(self.df)
 
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             assert self.lines[line_number][STATUS] == ExtraSales.objects.all()[

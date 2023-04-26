@@ -415,7 +415,7 @@ def make_complete_register_for_line_numbers(df, line_numbers):
         make_order_payment_charge_and_deposit_with_line(line, register)
 
 
-def make_order_from_effective_df(df):
+def make_models_from_effective_df(df):
     line_numbers_for_registers = get_line_numbers_for_registers(df)
     line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(df)
     for line_numbers_for_register in line_numbers_for_registers:
