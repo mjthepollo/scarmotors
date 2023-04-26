@@ -46,11 +46,16 @@ class UtilityTest(TestCase):
                       [331.0, None, None, pd.Timestamp('2023-03-31 00:00:00'), None, datetime(2023, 3, 31, 0, 0), 0.0, 'xxxx', '세차', None, None, None, 0.0, None, '세차실장', None, '일반경정비', '일반경정비', None, '세차', 1.0, 3.0, 230331.0, None, 50000.0, 50000.0, 5000.0, 55000.00000000001,
                        None, 55000.0, None, None, '카드', '신한', pd.Timestamp('2023-03-31 00:00:00'), 0.0, None, None, None, None, 0, None, 55000.0, 5000.000000000007, 49999.99999999999, None, None, '완료', '일반경정비', None, 1.0, 49999.99999999999, 0.0, 49999.99999999999, 0.0, 0.0, 50000.0],
                       [412.0, None, None, pd.Timestamp('2023-04-12 00:00:00'), pd.Timestamp('2023-04-12 00:00:00'), datetime(2023, 4, 12, 0, 0), 0.0, '307누8223', 'IG', '국산', None, None, 0.0, None, '세차실장', '010-5407-9545', '일반경정비', '일반경정비', None, '부분 유리막코팅', 1.0, 4.0, 230412.0, None,
-                       90000.0, 90000.0, 9000.0, 99000.00000000001, None, 99000.0, None, None, '카드', '롯데', pd.Timestamp('2023-04-12 00:00:00'), 0.0, None, None, None, None, 0, None, 99000.0, 9000.0, 90000.0, None, None, '완료', '일반경정비', None, 1.0, 90000.0, 0.0, 90000.0, 0.0, 0.0, 90000.0]
+                       90000.0, 90000.0, 9000.0, 99000.00000000001, None, 99000.0, None, None, '카드', '롯데', pd.Timestamp('2023-04-12 00:00:00'), 0.0, None, None, None, None, 0, None, 99000.0, 9000.0, 90000.0, None, None, '완료', '일반경정비', None, 1.0, 90000.0, 0.0, 90000.0, 0.0, 0.0, 90000.0],
+                      [None, None, '1-80', pd.Timestamp('2023-01-02 00:00:00'), pd.Timestamp('2023-02-03 00:00:00'), '폐차', None, '21하3555', 'SM7', '국산', 4.0, 4.0, 8.0, '이성도', '김용연/백준호', 1072230486, '보험', '현대', '대물', '12-109185', 1.0,
+                       None, None, None, None, 0.0, 0.0, 0.0, '스타렌트', None, None, None, None, None, None, 0.0, None, None, None, None, 0.0, None, 0.0, 0.0, 0.0, None, '폐차처리', '미청구', None, None, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                      [None, None, '1-103', pd.Timestamp('2023-01-21 00:00:00'), pd.Timestamp('2023-01-26 00:00:00'), '미수리출고', None, '48노5927', '클리오', '국산', 1.0, 1.0, 2.0, '김일한', '김장현담당', 1031717367, '보험', '현대', '대물', '23-01063895', None,
+                       None, None, None, None, 0.0, 0.0, 0.0, '롯데렌탈 용인영업소', None, None, None, None, None, None, 0.0, None, None, None, None, 0.0, None, 0.0, 0.0, 0.0, None, None, '미청구', None, None, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
                       ]
         self.df = pd.DataFrame(self.lines).replace(
             {pd.NaT: None, np.nan: None}, inplace=False)
-        self.line_numbers_for_registers = [[0, 1], [2], [3, 4], [5, 6], [7]]
+        self.line_numbers_for_registers = [
+            [0, 1], [2], [3, 4], [5, 6], [7], [10], [11]]
         self.line_numbers_for_extra_sales = [8, 9]
         self.first_lines = [self.lines[line_numbers_for_register[0]]
                             for line_numbers_for_register in self.line_numbers_for_registers]
@@ -125,14 +130,20 @@ class UtilityTest(TestCase):
             self.lines[7])
 
     def test_make_register_from_first_line_number(self):
-        test_answers = [("1-1", "60저0130", "2023-01-02", "2023-01-09", "2023-01-13", "320D", "수입", 0, 1, "이성도(타)", "김석종", "구본준", "01031370900", "무상7889", "TEST"),
+        test_answers = [("1-1", "60저0130", "2023-01-02", "2023-01-09", "2023-01-13", "320D", "수입", 0, 1, "이성도(타)", "김석종", "구본준", "01031370900", "무상7889", "TEST", False, False),
                         ("1-21", "13버6789", "2023-01-03", "2023-01-05", "2023-01-06", "투싼",
-                         "국산", 0, 2, "이소정(직원)", None, "구본준", "01034361547", "에스렌트", None),
+                         "국산", 0, 2, "이소정(직원)", None, "구본준", "01034361547", "에스렌트", None, False, False),
                         ("1-79", "241마5742", "2023-01-12", "2023-01-20", "2023-01-19", "QM6",
-                         "국산", 1, 2, "이성도(타)", "김윤희", "구본준", "01048104691", "반디", None),
+                         "국산", 1, 2, "이성도(타)", "김윤희", "구본준", "01048104691", "반디", None, False, False),
                         ("1-100", "60구2264", "2023-01-17", "2023-01-27", "2023-01-31", "렉서스LS460",
-                         "수입", 3, 0, "장영수", None, "윤석영", "01094034783", "무상4760", None),
-                        ("1-101", "193허2950", "2023-01-20", "2023-01-20", "2023-01-20", "K5", "국산", 0, 0, "고객", None, None, None, None, None),]
+                         "수입", 3, 0, "장영수", None, "윤석영", "01094034783", "무상4760", None, False, False),
+                        ("1-101", "193허2950", "2023-01-20", "2023-01-20", "2023-01-20",
+                         "K5", "국산", 0, 0, "고객", None, None, None, None, None, False, False),
+                        ("1-80", "21하3555", "2023-01-02", "2023-02-03", "None",
+                         "SM7", "국산", 4, 4, "이성도", "김용연", "백준호", "01072230486", "스타렌트", "폐차처리", True, False),
+                        ("1-103", "48노5927", "2023-01-21", "2023-01-26", "None",
+                         "클리오", "국산", 1, 1, "김일한", None, "김장현", "01031717367", "롯데렌탈 용인영업소", None, False, True),
+                        ]
         for i, register in enumerate(Register.objects.all()):
             object_to_tuple = (register.RO_number,
                                register.car_number,
@@ -148,9 +159,12 @@ class UtilityTest(TestCase):
                                str(register.insurance_agent) if register.insurance_agent else None,
                                register.phone_number,
                                register.rentcar_company_name,
-                               register.note)
+                               register.note,
+                               register.wasted,
+                               register.unrepaired,
+                               )
             assert object_to_tuple == test_answers[i]
-        assert Register.objects.count() == 5
+        assert Register.objects.count() == 7
 
     def check_chargable_amount(self, chargable_amount_list):
         for i, register in enumerate(self.registers):
@@ -165,10 +179,11 @@ class UtilityTest(TestCase):
             make_order_payment_charge_and_deposit_with_line(
                 self.first_lines[i], self.registers[i])
 
-        chargable_amount_list = [248741, 624999, None, 2555500, 10000]
+        chargable_amount_list = [248741, 624999,
+                                 None, 2555500, 10000, None, None]
         self.check_chargable_amount(chargable_amount_list)
 
-    def test_make_models_from_effective_df(self):
+    def test_make_extra_sales_from_effective_df(self):
         for line_number in self.line_numbers_for_extra_sales:
             make_extra_sales_from_line(self.lines[line_number])
         assert ExtraSales.objects.count() == 2
@@ -176,9 +191,9 @@ class UtilityTest(TestCase):
     def test_make_models_from_effective_df(self):
         Register.objects.all().delete()
         make_models_from_effective_df(self.df)
-        assert Register.objects.count() == 5
+        assert Register.objects.count() == 7
         assert ExtraSales.objects.count() == 2
-        assert Order.objects.count() == 8
+        assert Order.objects.count() == 10
         assert Deposit.objects.count() == 3
         assert Charge.objects.count() == 6+2  # by REGISTERs 6, EXTRA SALES 2
         assert Payment.objects.count() == 4+2  # by REGISTERs 4, EXTRA SALES 2

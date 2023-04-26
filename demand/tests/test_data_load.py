@@ -10,8 +10,9 @@ from demand.utility import (
     INTEGRATED_TURNOVER, NOT_PAID_AMOUNT, NOT_PAID_TURNOVER, PAID_TURNOVER,
     PAYMENT_RATE, STATUS, TURNOVER, WAGE_TURNOVER,
     check_line_numbers_for_registers_have_same_car_number,
-    check_line_numbers_for_registers_have_unique_RO_number, check_wash_car,
-    df_to_lines, get_effective_data_frame, get_effective_row_numbers,
+    check_line_numbers_for_registers_have_unique_RO_number,
+    check_values_of_column, check_wash_car, df_to_lines,
+    get_effective_data_frame, get_effective_row_numbers,
     get_line_numbers_for_extra_sales, get_line_numbers_for_registers,
     load_data, make_models_from_effective_df, zero_if_none)
 
@@ -85,238 +86,97 @@ class DataLoadTest(TestCase):
             self.df2) == [659, 671]
 
     def test_chargable_amount(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df1)
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales1):
-            extra_sales = ExtraSales.objects.all()[i]
-            chargable_amount = extra_sales.get_chargable_amount()
-            chargable_amount_value = self.lines[line_number][CHARGABLE_AMOUNT]
-            if extra_sales.charge:
-                assert abs(chargable_amount_value - chargable_amount) < 10
-            else:
-                if isinstance(chargable_amount_value, (float, int)):
-                    assert chargable_amount_value == 0.0
-                    assert chargable_amount == None
-                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
-                    raise AssertionError
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers2 for line_number in line_numbers_for_register]):
-            order = Order.objects.all()[i]
-            chargable_amount = order.get_chargable_amount()
-            chargable_amount_value = self.lines[line_number][CHARGABLE_AMOUNT]
-            if order.charge:
-                assert abs(chargable_amount_value - chargable_amount) < 10
-            else:
-                if isinstance(chargable_amount_value, (float, int)):
-                    assert chargable_amount_value == 0.0
-                    assert chargable_amount == None
-                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
-                    raise AssertionError
-
-        call_command("clean_models")
-        make_models_from_effective_df(self.df2)
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales2):
-            extra_sales = ExtraSales.objects.all()[i]
-            chargable_amount = extra_sales.get_chargable_amount()
-            chargable_amount_value = self.lines[line_number][CHARGABLE_AMOUNT]
-            if extra_sales.charge:
-                assert abs(chargable_amount_value - chargable_amount) < 10
-            else:
-                if isinstance(chargable_amount_value, (float, int)):
-                    assert chargable_amount_value == 0.0
-                    assert chargable_amount == None
-                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
-                    raise AssertionError
-
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers2 for line_number in line_numbers_for_register]):
-            order = Order.objects.all()[i]
-            chargable_amount = order.get_chargable_amount()
-            chargable_amount_value = self.lines[line_number][CHARGABLE_AMOUNT]
-            if order.charge:
-                assert abs(chargable_amount_value - chargable_amount) < 10
-            else:
-                if isinstance(chargable_amount_value, (float, int)):
-                    assert chargable_amount_value == 0.0
-                    assert chargable_amount == None
-                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
-                    raise AssertionError
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               CHARGABLE_AMOUNT, "get_chargable_amount")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               CHARGABLE_AMOUNT, "get_chargable_amount")
 
     def test_charge_amount(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df1)
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales1):
-            extra_sales = ExtraSales.objects.all()[i]
-            charge_amount = extra_sales.get_charge_amount()
-            charge_amount_value = self.lines[line_number][CHARGE_AMOUNT]
-            if extra_sales.charge:
-                assert abs(charge_amount_value - charge_amount) < 10
-            else:
-                if isinstance(charge_amount_value, (float, int)):
-                    assert charge_amount_value == 0.0
-                    assert charge_amount == None
-                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
-                    raise AssertionError
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers2 for line_number in line_numbers_for_register]):
-            order = Order.objects.all()[i]
-            charge_amount = order.get_charge_amount()
-            charge_amount_value = self.lines[line_number][CHARGE_AMOUNT]
-            if order.charge:
-                assert abs(charge_amount_value - charge_amount) < 10
-            else:
-                if isinstance(charge_amount_value, (float, int)):
-                    assert charge_amount_value == 0.0
-                    assert charge_amount == None
-                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
-                    raise AssertionError
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            extra_sales = ExtraSales.objects.all()[i]
-            charge_amount = extra_sales.get_charge_amount()
-            charge_amount_value = self.lines[line_number][CHARGE_AMOUNT]
-            if extra_sales.charge:
-                assert abs(charge_amount_value - charge_amount) < 10
-            else:
-                if isinstance(charge_amount_value, (float, int)):
-                    assert charge_amount_value == 0.0
-                    assert charge_amount == None
-                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
-                    raise AssertionError
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            order = Order.objects.all()[i]
-            charge_amount = order.get_charge_amount()
-            charge_amount_value = self.lines[line_number][CHARGE_AMOUNT]
-            if order.charge:
-                assert abs(charge_amount_value - charge_amount) < 10
-            else:
-                if isinstance(charge_amount_value, (float, int)):
-                    assert charge_amount_value == 0.0
-                    assert charge_amount == None
-                else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
-                    raise AssertionError
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               CHARGE_AMOUNT, "get_charge_amount")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               CHARGE_AMOUNT, "get_charge_amount")
 
     def test_not_paid_amount(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            extra_sales = ExtraSales.objects.all()[i]
-            not_paid_amount = extra_sales.get_not_paid_amount()
-            not_paid_amount_value = self.lines[line_number][NOT_PAID_AMOUNT]
-            assert abs(not_paid_amount_value - not_paid_amount) < 10
-
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            order = Order.objects.all()[i]
-            not_paid_amount = order.get_not_paid_amount()
-            not_paid_amount_value = self.lines[line_number][NOT_PAID_AMOUNT]
-            assert abs(not_paid_amount_value - not_paid_amount) < 10
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               NOT_PAID_AMOUNT, "get_not_paid_amount")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               NOT_PAID_AMOUNT, "get_not_paid_amount")
 
     def test_payment_rate(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            extra_sales = ExtraSales.objects.all()[i]
-            payment_rate = extra_sales.get_payment_rate()
-            payment_rate_value = self.lines[line_number][PAYMENT_RATE]
-            if payment_rate:
-                assert abs(payment_rate_value - payment_rate) <= 0.01
-            else:
-                assert payment_rate_value == None
-                assert payment_rate == None
-
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            order = Order.objects.all()[i]
-            payment_rate = order.get_payment_rate()
-            payment_rate_value = self.lines[line_number][PAYMENT_RATE]
-            if payment_rate:
-                assert abs(payment_rate_value - payment_rate) <= 0.01
-            else:
-                assert payment_rate_value == None
-                assert payment_rate == None
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               PAYMENT_RATE, "get_payment_rate")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               PAYMENT_RATE, "get_payment_rate")
 
     def test_turnover(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            assert abs(zero_if_none(self.lines[line_number][TURNOVER]) - ExtraSales.objects.all()[
-                i].get_turnover()) < 10
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            assert abs(zero_if_none(self.lines[line_number][TURNOVER]) - Order.objects.all()[
-                i].get_turnover()) < 10
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               TURNOVER, "get_turnover")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               TURNOVER, "get_turnover")
 
     def test_factory_turnover(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            assert abs(zero_if_none(self.lines[line_number][FACTORY_TURNOVER]) - ExtraSales.objects.all()[
-                i].get_factory_turnover()) < 10
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            assert abs(zero_if_none(self.lines[line_number][FACTORY_TURNOVER]) - Order.objects.all()[
-                i].get_factory_turnover()) < 10
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               FACTORY_TURNOVER, "get_factory_turnover")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               FACTORY_TURNOVER, "get_factory_turnover")
 
     def test_paid_turnover(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            assert abs(zero_if_none(self.lines[line_number][PAID_TURNOVER]) - ExtraSales.objects.all()[
-                i].get_paid_turnover()) < 10
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            assert abs(zero_if_none(self.lines[line_number][PAID_TURNOVER]) - Order.objects.all()[
-                i].get_paid_turnover()) < 10
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               PAID_TURNOVER, "get_paid_turnover")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               PAID_TURNOVER, "get_paid_turnover")
 
     def test_not_paid_turnover(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            assert abs(zero_if_none(self.lines[line_number][NOT_PAID_TURNOVER]) - ExtraSales.objects.all()[
-                i].get_not_paid_turnover()) < 10
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            assert abs(zero_if_none(self.lines[line_number][NOT_PAID_TURNOVER]) - Order.objects.all()[
-                i].get_not_paid_turnover()) < 10
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               NOT_PAID_TURNOVER, "get_not_paid_turnover")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               NOT_PAID_TURNOVER, "get_not_paid_turnover")
 
     def test_integrated_turnover(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            assert abs(zero_if_none(self.lines[line_number][INTEGRATED_TURNOVER]) - ExtraSales.objects.all()[
-                i].get_integrated_turnover()) < 10
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            assert abs(zero_if_none(self.lines[line_number][INTEGRATED_TURNOVER]) - Order.objects.all()[
-                i].get_integrated_turnover()) < 10
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               INTEGRATED_TURNOVER, "get_integrated_turnover")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               INTEGRATED_TURNOVER, "get_integrated_turnover")
 
     def test_component_turnover(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            assert abs(zero_if_none(self.lines[line_number][COMPONENT_TURNOVER]) - ExtraSales.objects.all()[
-                i].get_component_turnover()) < 10
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            assert abs(zero_if_none(self.lines[line_number][COMPONENT_TURNOVER]) - Order.objects.all()[
-                i].get_component_turnover()) < 10
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               COMPONENT_TURNOVER, "get_component_turnover")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               COMPONENT_TURNOVER, "get_component_turnover")
 
     def test_wage_turnover(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            assert abs(zero_if_none(self.lines[line_number][WAGE_TURNOVER]) - ExtraSales.objects.all()[
-                i].get_wage_turnover()) < 10
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            assert abs(zero_if_none(self.lines[line_number][WAGE_TURNOVER]) - Order.objects.all()[
-                i].get_wage_turnover()) < 10
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               WAGE_TURNOVER, "get_wage_turnover")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               WAGE_TURNOVER, "get_wage_turnover")
 
     def test_status(self):
-        call_command("clean_models")
-        make_models_from_effective_df(self.df)
-
-        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
-            assert self.lines[line_number][STATUS] == ExtraSales.objects.all()[
-                i].get_status()
-        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
-            assert self.lines[line_number][STATUS] == Order.objects.all()[
-                i].get_status()
+        check_values_of_column(self.df1, self.lines1, self.line_numbers_for_registers1,
+                               self.line_numbers_for_extra_sales1,
+                               STATUS, "get_status")
+        check_values_of_column(self.df2, self.lines2, self.line_numbers_for_registers2,
+                               self.line_numbers_for_extra_sales2,
+                               STATUS, "get_status")

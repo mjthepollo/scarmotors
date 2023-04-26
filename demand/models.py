@@ -349,6 +349,9 @@ class ExtraSales(TimeStampedModel):
         Deposit, null=True, blank=True, related_name="extra_sales", verbose_name="입금", on_delete=models.CASCADE)
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
+    wasted = models.BooleanField(default=False, verbose_name="폐차")
+    unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
+
     def get_payment_rate(self):
         charge_amount = self.get_charge_amount()
         if not charge_amount:

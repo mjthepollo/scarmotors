@@ -156,7 +156,12 @@ def input_to_date(input_date):
     elif isinstance(input_date, date):
         return input_date
     elif isinstance(input_date, str):
-        return string_to_date(input_date)
+        if input_date == "폐차":
+            return None
+        elif input_date == "미수리출고":
+            return None
+        else:
+            return string_to_date(input_date)
     elif isinstance(input_date, float):
         return string_to_date(str(int(input_date)))
     elif isinstance(input_date, int):
@@ -401,6 +406,9 @@ def make_extra_sales_from_line(line):
     if insurance_agent_name:
         insurance_agent, _ = InsuranceAgent.objects.get_or_create(
             name=insurance_agent_name)
+    else:
+        insurance_agent = None
+
     extra_sales = ExtraSales.objects.create(
         car_number=line[CAR_NUMBER],
         day_came_in=input_to_date(line[DAY_CAME_IN]),
@@ -421,7 +429,11 @@ def make_extra_sales_from_line(line):
 
 
 def make_register_from_first_line_number(first_line):
-    supporter, _ = Supporter.objects.get_or_create(name=first_line[SUPPORTER])
+    if first_line[SUPPORTER]:
+        supporter, _ = Supporter.objects.get_or_create(
+            name=first_line[SUPPORTER])
+    else:
+        supporter = None
     client_name, insurance_agent_name = get_client_name_and_insurance_agent_name(
         first_line)
     if insurance_agent_name:
@@ -429,6 +441,10 @@ def make_register_from_first_line_number(first_line):
             name=insurance_agent_name)
     else:
         insurance_agent = None
+
+    wasted = first_line[REAL_DAY_CAME_OUT] == "폐차"
+    unrepaired = first_line[REAL_DAY_CAME_OUT] == "미수리출고"
+
     return Register.objects.create(
         RO_number=first_line[RO_NUMBER],
         car_number=first_line[CAR_NUMBER],
@@ -447,6 +463,8 @@ def make_register_from_first_line_number(first_line):
         phone_number=input_to_phone_number(first_line[PHONE_NUMBER]),
         rentcar_company_name=first_line[RENT_CAR_COMPANY_NAME],
         note=first_line[NOTE],
+        wasted=wasted,
+        unrepaired=unrepaired,
     )
 
 
