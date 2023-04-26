@@ -31,6 +31,9 @@
   color: #009cff;
 }
 
+.error {
+  color: red;
+}
 body {
   position: relative;
 

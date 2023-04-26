@@ -7,5 +7,8 @@
   {{login_form.username}}
   {{login_form.password}}
   <button class="btn btn-dark">LOGIN</button>
+  {% for error in login_form.non_field_errors %}
+      <p class="error">{{ error }}</p>
+  {% endfor %}
 </form>
 {% endblock content %}
