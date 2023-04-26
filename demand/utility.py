@@ -3,7 +3,18 @@ from datetime import date, datetime
 
 import numpy as np
 import pandas as pd
+from django.core.management import call_command
 
+from demand.check_value_functions import (check_chargable_amount,
+                                          check_charge_amount,
+                                          check_component_turnover,
+                                          check_factory_turnover,
+                                          check_integrated_turnover,
+                                          check_not_paid_amount,
+                                          check_not_paid_turnover,
+                                          check_paid_turnover,
+                                          check_payment_rate, check_status,
+                                          check_turnover, check_wage_turnover)
 from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
                            InsuranceAgent, Order, Payment, Register, Supporter)
 
@@ -263,6 +274,47 @@ def get_line_numbers_for_extra_sales(effective_df):
             if check_wash_car(effective_df, i):  # 현재는 세차만 고려한다.
                 line_numbers_for_extra_sales.append(i)
     return line_numbers_for_extra_sales
+
+
+def df_to_lines(df):
+    lines = []
+    for i in range(len(df)):
+        lines.append(df.iloc[i, :].values.tolist())
+    return lines
+
+
+def check_values_of_column(df, lines, line_numbers_for_registers,
+                           line_numbers_for_extra_sales,
+                           COLUMN_NUMBER, METHOD_NAME):
+    CHECK_VALUE_FUNCTIONS = {
+        CHARGE_AMOUNT: check_charge_amount,
+        COMPONENT_TURNOVER: check_component_turnover,
+        FACTORY_TURNOVER: check_factory_turnover,
+        CHARGABLE_AMOUNT: check_chargable_amount,
+        INTEGRATED_TURNOVER: check_integrated_turnover,
+        NOT_PAID_AMOUNT: check_not_paid_amount,
+        NOT_PAID_TURNOVER: check_not_paid_turnover,
+        PAID_TURNOVER: check_paid_turnover,
+        PAYMENT_RATE: check_payment_rate,
+        STATUS: check_status,
+        TURNOVER: check_turnover,
+        WAGE_TURNOVER: check_wage_turnover,
+    }
+    call_command('clean_models')
+    make_models_from_effective_df(df)
+    for i, line_number in enumerate(line_numbers_for_extra_sales):
+        extra_sales = ExtraSales.objects.all()[i]
+        compared_value = getattr(extra_sales, METHOD_NAME)()
+        expecting_value = lines[line_number][COLUMN_NUMBER]
+        CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
+            extra_sales, compared_value, expecting_value)
+
+    for i, line_number in enumerate([line_number for line_numbers_for_register in line_numbers_for_registers for line_number in line_numbers_for_register]):
+        order = Order.objects.all()[i]
+        compared_value = getattr(order, METHOD_NAME)()
+        expecting_value = lines[line_number][COLUMN_NUMBER]
+        CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
+            order, compared_value, expecting_value)
 
 # -------------- tested by data_load_test finish--------------#
 

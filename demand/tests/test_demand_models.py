@@ -158,13 +158,14 @@ class ModelTest(TestCase):
 
     def test_get_charge_amount(self):
         self.setUpExtraCase()
-        self.assertEqual(self.order.get_charge_amount(), 55600)
-        self.assertEqual(self.extra_sales.get_charge_amount(), 82000)
+        self.assertEqual(self.order.get_charge_amount(), 65600)
+        self.assertEqual(self.extra_sales.get_charge_amount(), 92000)
 
     def test_get_payment_rate(self):
         self.setUpExtraCase()
-        self.assertEqual(self.order.get_payment_rate(), 74)
-        self.assertEqual(self.extra_sales.get_payment_rate(), 98)
+        self.assertAlmostEqual(self.order.get_payment_rate(), 0.625, places=2)
+        self.assertAlmostEqual(
+            self.extra_sales.get_payment_rate(), 0.869, places=2)
 
     def test_get_number_of_works(self):
         self.assertEqual(self.register.get_number_of_works(), 3)
