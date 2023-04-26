@@ -1,0 +1,14 @@
+{% load static %}
+<header>
+    <div id="inner_header" class="container">
+        <div id="inner_header_left">
+            <a id="home_link" href="{% url 'home'%}"><img src="{% static 'images/scar_tech.png'%}"></a>
+            <a class="header_link" href="{% url 'new_register'%}">입고</a>
+            <a class="header_link" href="{% url 'finish_register'%}">출고</a>
+            <a class="header_link" href="{% url 'search_registers'%}">검색</a>
+        </div>
+        <div id="inner_header_right">
+            <a class="header_link" href="{% url 'logout'%}">로그아웃</a>
+        </div>
+    </div>
+</header>

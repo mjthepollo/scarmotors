@@ -1,9 +1,14 @@
 main.container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 
   height: calc(var(--vh) * 100);
+}
+
+img {
+  width: 280px;
 }
 
 h2 {
@@ -15,11 +20,14 @@ form {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  padding-bottom: 50px;
 }
 
 form > input {
   width: 280px;
   height: 38px;
+  margin-top: 5px;
 
   text-align: center;
 }
