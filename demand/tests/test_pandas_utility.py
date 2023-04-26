@@ -8,9 +8,11 @@ from django.test import TestCase
 from demand.models import (STATUS_DICT, Charge, ChargedCompany, Deposit,
                            ExtraSales, InsuranceAgent, Order, Payment,
                            Register, Supporter)
-from demand.utility import (CHARGABLE_AMOUNT, CHARGE_AMOUNT, FACTORY_TURNOVER,
-                            INTEGRATED_TURNOVER, NOT_PAID_TURNOVER,
-                            PAID_TURNOVER, STATUS, TURNOVER, check_car_number,
+from demand.utility import (CHARGABLE_AMOUNT, CHARGE_AMOUNT,
+                            COMPONENT_TURNOVER, FACTORY_TURNOVER,
+                            INTEGRATED_TURNOVER, NOT_PAID_AMOUNT,
+                            NOT_PAID_TURNOVER, PAID_TURNOVER, PAYMENT_RATE,
+                            STATUS, TURNOVER, WAGE_TURNOVER, check_car_number,
                             check_wash_car, fault_ratio_to_int,
                             get_client_name_and_insurance_agent_name,
                             get_line_numbers_for_registers, get_refund_date,
@@ -121,9 +123,6 @@ class UtilityTest(TestCase):
         assert (None, None) == get_client_name_and_insurance_agent_name(
             self.lines[7])
 
-    def test_make_register_from_effective_df(self):
-        pass
-
     def test_make_register_from_first_line_number(self):
         test_answers = [("1-1", "60저0130", "2023-01-02", "2023-01-09", "2023-01-13", "320D", "수입", 0, 1, "이성도(타)", "김석종", "구본준", "01031370900", "무상7889", "TEST"),
                         ("1-21", "13버6789", "2023-01-03", "2023-01-05", "2023-01-06", "투싼",
@@ -222,12 +221,12 @@ class UtilityTest(TestCase):
         for i, line_number in enumerate(self.line_numbers_for_extra_sales):
             extra_sales = ExtraSales.objects.all()[i]
             charge_amount = extra_sales.get_charge_amount()
+            charge_amount_value = self.lines[line_number][CHARGE_AMOUNT]
             if extra_sales.charge:
-                assert abs(self.lines[line_number]
-                           [CHARGE_AMOUNT] - charge_amount) < 10
+                assert abs(charge_amount_value - charge_amount) < 10
             else:
-                if isinstance(self.lines[line_number][CHARGE_AMOUNT], (float, int)):
-                    assert self.lines[line_number][CHARGE_AMOUNT] == 0.0
+                if isinstance(charge_amount_value, (float, int)):
+                    assert charge_amount_value == 0.0
                     assert charge_amount == None
                 else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
                     raise AssertionError
@@ -235,15 +234,56 @@ class UtilityTest(TestCase):
         for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
             order = Order.objects.all()[i]
             charge_amount = order.get_charge_amount()
+            charge_amount_value = self.lines[line_number][CHARGE_AMOUNT]
             if order.charge:
-                assert abs(self.lines[line_number]
-                           [CHARGE_AMOUNT] - charge_amount) < 10
+                assert abs(charge_amount_value - charge_amount) < 10
             else:
-                if isinstance(self.lines[line_number][CHARGE_AMOUNT], (float, int)):
-                    assert self.lines[line_number][CHARGE_AMOUNT] == 0.0
+                if isinstance(charge_amount_value, (float, int)):
+                    assert charge_amount_value == 0.0
                     assert charge_amount == None
                 else:  # 모두가 숫자일 것으로 예상되므로 이런 경우는 없어야 한다.
                     raise AssertionError
+
+    def test_not_paid_amount(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            extra_sales = ExtraSales.objects.all()[i]
+            not_paid_amount = extra_sales.get_not_paid_amount()
+            not_paid_amount_value = self.lines[line_number][NOT_PAID_AMOUNT]
+            assert abs(not_paid_amount_value - not_paid_amount) < 10
+
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            order = Order.objects.all()[i]
+            not_paid_amount = order.get_not_paid_amount()
+            not_paid_amount_value = self.lines[line_number][NOT_PAID_AMOUNT]
+            assert abs(not_paid_amount_value - not_paid_amount) < 10
+
+    def test_payment_rate(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            extra_sales = ExtraSales.objects.all()[i]
+            payment_rate = extra_sales.get_payment_rate()
+            payment_rate_value = self.lines[line_number][PAYMENT_RATE]
+            if payment_rate:
+                assert abs(payment_rate_value - payment_rate) <= 0.01
+            else:
+                assert payment_rate_value == None
+                assert payment_rate == None
+
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            order = Order.objects.all()[i]
+            payment_rate = order.get_payment_rate()
+            payment_rate_value = self.lines[line_number][PAYMENT_RATE]
+            if payment_rate:
+                assert abs(payment_rate_value - payment_rate) <= 0.01
+            else:
+                assert payment_rate_value == None
+                assert payment_rate == None
 
     def test_turnover(self):
         Register.objects.all().delete()
@@ -292,6 +332,42 @@ class UtilityTest(TestCase):
         for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
             assert abs(zero_if_none(self.lines[line_number][NOT_PAID_TURNOVER]) - Order.objects.all()[
                 i].get_not_paid_turnover()) < 10
+
+    def test_integrated_turnover(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            assert abs(zero_if_none(self.lines[line_number][INTEGRATED_TURNOVER]) - ExtraSales.objects.all()[
+                i].get_integrated_turnover()) < 10
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            assert abs(zero_if_none(self.lines[line_number][INTEGRATED_TURNOVER]) - Order.objects.all()[
+                i].get_integrated_turnover()) < 10
+
+    def test_component_turnover(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            assert abs(zero_if_none(self.lines[line_number][COMPONENT_TURNOVER]) - ExtraSales.objects.all()[
+                i].get_component_turnover()) < 10
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            assert abs(zero_if_none(self.lines[line_number][COMPONENT_TURNOVER]) - Order.objects.all()[
+                i].get_component_turnover()) < 10
+
+    def test_wage_turnover(self):
+        Register.objects.all().delete()
+        ExtraSales.objects.all().delete()
+        make_order_from_effective_df(self.df)
+
+        for i, line_number in enumerate(self.line_numbers_for_extra_sales):
+            assert abs(zero_if_none(self.lines[line_number][WAGE_TURNOVER]) - ExtraSales.objects.all()[
+                i].get_wage_turnover()) < 10
+        for i, line_number in enumerate([line_number for line_numbers_for_register in self.line_numbers_for_registers for line_number in line_numbers_for_register]):
+            assert abs(zero_if_none(self.lines[line_number][WAGE_TURNOVER]) - Order.objects.all()[
+                i].get_wage_turnover()) < 10
 
     def test_status(self):
         Register.objects.all().delete()

@@ -221,11 +221,29 @@ class Order(TimeStampedModel):
         else:
             return None
 
+    def get_payment_rate(self):
+        charge_amount = self.get_charge_amount()
+        if not charge_amount:
+            return None
+        else:
+            if charge_amount != 0:
+                deposit_amount = self.deposit.deposit_amount if self.deposit else 0
+                return deposit_amount/charge_amount
+            else:
+                return None
+
     def get_chargable_amount(self):
         if self.charge:
             return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
         else:
             None
+
+    def get_not_paid_amount(self):
+        charge_amount = self.get_charge_amount()
+        if not self.deposit:
+            return charge_amount if charge_amount else 0
+        else:
+            return 0
 
     def get_turnover(self):
         deposit_amount = self.deposit.deposit_amount if self.deposit else 0
@@ -239,6 +257,9 @@ class Order(TimeStampedModel):
             indemnity_amount = 0
         return deposit_amount+indemnity_amount-discount_amount-refund_amount
 
+    def get_factory_turnover(self):
+        return int(self.get_turnover()/1.1)
+
     def get_paid_turnover(self):
         return self.get_factory_turnover() if self.get_factory_turnover() > 0 else 0
 
@@ -248,12 +269,32 @@ class Order(TimeStampedModel):
         else:
             return 0
 
-    def get_factory_turnover(self):
-        return int(self.get_turnover()/1.1)
+    def get_integrated_turnover(self):
+        status = self.get_status()
+        if status == STATUS_DICT["NO_COMPLETE"]:
+            return self.get_not_paid_turnover()
+        elif status == STATUS_DICT["COMPLETE"]:
+            return self.get_paid_turnover()
+        elif status == STATUS_DICT["NO_CHARGE"]:
+            return 0
+        elif status == STATUS_DICT["NO_CAME_OUT"]:
+            return self.get_paid_turnover()
+        elif status == STATUS_DICT["OVER_DEPOSIT"]:
+            return self.get_paid_turnover()
+        else:
+            raise ("STATUS ERROR!")
 
-    def get_payment_rate(self):
-        deposit_amount = self.deposit.deposit_amount if self.deposit else 0
-        return round(deposit_amount/self.get_charge_amount()*100)
+    def get_component_turnover(self):
+        if self.charge:
+            if self.charge.component_amount:
+                if self.fault_ratio:
+                    return int(self.fault_ratio*self.charge.component_amount/100)
+                else:
+                    return self.charge.component_amount
+        return 0
+
+    def get_wage_turnover(self):
+        return self.get_integrated_turnover() - self.get_component_turnover()
 
     def get_status(self):
         receive = self.deposit or self.payment
@@ -309,8 +350,15 @@ class ExtraSales(TimeStampedModel):
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
     def get_payment_rate(self):
-        deposit_amount = self.deposit.deposit_amount if self.deposit else 0
-        return round(deposit_amount/self.get_charge_amount()*100)
+        charge_amount = self.get_charge_amount()
+        if not charge_amount:
+            return None
+        else:
+            if charge_amount != 0:
+                deposit_amount = self.deposit.deposit_amount if self.deposit else 0
+                return deposit_amount/charge_amount
+            else:
+                return None
 
     def get_charge_amount(self):
         if self.charge:
@@ -323,6 +371,13 @@ class ExtraSales(TimeStampedModel):
             return round(self.charge.get_repair_amount()*1.1)
         else:
             None
+
+    def get_not_paid_amount(self):
+        charge_amount = self.get_charge_amount()
+        if not self.deposit:
+            return charge_amount if charge_amount else 0
+        else:
+            return 0
 
     def get_turnover(self):
         deposit_amount = self.deposit.deposit_amount if self.deposit else 0
@@ -347,6 +402,30 @@ class ExtraSales(TimeStampedModel):
             return round(self.get_charge_amount()*0.95)
         else:
             return 0
+
+    def get_integrated_turnover(self):
+        status = self.get_status()
+        if status == STATUS_DICT["NO_COMPLETE"]:
+            return self.get_not_paid_turnover()
+        elif status == STATUS_DICT["COMPLETE"]:
+            return self.get_paid_turnover()
+        elif status == STATUS_DICT["NO_CHARGE"]:
+            return 0
+        elif status == STATUS_DICT["NO_CAME_OUT"]:
+            return self.get_paid_turnover()
+        elif status == STATUS_DICT["OVER_DEPOSIT"]:
+            return self.get_paid_turnover()
+        else:
+            raise ("STATUS ERROR!")
+
+    def get_component_turnover(self):
+        if self.charge:
+            if self.charge.component_amount:
+                return self.charge.component_amount
+        return 0
+
+    def get_wage_turnover(self):
+        return self.get_integrated_turnover() - self.get_component_turnover()
 
     def get_status(self):
         receive = self.deposit or self.payment
