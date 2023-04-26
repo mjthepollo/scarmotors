@@ -308,18 +308,26 @@ def check_values_of_column(df, lines, line_numbers_for_registers,
     call_command('clean_models')
     make_models_from_effective_df(df)
     for i, line_number in enumerate(line_numbers_for_extra_sales):
-        extra_sales = ExtraSales.objects.all()[i]
-        compared_value = getattr(extra_sales, METHOD_NAME)()
-        expecting_value = lines[line_number][COLUMN_NUMBER]
-        CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
-            extra_sales, compared_value, expecting_value)
+        try:
+            extra_sales = ExtraSales.objects.all()[i]
+            compared_value = getattr(extra_sales, METHOD_NAME)()
+            expecting_value = lines[line_number][COLUMN_NUMBER]
+            CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
+                extra_sales, compared_value, expecting_value)
+        except Exception as e:
+            print_fields(extra_sales)
+            raise e
 
     for i, line_number in enumerate([line_number for line_numbers_for_register in line_numbers_for_registers for line_number in line_numbers_for_register]):
-        order = Order.objects.all()[i]
-        compared_value = getattr(order, METHOD_NAME)()
-        expecting_value = lines[line_number][COLUMN_NUMBER]
-        CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
-            order, compared_value, expecting_value)
+        try:
+            order = Order.objects.all()[i]
+            compared_value = getattr(order, METHOD_NAME)()
+            expecting_value = lines[line_number][COLUMN_NUMBER]
+            CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
+                order, compared_value, expecting_value)
+        except Exception as e:
+            print_fields(order)
+            raise e
 
 # -------------- tested by data_load_test finish--------------#
 
@@ -365,7 +373,7 @@ def create_deposit_from_line(line, sales):
 
 
 def create_charge_from_line(line, sales):
-    if line[CHARGE_DATE]:
+    if line[CHARGE_DATE] or line[WAGE_AMOUNT] or line[COMPONENT_AMOUNT]:
         charge = Charge.objects.create(
             charge_date=input_to_date(line[CHARGE_DATE]),
             wage_amount=zero_if_none(int_or_none(line[WAGE_AMOUNT])),

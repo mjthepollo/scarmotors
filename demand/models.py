@@ -63,7 +63,7 @@ class Payment(TimeStampedModel):
 
 
 class Charge(TimeStampedModel):
-    charge_date = models.DateField(verbose_name="청구일")
+    charge_date = models.DateField(verbose_name="청구일", null=True, blank=True)
     wage_amount = models.IntegerField(default=0, verbose_name="공임비")
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
 
@@ -202,7 +202,7 @@ class Order(TimeStampedModel):
     order_type = models.CharField(null=True, blank=True, choices=(
         ("자차", "자차"), ("대물", "대물"), ("일반", "일반")), max_length=10, verbose_name="차/대/일")
     receipt_number = models.CharField(
-        max_length=20, verbose_name="접수번호", null=True, blank=True, unique=True)
+        max_length=20, verbose_name="접수번호", null=True, blank=True)
     fault_ratio = models.IntegerField(
         null=True, blank=True, verbose_name="과실분")
 
@@ -234,7 +234,10 @@ class Order(TimeStampedModel):
 
     def get_chargable_amount(self):
         if self.charge:
-            return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
+            if self.fault_ratio:
+                return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
+            else:
+                return round(self.charge.get_repair_amount()*1.1)
         else:
             None
 
