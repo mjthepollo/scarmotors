@@ -1,14 +1,44 @@
 from datetime import datetime
+from random import randint
 
 from django.test import TestCase
 
-from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
-                           InsuranceAgent, Order, Payment, Register, Supporter)
+from demand.models import (STATUS_DICT, Charge, ChargedCompany, Deposit,
+                           ExtraSales, InsuranceAgent, Order, Payment,
+                           Register, Supporter)
 from demand.utility import string_to_date
 
 
-class ModelTest(TestCase):
+def createRandomRegister():
+    randint(1, 9)
+    car_number = "RANDOM"
+    RO_number = f"TEST_RO"
+    return Register.objects.create(
+        RO_number=RO_number, car_number=car_number,
+        day_came_in=string_to_date("2023-04-20"),
+        expected_day_came_out=string_to_date("2023-04-25"), real_day_came_out=string_to_date("2023-04-26"),
+        car_model="아반떼", abroad_type="국산",
+        number_of_repair_works=randint(0, 4), number_of_exchange_works=randint(0, 4), client_name="김민준",
+        phone_number="010-1234-5678")
 
+
+def createRandomExtraSales(payment, charge, deposit):
+    return ExtraSales.objects.create(
+        day_came_in=string_to_date("2023-04-20"),
+        expected_day_came_out=string_to_date("2023-04-25"),
+        real_day_came_out=string_to_date("2023-04-26"),
+        payment=payment, charge=charge, deposit=deposit
+    )
+
+
+def createRandomOrder(register, fault_ratio, payment, charge, deposit):
+    return Order.objects.create(
+        register=register, charge_type="보험", receipt_number="TEST_RN",
+        fault_ratio=fault_ratio, payment=payment, charge=charge, deposit=deposit,
+    )
+
+
+class DemandModelTest(TestCase):
     def setUp(self):
         self.supporter = Supporter.objects.create(name="test_supporter")
         self.charged_company = ChargedCompany.objects.create(
@@ -101,6 +131,143 @@ class ModelTest(TestCase):
             note="기타매출"
         )
 
+    def setUpOrderStatusTestCase(self):
+        payment_date = string_to_date("2023-03-19")
+        refund_date = string_to_date("2023-03-19")
+        charge_date = string_to_date("2023-03-19")
+        deposit_date = string_to_date("2023-03-19")
+        register = createRandomRegister()
+        register_without_day_came_out = createRandomRegister()
+        register_without_day_came_out.real_day_came_out = None
+        register_without_day_came_out.save()
+
+        no_charge_order_payment = Payment.objects.create(indemnity_amount=50000,
+                                                         discount_amount=10000, payment_type="카드",
+                                                         payment_info="삼성카드", payment_date=payment_date,
+                                                         refund_amount=10000, refund_date=refund_date)
+        no_charge_order_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=90000)
+        self.no_charge_order1 = createRandomOrder(
+            register, 70, no_charge_order_payment, None, no_charge_order_deposit)
+        self.no_charge_order2 = createRandomOrder(
+            register, 80, None, None, None)
+
+        no_complete_order_charge1 = Charge.objects.create(charge_date=charge_date,
+                                                          wage_amount=100000, component_amount=0)
+        no_complete_order_charge2 = Charge.objects.create(charge_date=charge_date,
+                                                          wage_amount=100000, component_amount=0)
+        no_complete_order_payment = Payment.objects.create(indemnity_amount=50000,
+                                                           discount_amount=10000, payment_type="카드",
+                                                           payment_info="삼성카드", payment_date=payment_date,
+                                                           refund_amount=10000, refund_date=refund_date)
+        self.no_complete_order1 = createRandomOrder(
+            register, 100, no_complete_order_payment, no_complete_order_charge1, None)
+        self.no_complete_order2 = createRandomOrder(
+            register, 100, None, no_complete_order_charge2, None)
+
+        no_came_out_order_charge = Charge.objects.create(charge_date=charge_date,
+                                                         wage_amount=100000, component_amount=0)
+        no_came_out_order_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=100000)
+        self.no_came_out_order = createRandomOrder(
+            register_without_day_came_out, 100, None, no_came_out_order_charge, no_came_out_order_deposit)
+
+        over_deposit_order_charge = Charge.objects.create(charge_date=charge_date,
+                                                          wage_amount=100000, component_amount=0)
+        over_deposit_order_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=120000)
+        self.over_deposit_order = createRandomOrder(
+            register, 100, None, over_deposit_order_charge, over_deposit_order_deposit)
+
+        complete_order_charge1 = Charge.objects.create(charge_date=charge_date,
+                                                       wage_amount=100000, component_amount=0)
+        complete_order_charge2 = Charge.objects.create(charge_date=charge_date,
+                                                       wage_amount=100000, component_amount=0)
+        complete_order_payment = Payment.objects.create(indemnity_amount=110000,
+                                                        discount_amount=10000, payment_type="카드",
+                                                        payment_info="삼성카드", payment_date=payment_date,
+                                                        refund_amount=0, refund_date=refund_date)
+        complete_order_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=100000)
+        self.complete_order1 = createRandomOrder(
+            register, 100, complete_order_payment, complete_order_charge1, None)
+        self.complete_order2 = createRandomOrder(
+            register, 100, None, complete_order_charge2, complete_order_deposit)
+
+        need_check_order_charge = Charge.objects.create(charge_date=charge_date,
+                                                        wage_amount=100000, component_amount=0)
+        need_check_order_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=60000)
+        self.need_check_order = createRandomOrder(
+            register, 100, None, need_check_order_charge, need_check_order_deposit)
+
+    def setUpExtraSalesStatusTestCase(self):
+        payment_date = string_to_date("2023-03-19")
+        refund_date = string_to_date("2023-03-19")
+        charge_date = string_to_date("2023-03-19")
+        deposit_date = string_to_date("2023-03-19")
+
+        no_charge_extra_sales_payment = Payment.objects.create(indemnity_amount=50000,
+                                                               discount_amount=10000, payment_type="카드",
+                                                               payment_info="삼성카드", payment_date=payment_date,
+                                                               refund_amount=10000, refund_date=refund_date)
+        no_charge_extra_sales_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=90000)
+        self.no_charge_extra_sales1 = createRandomExtraSales(
+            no_charge_extra_sales_payment, None, no_charge_extra_sales_deposit)
+        self.no_charge_extra_sales2 = createRandomExtraSales(None, None, None)
+
+        no_complete_extra_sales_charge1 = Charge.objects.create(charge_date=charge_date,
+                                                                wage_amount=100000, component_amount=0)
+        no_complete_extra_sales_charge2 = Charge.objects.create(charge_date=charge_date,
+                                                                wage_amount=100000, component_amount=0)
+        no_complete_extra_sales_payment = Payment.objects.create(indemnity_amount=50000,
+                                                                 discount_amount=10000, payment_type="카드",
+                                                                 payment_info="삼성카드", payment_date=payment_date,
+                                                                 refund_amount=10000, refund_date=refund_date)
+        self.no_complete_extra_sales1 = createRandomExtraSales(
+            None, no_complete_extra_sales_charge1, None)
+        self.no_complete_extra_sales2 = createRandomExtraSales(
+            no_complete_extra_sales_payment, no_complete_extra_sales_charge2, None)
+
+        no_came_out_extra_sales_charge = Charge.objects.create(charge_date=charge_date,
+                                                               wage_amount=100000, component_amount=0)
+        no_came_out_extra_sales_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=100000)
+        self.no_came_out_extra_sales = createRandomExtraSales(
+            None, no_came_out_extra_sales_charge, no_came_out_extra_sales_deposit)
+        self.no_came_out_extra_sales.real_day_came_out = None
+        self.no_came_out_extra_sales.save()
+
+        over_deposit_extra_sales_charge = Charge.objects.create(charge_date=charge_date,
+                                                                wage_amount=100000, component_amount=0)
+        over_deposit_extra_sales_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=120000)
+        self.over_deposit_extra_sales = createRandomExtraSales(
+            None, over_deposit_extra_sales_charge, over_deposit_extra_sales_deposit)
+
+        complete_extra_sales_charge1 = Charge.objects.create(charge_date=charge_date,
+                                                             wage_amount=100000, component_amount=0)
+        complete_extra_sales_charge2 = Charge.objects.create(charge_date=charge_date,
+                                                             wage_amount=100000, component_amount=0)
+        complete_extra_sales_payment = Payment.objects.create(indemnity_amount=110000,
+                                                              discount_amount=10000, payment_type="카드",
+                                                              payment_info="삼성카드", payment_date=payment_date,
+                                                              refund_amount=0, refund_date=refund_date)
+        complete_extra_sales_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=100000)
+        self.complete_extra_sales1 = createRandomExtraSales(
+            complete_extra_sales_payment, complete_extra_sales_charge1, None)
+        self.complete_extra_sales2 = createRandomExtraSales(
+            None, complete_extra_sales_charge2, complete_extra_sales_deposit)
+
+        need_check_extra_sales_charge = Charge.objects.create(charge_date=charge_date,
+                                                              wage_amount=100000, component_amount=0)
+        need_check_extra_sales_deposit = Deposit.objects.create(
+            deposit_date=deposit_date, deposit_amount=60000)
+        self.need_check_extra_sales = createRandomExtraSales(
+            None, need_check_extra_sales_charge, need_check_extra_sales_deposit)
+
     def test_get_work_days(self):
         self.assertEqual(self.register.get_work_days(), 7)
 
@@ -172,3 +339,45 @@ class ModelTest(TestCase):
 
     def test_get_RO_number(self):
         self.assertEqual(Register.get_RO_number(), f"{datetime.now().month}-1")
+
+    def test_get_order_status(self):
+        self.setUpOrderStatusTestCase()
+        self.assertEqual(self.no_charge_order1.get_status(),
+                         STATUS_DICT["NO_CHARGE"])
+        self.assertEqual(self.no_charge_order2.get_status(),
+                         STATUS_DICT["NO_CHARGE"])
+        self.assertEqual(self.no_complete_order1.get_status(),
+                         STATUS_DICT["NO_COMPLETE"])
+        self.assertEqual(self.no_complete_order2.get_status(),
+                         STATUS_DICT["NO_COMPLETE"])
+        self.assertEqual(self.no_came_out_order.get_status(),
+                         STATUS_DICT["NO_CAME_OUT"])
+        self.assertEqual(self.over_deposit_order.get_status(),
+                         STATUS_DICT["OVER_DEPOSIT"])
+        self.assertEqual(self.complete_order1.get_status(),
+                         STATUS_DICT["COMPLETE"])
+        self.assertEqual(self.complete_order2.get_status(),
+                         STATUS_DICT["COMPLETE"])
+        self.assertEqual(self.need_check_order.get_status(),
+                         STATUS_DICT["NEED_CHECK"])
+
+    def test_get_extra_sales_status(self):
+        self.setUpExtraSalesStatusTestCase()
+        self.assertEqual(self.no_charge_extra_sales1.get_status(),
+                         STATUS_DICT["NO_CHARGE"])
+        self.assertEqual(self.no_charge_extra_sales2.get_status(),
+                         STATUS_DICT["NO_CHARGE"])
+        self.assertEqual(self.no_complete_extra_sales1.get_status(),
+                         STATUS_DICT["NO_COMPLETE"])
+        self.assertEqual(self.no_complete_extra_sales2.get_status(),
+                         STATUS_DICT["NO_COMPLETE"])
+        self.assertEqual(self.no_came_out_extra_sales.get_status(),
+                         STATUS_DICT["NO_CAME_OUT"])
+        self.assertEqual(
+            self.over_deposit_extra_sales.get_status(), STATUS_DICT["OVER_DEPOSIT"])
+        self.assertEqual(self.complete_extra_sales1.get_status(),
+                         STATUS_DICT["COMPLETE"])
+        self.assertEqual(self.complete_extra_sales2.get_status(),
+                         STATUS_DICT["COMPLETE"])
+        self.assertEqual(self.need_check_extra_sales.get_status(),
+                         STATUS_DICT["NEED_CHECK"])

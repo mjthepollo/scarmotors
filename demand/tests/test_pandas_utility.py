@@ -252,8 +252,3 @@ class UtilityTest(TestCase):
         check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,
                                self.line_numbers_for_extra_sales,
                                WAGE_TURNOVER, "get_wage_turnover")
-
-    def test_status(self):
-        check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,
-                               self.line_numbers_for_extra_sales,
-                               STATUS, "get_status")

@@ -13,6 +13,12 @@ class Sales(TimeStampedModel):
     class Meta:
         abstract = True
 
+    def get_indemnity_amount(self):
+        if self.payment:
+            return self.payment.indemnity_amount
+        else:
+            return 0
+
     def get_charge_amount(self):
         if self.charge:
             return self.charge.get_charge_amount()
@@ -91,7 +97,31 @@ class Sales(TimeStampedModel):
         return self.get_integrated_turnover() - self.get_component_turnover()
 
     def get_status(self):
-        raise NotImplementedError
+        if not self.charge:
+            return STATUS_DICT["NO_CHARGE"]
+        elif self.get_not_paid_turnover() > 0:
+            return STATUS_DICT["NO_COMPLETE"]
+        else:
+            if self.deposit:
+                if self.get_payment_rate() > 1.0:
+                    return STATUS_DICT["OVER_DEPOSIT"]
+                else:
+                    if hasattr(self, "register"):  # Order Case
+                        real_day_came_out = self.register.real_day_came_out
+                    else:  # ExtraSales Case
+                        real_day_came_out = self.real_day_came_out
+                    if real_day_came_out:
+                        if self.get_payment_rate() > 0.85:
+                            return STATUS_DICT["COMPLETE"]
+                        else:
+                            return STATUS_DICT["NEED_CHECK"]
+                    else:
+                        return STATUS_DICT["NO_CAME_OUT"]
+            else:
+                if self.get_charge_amount() > 0.0:
+                    return STATUS_DICT["NO_COMPLETE"]
+                else:
+                    return STATUS_DICT["COMPLETE"]
 
     def __str__(self):
         raise NotImplementedError
@@ -157,12 +187,9 @@ class Charge(TimeStampedModel):
 
     def get_indemnity_amount(self):
         if hasattr(self, "order"):
-            if self.order.payment:
-                return self.order.payment.indemnity_amount
-            else:
-                return 0
+            return self.order.get_indemnity_amount()
         elif hasattr(self, "extra_sales"):
-            return self.extra_sales.payment.indemnity_amount
+            return self.extra_sales.get_indemnity_amount()
         else:
             raise Exception("Charge에 order나 extra_sales가 없습니다.")
 
@@ -303,34 +330,6 @@ class Order(Sales):
 
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
-    def get_status(self):
-        receive = self.deposit or self.payment
-        if not self.charge and not receive:
-            return STATUS_DICT["NO_CHARGE"]
-        elif self.charge and not receive:
-            return STATUS_DICT["NO_COMPLETE"]
-        elif self.charge and receive and not self.register.real_day_came_out:
-            return STATUS_DICT["NO_CAME_OUT"]
-        elif receive:
-            payment_rate = self.get_payment_rate()
-            if payment_rate and payment_rate >= 0.85:
-                return STATUS_DICT["COMPLETE"]
-            elif payment_rate and payment_rate < 0.85:
-                return STATUS_DICT["NEED_CHECK"]
-            else:
-                if self.get_charge_amount() == 0:
-                    return STATUS_DICT["COMPLETE"]
-                else:
-                    return STATUS_DICT["NO_COMPLETE"]
-            # if self.get_payment_rate() > 100:
-            #     return STATUS_DICT["OVER_DEPOSIT"]
-            # else:
-            #     if self.get_turnover() > 0:
-            #         return STATUS_DICT["COMPLETE"]
-            #     raise Exception("STATUS NOT DETERMINED")
-        else:
-            raise Exception("STATUS_DICT ERROR")
-
     def __str__(self):
         return f"{self.register.RO_number} {self.order_type} {self.charge_type}"
 
@@ -367,9 +366,6 @@ class ExtraSales(Sales):
 
     wasted = models.BooleanField(default=False, verbose_name="폐차")
     unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
-
-    def get_status(self):
-        pass
 
     def __str__(self):
         return f"({self.day_came_in})입고: {self.note}"
