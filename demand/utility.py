@@ -453,6 +453,10 @@ def make_register_from_first_line_number(first_line):
     wasted = first_line[REAL_DAY_CAME_OUT] == "폐차"
     unrepaired = first_line[REAL_DAY_CAME_OUT] == "미수리출고"
 
+    overlapped_list = ["2-27", "4-30"]
+    if first_line[REAL_DAY_CAME_OUT] in overlapped_list:
+        real_day_came_out = input_to_date(first_line[REAL_DAY_CAME_OUT])
+
     return Register.objects.create(
         RO_number=first_line[RO_NUMBER],
         car_number=first_line[CAR_NUMBER],
