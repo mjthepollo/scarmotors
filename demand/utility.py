@@ -68,6 +68,9 @@ COMPONENT_TURNOVER = 56
 END = 57
 
 
+SKIPPED_RO_NUMBERS = ["2-27", "2-128", "4-26", "4-30"]
+
+
 def print_fields(obj):
     except_fields = ["updated", "created", "id"]
     foreign_fields = []
@@ -346,8 +349,11 @@ def get_client_name_and_insurance_agent_name(first_line):
 
 
 def create_order_from_line(line, register):
-    charged_company, _ = ChargedCompany.objects.get_or_create(
-        name=line[CHARGED_COMPANY])
+    if line[CHARGED_COMPANY]:
+        charged_company, _ = ChargedCompany.objects.get_or_create(
+            name=line[CHARGED_COMPANY])
+    else:
+        charged_company = None
     fault_ratio = fault_ratio_to_int(line[FAULT_RATIO])
     return Order.objects.create(
         register=register,
@@ -453,15 +459,14 @@ def make_register_from_first_line_number(first_line):
     wasted = first_line[REAL_DAY_CAME_OUT] == "폐차"
     unrepaired = first_line[REAL_DAY_CAME_OUT] == "미수리출고"
 
-    overlapped_list = ["2-27", "4-30"]
-    if first_line[REAL_DAY_CAME_OUT] in overlapped_list:
-        real_day_came_out = input_to_date(first_line[REAL_DAY_CAME_OUT])
-
+    if first_line[RO_NUMBER] in SKIPPED_RO_NUMBERS:
+        return None
     return Register.objects.create(
         RO_number=first_line[RO_NUMBER],
         car_number=first_line[CAR_NUMBER],
         day_came_in=input_to_date(first_line[DAY_CAME_IN]),
-        expected_day_came_out=input_to_date(first_line[EXPECTED_DAY_CAME_OUT]),
+        expected_day_came_out=input_to_date(
+            first_line[EXPECTED_DAY_CAME_OUT]),
         real_day_came_out=input_to_date(first_line[REAL_DAY_CAME_OUT]),
         car_model=str(first_line[CAR_MODEL]),
         abroad_type=first_line[ABROAD_TYPE],
@@ -492,9 +497,13 @@ def make_order_payment_charge_and_deposit_with_line(line, register):
 def make_complete_register_for_line_numbers(df, line_numbers):
     first_line = df.iloc[line_numbers[0], :].values.tolist()
     register = make_register_from_first_line_number(first_line)
-    for line_number in line_numbers:
-        line = df.iloc[line_number, :].values.tolist()
-        make_order_payment_charge_and_deposit_with_line(line, register)
+    try:
+        for line_number in line_numbers:
+            line = df.iloc[line_number, :].values.tolist()
+            make_order_payment_charge_and_deposit_with_line(line, register)
+    except Exception as e:
+        print_fields(register)
+        raise e
 
 
 def make_models_from_effective_df(df):
