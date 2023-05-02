@@ -25,7 +25,7 @@ class Sales(TimeStampedModel):
         else:
             return None
 
-    def get_payment_rate(self):
+    def get_payment_rate_for_input(self):
         charge_amount = self.get_charge_amount()
         if not charge_amount:
             return None
@@ -103,7 +103,7 @@ class Sales(TimeStampedModel):
             return STATUS_DICT["NO_COMPLETE"]
         else:
             if self.deposit:
-                if self.get_payment_rate() > 1.0:
+                if self.get_payment_rate_for_input() > 1.0:
                     return STATUS_DICT["OVER_DEPOSIT"]
                 else:
                     if hasattr(self, "register"):  # Order Case
@@ -111,7 +111,7 @@ class Sales(TimeStampedModel):
                     else:  # ExtraSales Case
                         real_day_came_out = self.real_day_came_out
                     if real_day_came_out:
-                        if self.get_payment_rate() > 0.85:
+                        if self.get_payment_rate_for_input() > 0.85:
                             return STATUS_DICT["COMPLETE"]
                         else:
                             return STATUS_DICT["NEED_CHECK"]
@@ -232,9 +232,6 @@ class Charge(TimeStampedModel):
 class Deposit(TimeStampedModel):
     deposit_amount = models.IntegerField(verbose_name="입금액")
     deposit_date = models.DateField(verbose_name="입금일")
-
-    def get_payment_rate(self):
-        return round(self.deposit_amount/self.order.charge.get_charge_amount()*100)
 
     def __str__(self):
         if hasattr(self, "order"):

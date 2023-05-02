@@ -328,11 +328,12 @@ class DemandModelTest(TestCase):
         self.assertEqual(self.order.get_charge_amount(), 65600)
         self.assertEqual(self.extra_sales.get_charge_amount(), 92000)
 
-    def test_get_payment_rate(self):
+    def test_get_payment_rate_for_input(self):
         self.setUpExtraCase()
-        self.assertAlmostEqual(self.order.get_payment_rate(), 0.625, places=2)
         self.assertAlmostEqual(
-            self.extra_sales.get_payment_rate(), 0.869, places=2)
+            self.order.get_payment_rate_for_input(), 0.625, places=2)
+        self.assertAlmostEqual(
+            self.extra_sales.get_payment_rate_for_input(), 0.869, places=2)
 
     def test_get_number_of_works(self):
         self.assertEqual(self.register.get_number_of_works(), 3)
