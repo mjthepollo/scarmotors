@@ -5,7 +5,7 @@ from django.db import models
 from core.models import TimeStampedModel
 
 # Create your models here.
-STATUS_DICT = {"NO_CHARGE": "미청구", "NO_COMPLETE": "미수",
+STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금",
                "NO_CAME_OUT": "미출고", "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요"}
 
 
@@ -38,9 +38,36 @@ class Sales(TimeStampedModel):
             else:
                 return None
 
+    def get_net_payment(self):
+        if self.payment:
+            refund_amount = self.payment.refund_amount if self.payment.refund_amount else 0
+            discount_amount = self.payment.discount_amount if self.payment.discount_amount else 0
+            indemnity_amount = self.payment.indemnity_amount if self.payment.indemnity_amount else 0
+        else:
+            refund_amount = 0
+            discount_amount = 0
+            indemnity_amount = 0
+        return indemnity_amount-discount_amount-refund_amount
+
+    def get_payment_rate(self):
+        if not self.charge:
+            return 0
+        else:
+            # 일반
+            if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
+                if self.payment:
+                    return self.get_net_payment()/self.get_chargable_amount()
+                else:
+                    return 0
+            else:  # 보험
+                if self.deposit:
+                    return self.deposit.deposit_amount/self.get_charge_amount()
+                else:
+                    return 0
+
     def get_chargable_amount(self):
         if self.charge:
-            if hasattr(self, "fault_ratio"):
+            if isinstance(self, Order):
                 if self.fault_ratio:
                     return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
             return round(self.charge.get_repair_amount()*1.1)
@@ -56,15 +83,7 @@ class Sales(TimeStampedModel):
 
     def get_turnover(self):
         deposit_amount = self.deposit.deposit_amount if self.deposit else 0
-        if self.payment:
-            refund_amount = self.payment.refund_amount if self.payment.refund_amount else 0
-            discount_amount = self.payment.discount_amount if self.payment.discount_amount else 0
-            indemnity_amount = self.payment.indemnity_amount if self.payment.indemnity_amount else 0
-        else:
-            refund_amount = 0
-            discount_amount = 0
-            indemnity_amount = 0
-        return deposit_amount+indemnity_amount-discount_amount-refund_amount
+        return deposit_amount+self.get_net_payment()
 
     def get_factory_turnover(self):
         return int(self.get_turnover()/1.1)
@@ -87,7 +106,7 @@ class Sales(TimeStampedModel):
     def get_component_turnover(self):
         if self.charge:
             if self.charge.component_amount:
-                if hasattr(self, "fault_ratio"):
+                if isinstance(self, Order):
                     if self.fault_ratio:
                         return int(self.fault_ratio*self.charge.component_amount/100)
                 return self.charge.component_amount
@@ -97,31 +116,43 @@ class Sales(TimeStampedModel):
         return self.get_integrated_turnover() - self.get_component_turnover()
 
     def get_status(self):
-        if not self.charge:
-            return STATUS_DICT["NO_CHARGE"]
-        elif self.get_not_paid_turnover() > 0:
-            return STATUS_DICT["NO_COMPLETE"]
-        else:
-            if self.deposit:
-                if self.get_payment_rate_for_input() > 1.0:
-                    return STATUS_DICT["OVER_DEPOSIT"]
-                else:
-                    if hasattr(self, "register"):  # Order Case
-                        real_day_came_out = self.register.real_day_came_out
-                    else:  # ExtraSales Case
-                        real_day_came_out = self.real_day_came_out
+        if isinstance(self, Order):
+            real_day_came_out = self.register.real_day_came_out
+        else:  # ExtraSales Case
+            real_day_came_out = self.real_day_came_out
+
+        if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
+            if not self.charge:
+                return STATUS_DICT["NO_CHARGE"]
+            else:
+                if self.payment:
                     if real_day_came_out:
-                        if self.get_payment_rate_for_input() > 0.85:
+                        if self.get_payment_rate() > 1.01:
+                            return STATUS_DICT["OVER_DEPOSIT"]
+                        elif self.get_payment_rate() < 0.99:
+                            return STATUS_DICT["NEED_CHECK"]
+                        else:
+                            return STATUS_DICT["COMPLETE"]
+                    else:
+                        return STATUS_DICT["NO_CAME_OUT"]
+                else:
+                    return STATUS_DICT["NOT_PAID"]
+        else:  # 보험의 경우
+            if not self.charge:
+                return STATUS_DICT["NO_CHARGE"]
+            else:
+                if self.deposit:
+                    if real_day_came_out:
+                        if self.get_payment_rate() > 1.01:
+                            return STATUS_DICT["OVER_DEPOSIT"]
+                        elif self.get_payment_rate() >= 0.85:
                             return STATUS_DICT["COMPLETE"]
                         else:
                             return STATUS_DICT["NEED_CHECK"]
                     else:
                         return STATUS_DICT["NO_CAME_OUT"]
-            else:
-                if self.get_charge_amount() > 0.0:
-                    return STATUS_DICT["NO_COMPLETE"]
                 else:
-                    return STATUS_DICT["COMPLETE"]
+                    return STATUS_DICT["NOT_PAID"]
 
     def __str__(self):
         raise NotImplementedError
