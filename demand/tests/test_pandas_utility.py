@@ -213,7 +213,7 @@ class UtilityTest(TestCase):
                                self.line_numbers_for_extra_sales,
                                NOT_PAID_AMOUNT, "get_not_paid_amount")
 
-    def test_payment_rate(self):
+    def test_payment_rate_for_input(self):
         check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,
                                self.line_numbers_for_extra_sales,
                                PAYMENT_RATE, "get_payment_rate_for_input")
