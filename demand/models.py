@@ -181,7 +181,7 @@ class Payment(TimeStampedModel):
 
 
 class Charge(TimeStampedModel):
-    charge_date = models.DateField(verbose_name="청구일", null=True, blank=True)
+    charge_date = models.DateField(verbose_name="청구일")
     wage_amount = models.IntegerField(default=0, verbose_name="공임비")
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
 

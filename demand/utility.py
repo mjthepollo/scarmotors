@@ -379,7 +379,7 @@ def create_deposit_from_line(line, sales):
 
 
 def create_charge_from_line(line, sales):
-    if line[CHARGE_DATE] or line[WAGE_AMOUNT] or line[COMPONENT_AMOUNT]:
+    if line[CHARGE_DATE]:
         charge = Charge.objects.create(
             charge_date=input_to_date(line[CHARGE_DATE]),
             wage_amount=zero_if_none(int_or_none(line[WAGE_AMOUNT])),
