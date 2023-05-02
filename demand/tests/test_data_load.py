@@ -14,7 +14,8 @@ from demand.utility import (
     check_values_of_column, check_wash_car, df_to_lines,
     get_effective_data_frame, get_effective_row_numbers,
     get_line_numbers_for_extra_sales, get_line_numbers_for_registers,
-    load_data, make_models_from_effective_df, zero_if_none)
+    get_sales_of_month_and_type, load_data, make_models_from_effective_df,
+    zero_if_none)
 
 
 class DataLoadTest(TestCase):
@@ -112,6 +113,20 @@ class DataLoadTest(TestCase):
         check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,
                                self.line_numbers_for_extra_sales,
                                WAGE_TURNOVER, "get_wage_turnover")
+
+    def test_monthly_sales(self):
+        call_command('clean_models')
+        make_models_from_effective_df(self.df)
+        from datetime import datetime
+        current_month = datetime.now().month
+        for month in range(1, current_month+1):
+            print(f"Month : {month}")
+            print(get_sales_of_month_and_type(month, "보험"))
+            print(get_sales_of_month_and_type(month, "렌트일반"))
+            print(get_sales_of_month_and_type(month, "렌트판도"))
+            print(get_sales_of_month_and_type(month, "일반판도"))
+            print(get_sales_of_month_and_type(month, "알반경정비"))
+            print("--------------")
 
     # def test_status(self):
     #     check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,

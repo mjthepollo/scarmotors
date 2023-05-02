@@ -514,3 +514,28 @@ def make_models_from_effective_df(df):
     for line_number in line_numbers_for_extra_sales:
         line = df.iloc[line_number, :].values.tolist()
         make_extra_sales_from_line(line)
+
+
+def get_sales_of_month_and_type(month, charge_type):
+    integrated_sales = 0
+    paid_sales = 0
+    not_paid_sales = 0
+    if charge_type == "일반경정비":
+        extra_sales_query = ExtraSales.objects.filter(
+            charge__charge_date__month=month)
+        for extra_sales in extra_sales_query:
+            integrated_sales += extra_sales.get_integrated_turnover()
+            paid_sales += extra_sales.get_paid_turnover()
+            not_paid_sales += extra_sales.get_not_paid_turnover()
+    orders = Order.objects.filter(
+        charge__charge_date__month=month, charge_type=charge_type)
+    for order in orders:
+        integrated_sales += order.get_integrated_turnover()
+        paid_sales += order.get_paid_turnover()
+        not_paid_sales += order.get_not_paid_turnover()
+    print(f"Order Count : {orders.count()}")
+    return {
+        "paid_sales": paid_sales,
+        "not_paid_sales": not_paid_sales,
+        "integrated_sales": integrated_sales,
+    }

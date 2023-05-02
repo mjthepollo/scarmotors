@@ -339,7 +339,7 @@ class Order(Sales):
         Register, null=True, on_delete=models.CASCADE, verbose_name="등록", related_name="orders")
     charged_company = models.ForeignKey(
         ChargedCompany, null=True, related_name="orders", verbose_name="담당 업체명", on_delete=models.CASCADE)
-    charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정", "일반경정"), (
+    charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정비", "일반경정비"), (
         "일반판도", "일반판도"), ("렌트판도", "렌트판도"), ("렌트일반", "렌트일반"),
         ("인정매출", "인정매출")), max_length=20, verbose_name="구분")
     order_type = models.CharField(null=True, blank=True, choices=(
