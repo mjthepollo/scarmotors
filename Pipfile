@@ -21,6 +21,8 @@ openpyxl = "*"
 django-debug-toolbar = "*"
 pytest = "*"
 pytest-django = "*"
+sphinx = "*"
+sphinx-autobuild = "*"
 
 [requires]
 python_version = "3.8"
