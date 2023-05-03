@@ -1,19 +1,11 @@
 from datetime import date
 
-from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
-from django.forms import NumberInput, TextInput, modelformset_factory
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from demand.forms import (ChargedCompanyForm, ChargeForm, InsuranceAgentForm,
-                          NewRegisterForm, OrderForm, PaymentForm,
-                          SupporterForm)
-from demand.models import (Charge, ChargedCompany, InsuranceAgent, Order,
-                           Payment, Register, Supporter)
 from users.forms import CustomAuthForm
 
 

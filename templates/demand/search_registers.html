@@ -6,7 +6,7 @@
   {{register_filter.form}}
   <input type="submit" value="Search">
 </form>
-
+<a href="{{download_url}}" download>Download Excel</a>
 {% for register in registers %}
 <a href="{% url 'demand:edit_register' register.pk %}"><h2>{{register}}</h2></a>
 {% endfor %}

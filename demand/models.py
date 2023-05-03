@@ -12,7 +12,7 @@ STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금",
 
 class Sales(TimeStampedModel):
     status = models.CharField(choices=[(value, value)for value in STATUS_DICT.values()],
-                              max_length=20, default="미청구", verbose_name="상태", blank=True, null=True)
+                              max_length=20, default="미청구", verbose_name="상태")
 
     class Meta:
         abstract = True
@@ -176,6 +176,9 @@ class Sales(TimeStampedModel):
     def save(self, *args, **kwargs):
         self.status = self.get_status()
         super().save(*args, **kwargs)
+
+    def to_excel_line(self):
+        raise NotImplementedError
 
     def __str__(self):
         raise NotImplementedError
@@ -381,6 +384,9 @@ class Order(Sales):
 
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
+    def to_excel_line(self):
+        pass
+
     def __str__(self):
         return f"{self.register.RO_number} {self.order_type} {self.charge_type}"
 
@@ -417,6 +423,9 @@ class ExtraSales(Sales):
 
     wasted = models.BooleanField(default=False, verbose_name="폐차")
     unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
+
+    def to_excel_line(self):
+        pass
 
     def __str__(self):
         return f"({self.day_came_in})입고: {self.note}"
