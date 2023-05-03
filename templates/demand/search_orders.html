@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
+{% endblock css %} {% block content %}
+<h1>Search</h1>
+<form method="GET">
+  {{register_filter.form}}
+  {{order_filter.form}}
+  <input type="submit" value="Search">
+</form>
+
+{% for order in orders %}
+<a href="{% url 'demand:edit_order' order.pk %}"><h2>{{order}}</h2></a>
+{% endfor %}
+{% with request.GET as params %}
+  {% with params|remove_page_param as params_without_page %}
+  <div class="pagination">
+    <span class="step-links">
+    {% if orders.has_previous %}
+      <a href="?{{ params_without_page }}&page=1">&laquo; first</a>
+      <a href="?{{ params_without_page }}&page={{orders.previous_page_number}}">previous</a>
+    {% endif %}
+    <span class="current">
+      Page {{ orders.number }} of {{ orders.paginator.num_pages }}.
+    </span>
+    {% if orders.has_next %}
+      <a href="?{{ params_without_page }}&page={{orders.next_page_number}}">next</a>
+      <a href="?{{ params_without_page }}&page={{orders.paginator.num_pages}}">last &raquo;</a>
+    {% endif %}
+    </span>
+  </div>
+  {% endwith %}
+{%endwith %}
+{% endblock content %}

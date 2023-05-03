@@ -7,9 +7,10 @@ from django.forms import NumberInput, TextInput, modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from demand.forms import (ChargeForm, DepositForm, NewRegisterForm, OrderForm,
-                          PaymentForm, RegisterFilter)
-from demand.models import Charge, Deposit, Order, Payment, Register
+from demand.forms import (ChargeForm, DepositForm, NewRegisterForm,
+                          OrderFilter, OrderForm, PaymentForm, RegisterFilter,
+                          RegisterFilterForOrderFilter)
+from demand.models import Charge, Deposit, ExtraSales, Order, Payment, Register
 
 
 @login_required
@@ -139,15 +140,24 @@ def search_registers(request):
 
 
 @ login_required
-def search_sales(request):
-    register_filter = RegisterFilter(
+def search_orders(request):
+    register_filter = RegisterFilterForOrderFilter(
         request.GET, queryset=Register.objects.all())
-    paginator = Paginator(register_filter.qs, 20)
+    order_filter = OrderFilter(
+        request.GET, queryset=Order.objects.filter(register__in=register_filter.qs))
+    paginator = Paginator(order_filter.qs, 20)
     page = request.GET.get('page')
-    registers = paginator.get_page(page)
-    return render(request, "demand/search_registers.html",
+    orders = paginator.get_page(page)
+    return render(request, "demand/search_orders.html",
                   context={"register_filter": register_filter,
-                           "registers": registers})
+                           "order_filter": order_filter,
+                           "orders": orders})
+
+
+@login_required
+def extra_sales(request):
+    return render(request, "demand/extra_sales.html", context={"extra_sales_queryset": ExtraSales.objects.all()})
+
 # 차량번호 검색
 # RO 번호 검색
 #

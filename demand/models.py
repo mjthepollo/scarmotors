@@ -12,7 +12,7 @@ STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금",
 
 class Sales(TimeStampedModel):
     status = models.CharField(choices=[(value, value)for value in STATUS_DICT.values()],
-                              max_length=20, default="미청구", verbose_name="상태", blank=True, null=True)
+                              max_length=20, default="미청구", verbose_name="상태")
 
     class Meta:
         abstract = True
