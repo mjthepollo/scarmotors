@@ -40,7 +40,7 @@ class ChargeForm(forms.ModelForm):
 
 class NewRegisterForm(forms.ModelForm):
     class Meta:
-        model = Order
+        model = Register
         exclude = ["RO_number", "real_day_came_out"]
         widgets = {
             'day_came_in': forms.DateInput(attrs={'type': 'date'}),
@@ -52,7 +52,7 @@ class NewRegisterForm(forms.ModelForm):
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        exclude = ["register", "payment", "charge"]
+        exclude = ["register", "payment", "charge", "deposit",]
 
 
 class DepositForm(forms.ModelForm):

@@ -1,49 +1,71 @@
 # Create your views here.
 from datetime import date
 
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as login_user
-from django.contrib.auth import logout as logout_user
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.forms import NumberInput, TextInput, modelformset_factory
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from demand.forms import (ChargedCompanyForm, ChargeForm, InsuranceAgentForm,
-                          NewRegisterForm, OrderForm, PaymentForm,
-                          SupporterForm)
-from demand.models import (Charge, ChargedCompany, InsuranceAgent, Order,
-                           Payment, Register, Supporter)
-from users.forms import CustomAuthForm
+from demand.forms import (ChargeForm, DepositForm, NewRegisterForm, OrderForm,
+                          PaymentForm)
+from demand.models import Charge, Deposit, Order, Payment, Register
 
 
 @login_required
 def new_register(request):
-    register_form = NewRegisterForm(initial={'day_came_in': date.today()})
+    register_form = NewRegisterForm(initial={
+        'car_number': "TEST",
+        'day_came_in': date.today()})
+    order_form_factory = modelformset_factory(
+        Order, form=OrderForm, extra=1)
     if request.method == "GET":
-        return render(request, "new_register.html", context={
-            "register_form": register_form
+        order_formset = order_form_factory(
+            queryset=Order.objects.none())
+        return render(request, "demand/new_register.html", context={
+            "register_form": register_form,
+            "order_formset": order_formset,
         })
     else:
         register_form = NewRegisterForm(request.POST)
+        order_formset = order_form_factory(
+            request.POST, queryset=Order.objects.none())
         if register_form.is_valid():
             register = register_form.save()
-            register.RO_number = Register.get_RO_number()
-            return redirect(reverse("demand/edit_register")+"?RO_number="+Register.RO_number)
+            if order_formset.is_valid():
+                orders = order_formset.save()
+                for order in orders:
+                    order.register = register
+                    order.save()
+                register.RO_number = Register.get_RO_number()
+                register.save()
+                return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
+            else:
+                register.delete()
+                return render(request, "demand/new_register.html", context={
+                    "register_form": register_form,
+                    "order_formset": order_formset,
+                })
         else:
             return render(request, "demand/new_register.html", context={
-                "register_form": register_form, })
+                "register_form": register_form,
+                "order_formset": order_formset,
+            })
 
 
 @login_required
-def edit_register(request, pk):
-    pk = request.GET.get("pk")
-    register = Register.objects.get(pk=pk)
+def edit_register(request):
+    RO_number = request.GET.get("RO_number")
+    register = Register.objects.get(RO_number=RO_number)
     register_form = NewRegisterForm(instance=register)
+    order_form_factory = modelformset_factory(
+        Order, form=OrderForm, extra=0)
     if request.method == "GET":
-        return render(request, "demand/edit_register.html", context={
-            "register_form": register_form, })
+        order_formset = order_form_factory(
+            queryset=register.orders.all())
+        return render(request, "edit_register.html", context={
+            "register_form": register_form,
+            "order_formset": order_formset,
+        })
     else:
         register_form = NewRegisterForm(request.POST, instance=register)
         order_formset = order_form_factory(
@@ -56,9 +78,9 @@ def edit_register(request, pk):
                     order.register = register
                     order.save()
                 register.save()
-                return redirect(reverse("home"))
+                return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
             else:
-                return render(request, "demand/edit_register.html", context={
+                return render(request, "edit_register.html", context={
                     "register_form": register_form,
                     "order_formset": order_formset,
                 })
@@ -69,94 +91,43 @@ def edit_register(request, pk):
             })
 
 
-@ login_required
-def finish_register(request):
-    pass
+@login_required
+def edit_order(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    order_form = OrderForm(instance=order)
+    deposit_form = DepositForm(instance=order.deposit)
+    charge_form = ChargeForm(instance=order.charge)
+    payment_form = PaymentForm(instance=order.payment)
+    if request.method == "GET":
+        return render(request, "demand/edit_order.html", context={
+            "order_form": order_form,
+            "deposit_form": deposit_form,
+            "charge_form": charge_form,
+            "payment_form": payment_form,
+        })
+    else:
+        order_form = OrderForm(request.POST, instance=order)
+        deposit_form = DepositForm(request.POST, instance=order.deposit)
+        charge_form = ChargeForm(request.POST, instance=order.charge)
+        payment_form = PaymentForm(request.POST, instance=order.payment)
+        if order_form.is_valid() and deposit_form.is_valid() and charge_form.is_valid() and payment_form.is_valid():
+            order_form.save()
+            deposit_form.save()
+            charge_form.save()
+            payment_form.save()
+            return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+        else:
+            return render(request, "demand/edit_order.html", context={
+                "order_form": order_form,
+                "deposit_form": deposit_form,
+                "charge_form": charge_form,
+                "payment_form": payment_form,
+            })
 
 
 @ login_required
 def search_registers(request):
-    return render(request, "demand/search_registers.html")
+    return render(request, "demand/search_registers.html", context={"registers": Register.objects.all()})
 # 차량번호 검색
 # RO 번호 검색
 #
-
-
-# @login_required
-# def new_register(request):
-#     register_form = NewRegisterForm(initial={
-#         'car_number': "TEST",
-#         'day_came_in': date.today()})
-#     order_form_factory = modelformset_factory(
-#         Order, form=OrderForm, extra=1)
-#     if request.method == "GET":
-#         order_formset = order_form_factory(
-#             queryset=Order.objects.none())
-#         return render(request, "new_register.html", context={
-#             "register_form": register_form,
-#             "order_formset": order_formset,
-#         })
-#     else:
-#         register_form = NewRegisterForm(request.POST)
-#         order_formset = order_form_factory(
-#             request.POST, queryset=Order.objects.none())
-#         if register_form.is_valid():
-#             register = register_form.save()
-#             if order_formset.is_valid():
-#                 orders = order_formset.save()
-#                 for order in orders:
-#                     order.register = register
-#                     order.save()
-#                 register.RO_number = Register.get_RO_number()
-#                 register.save()
-#                 return redirect(reverse("edit_register")+"?RO_number="+Register.RO_number)
-#             else:
-#                 register.delete()
-#                 return render(request, "new_register.html", context={
-#                     "register_form": register_form,
-#                     "order_formset": order_formset,
-#                 })
-#         else:
-#             return render(request, "new_register.html", context={
-#                 "register_form": register_form,
-#                 "order_formset": order_formset,
-#             })
-
-
-# @login_required
-# def edit_register(request):
-#     RO_number = request.GET.get("RO_number")
-#     register = Register.objects.get(RO_number=RO_number)
-#     register_form = NewRegisterForm(instance=register)
-#     order_form_factory = modelformset_factory(
-#         Order, form=OrderForm, extra=0)
-#     if request.method == "GET":
-#         order_formset = order_form_factory(
-#             queryset=register.orders.all())
-#         return render(request, "edit_register.html", context={
-#             "register_form": register_form,
-#             "order_formset": order_formset,
-#         })
-#     else:
-#         register_form = NewRegisterForm(request.POST, instance=register)
-#         order_formset = order_form_factory(
-#             request.POST, queryset=register.orders.all())
-#         if register_form.is_valid():
-#             register = register_form.save()
-#             if order_formset.is_valid():
-#                 orders = order_formset.save()
-#                 for order in orders:
-#                     order.register = register
-#                     order.save()
-#                 register.save()
-#                 return redirect(reverse("home"))
-#             else:
-#                 return render(request, "edit_register.html", context={
-#                     "register_form": register_form,
-#                     "order_formset": order_formset,
-#                 })
-#         else:
-#             return render(request, "edit_register.html", context={
-#                 "register_form": register_form,
-#                 "order_formset": order_formset,
-#             })
