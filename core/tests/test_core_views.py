@@ -27,5 +27,4 @@ class CoreViewTest(TestCase):
 
     def test_home(self):
         response = self.client.get('/')
-        self.assertContains(response, "입고", 1)
-        self.assertContains(response, "검색", 1)
+        self.assertContains(response, "Summary", 1)

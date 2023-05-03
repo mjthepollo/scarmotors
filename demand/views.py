@@ -136,5 +136,18 @@ def search_registers(request):
                   context={"register_filter": register_filter,
                            "registers": registers})
 # 차량번호 검색
+
+
+@ login_required
+def search_sales(request):
+    register_filter = RegisterFilter(
+        request.GET, queryset=Register.objects.all())
+    paginator = Paginator(register_filter.qs, 20)
+    page = request.GET.get('page')
+    registers = paginator.get_page(page)
+    return render(request, "demand/search_registers.html",
+                  context={"register_filter": register_filter,
+                           "registers": registers})
+# 차량번호 검색
 # RO 번호 검색
 #

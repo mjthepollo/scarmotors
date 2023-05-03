@@ -4,7 +4,8 @@
         <div id="inner_header_left">
             <a id="home_link" href="{% url 'home'%}"><img src="{% static 'images/scar_tech.png'%}"></a>
             <a class="header_link" href="{% url 'demand:new_register'%}">입고</a>
-            <a class="header_link" href="{% url 'demand:search_registers'%}">검색</a>
+            <a class="header_link" href="{% url 'demand:search_registers'%}">등록 검색</a>
+            <a class="header_link" href="{% url 'demand:search_sales'%}">매출 검색</a>
         </div>
         <div id="inner_header_right">
             <a class="header_link" href="{% url 'logout'%}">로그아웃</a>

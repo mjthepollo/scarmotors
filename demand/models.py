@@ -3,13 +3,17 @@ from datetime import datetime
 from django.db import models
 
 from core.models import TimeStampedModel
+from core.utility import print_colored
 
 # Create your models here.
 STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금",
-               "NO_CAME_OUT": "미출고", "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요"}
+               "NO_CAME_OUT": "미출고", "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요", "ERROR": "오류"}
 
 
 class Sales(TimeStampedModel):
+    status = models.CharField(choices=[(value, value)for value in STATUS_DICT.values()],
+                              max_length=20, default="미청구", verbose_name="상태", blank=True, null=True)
+
     class Meta:
         abstract = True
 
@@ -53,15 +57,18 @@ class Sales(TimeStampedModel):
         if not self.charge:
             return 0
         else:
+            chargable_amount = self.get_chargable_amount()
+            if chargable_amount == 0:
+                return None
             # 일반
             if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
                 if self.payment:
-                    return self.get_net_payment()/self.get_chargable_amount()
+                    return self.get_net_payment()/chargable_amount
                 else:
                     return 0
             else:  # 보험
                 if self.deposit:
-                    return self.deposit.deposit_amount/self.get_charge_amount()
+                    return self.deposit.deposit_amount/chargable_amount
                 else:
                     return 0
 
@@ -116,43 +123,59 @@ class Sales(TimeStampedModel):
         return self.get_integrated_turnover() - self.get_component_turnover()
 
     def get_status(self):
-        if isinstance(self, Order):
-            real_day_came_out = self.register.real_day_came_out
-        else:  # ExtraSales Case
-            real_day_came_out = self.real_day_came_out
+        try:
+            if isinstance(self, Order):
+                real_day_came_out = self.register.real_day_came_out
+            else:  # ExtraSales Case
+                real_day_came_out = self.real_day_came_out
 
-        if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
-            if not self.charge:
-                return STATUS_DICT["NO_CHARGE"]
-            else:
-                if self.payment:
-                    if real_day_came_out:
-                        if self.get_payment_rate() > 1.01:
-                            return STATUS_DICT["OVER_DEPOSIT"]
-                        elif self.get_payment_rate() < 0.99:
-                            return STATUS_DICT["NEED_CHECK"]
-                        else:
-                            return STATUS_DICT["COMPLETE"]
-                    else:
-                        return STATUS_DICT["NO_CAME_OUT"]
+            if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
+                if not self.charge:
+                    return STATUS_DICT["NO_CHARGE"]
                 else:
-                    return STATUS_DICT["NOT_PAID"]
-        else:  # 보험의 경우
-            if not self.charge:
-                return STATUS_DICT["NO_CHARGE"]
-            else:
-                if self.deposit:
-                    if real_day_came_out:
-                        if self.get_payment_rate() > 1.01:
-                            return STATUS_DICT["OVER_DEPOSIT"]
-                        elif self.get_payment_rate() >= 0.85:
-                            return STATUS_DICT["COMPLETE"]
+                    if self.payment:
+                        if real_day_came_out:
+                            if self.get_payment_rate() > 1.01:
+                                return STATUS_DICT["OVER_DEPOSIT"]
+                            elif self.get_payment_rate() < 0.99:
+                                return STATUS_DICT["NEED_CHECK"]
+                            else:
+                                return STATUS_DICT["COMPLETE"]
                         else:
-                            return STATUS_DICT["NEED_CHECK"]
+                            return STATUS_DICT["NO_CAME_OUT"]
                     else:
-                        return STATUS_DICT["NO_CAME_OUT"]
+                        return STATUS_DICT["NOT_PAID"]
+            else:  # 보험의 경우
+                if not self.charge:
+                    return STATUS_DICT["NO_CHARGE"]
                 else:
-                    return STATUS_DICT["NOT_PAID"]
+                    if self.deposit:
+                        if real_day_came_out:
+                            if self.get_payment_rate() > 1.01:
+                                return STATUS_DICT["OVER_DEPOSIT"]
+                            elif self.get_payment_rate() >= 0.85:
+                                return STATUS_DICT["COMPLETE"]
+                            else:
+                                return STATUS_DICT["NEED_CHECK"]
+                        else:
+                            return STATUS_DICT["NO_CAME_OUT"]
+                    else:
+                        return STATUS_DICT["NOT_PAID"]
+        except Exception as e:
+            if self == None:
+                print_colored("self is None", "red")
+            else:
+                try:
+                    print_colored(self.__str__, "red")
+                except AttributeError:
+                    print_colored("[Below self is not printable]", "red")
+                    print_colored(f"{type(self)}:{self.pk}", "red")
+
+            return STATUS_DICT["ERROR"]
+
+    def save(self, *args, **kwargs):
+        self.status = self.get_status()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         raise NotImplementedError
