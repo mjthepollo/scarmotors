@@ -533,7 +533,6 @@ def get_sales_of_month_and_type(month, charge_type):
         integrated_sales += order.get_integrated_turnover()
         paid_sales += order.get_paid_turnover()
         not_paid_sales += order.get_not_paid_turnover()
-    print(f"Order Count : {orders.count()}")
     return {
         "paid_sales": paid_sales,
         "not_paid_sales": not_paid_sales,
