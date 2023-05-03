@@ -1,3 +1,4 @@
+import django_filters
 from django import forms
 
 from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
@@ -47,6 +48,36 @@ class NewRegisterForm(forms.ModelForm):
             'expected_day_came_out': forms.DateInput(attrs={'type': 'date'}),
             'real_day_came_out': forms.DateInput(attrs={'type': 'date'}),
         }
+
+
+class RegisterFilter(django_filters.FilterSet):
+    car_number = django_filters.CharFilter(
+        field_name='car_number', lookup_expr='icontains', label="차량번호")
+
+    day_came_in__gt = django_filters.DateFilter(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        field_name='day_came_in', lookup_expr='gt', label="입고일(~부터)")
+    day_came_in__ls = django_filters.DateFilter(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        field_name='day_came_in', lookup_expr='lt', label="입고일(~까지)")
+
+    real_day_came_out__gt = django_filters.DateFilter(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        field_name='real_day_came_out', lookup_expr='gt', label="출고일(~부터)")
+    real_day_came_out__ls = django_filters.DateFilter(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        field_name='real_day_came_out', lookup_expr='lt', label="출고일(~까지)")
+
+    client_name = django_filters.CharFilter(
+        field_name='client_name', lookup_expr='icontains', label="고객명")
+
+    note = django_filters.CharFilter(
+        field_name='note', lookup_expr='icontains', label="비고")
+
+    class Meta:
+        model = Register
+        fields = ["RO_number", "car_number",
+                  "supporter", "client_name", "insurance_agent", "note"]
 
 
 class OrderForm(forms.ModelForm):

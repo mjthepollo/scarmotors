@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'jquery',
     'djangoformsetjs',
+    'django_filters',
 ]
 
 LOCAL_APPS = [

@@ -6,24 +6,23 @@
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock css %}
 {% block content %}
-<a href="{% url 'home' %}"><h1>입고 수정</h1></a>
 <form id="formset" method="POST" data-formset-prefix="{{order_formset.prefix}}">
     {% csrf_token %}
     <div id="register_form">
-        {{register_form}}
+        {{register_form.as_div}}
     </div>
     {{order_formset.management_form}}
     <div data-formset-body id="order_formset">
-        <div data-formset-form>
         {% for form in order_formset %}
-            {{form}}
-        {% endfor %}
+        <div data-formset-form class="new_order">
+            {{form.as_div}}
         </div>
+        {% endfor %}
     </div>
     <script type="form-template" data-formset-empty-form>
         {% escapescript %}
         <div data-formset-form class="new_order">
-            {{ order_formset.empty_form}}
+            {{order_formset.empty_form.as_div}}
         </div>
         {% endescapescript %}
     </script>

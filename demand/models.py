@@ -311,7 +311,7 @@ class Register(TimeStampedModel):
     rentcar_company_name = models.CharField(
         blank=True, null=True, max_length=100, verbose_name="렌트 업체명")
     note = models.TextField(
-        blank=True, null=True, verbose_name="메모")
+        blank=True, null=True, verbose_name="비고")
 
     def get_work_days(self):
         return (self.real_day_came_out - self.day_came_in).days

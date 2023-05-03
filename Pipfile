@@ -16,6 +16,7 @@ django-debug-toolbar = "*"
 django-extensions = "*"
 argon2-cffi = "*"
 openpyxl = "*"
+django-filter = "*"
 
 [dev-packages]
 django-debug-toolbar = "*"

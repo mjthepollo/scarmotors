@@ -2,12 +2,13 @@
 from datetime import date
 
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.forms import NumberInput, TextInput, modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from demand.forms import (ChargeForm, DepositForm, NewRegisterForm, OrderForm,
-                          PaymentForm)
+                          PaymentForm, RegisterFilter)
 from demand.models import Charge, Deposit, Order, Payment, Register
 
 
@@ -53,16 +54,15 @@ def new_register(request):
 
 
 @login_required
-def edit_register(request):
-    RO_number = request.GET.get("RO_number")
-    register = Register.objects.get(RO_number=RO_number)
+def edit_register(request, pk):
+    register = get_object_or_404(Register, pk=pk)
     register_form = NewRegisterForm(instance=register)
     order_form_factory = modelformset_factory(
         Order, form=OrderForm, extra=0)
     if request.method == "GET":
         order_formset = order_form_factory(
             queryset=register.orders.all())
-        return render(request, "edit_register.html", context={
+        return render(request, "demand/edit_register.html", context={
             "register_form": register_form,
             "order_formset": order_formset,
         })
@@ -80,12 +80,12 @@ def edit_register(request):
                 register.save()
                 return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
             else:
-                return render(request, "edit_register.html", context={
+                return render(request, "demand/edit_register.html", context={
                     "register_form": register_form,
                     "order_formset": order_formset,
                 })
         else:
-            return render(request, "edit_register.html", context={
+            return render(request, "demand/edit_register.html", context={
                 "register_form": register_form,
                 "order_formset": order_formset,
             })
@@ -127,7 +127,14 @@ def edit_order(request, pk):
 
 @ login_required
 def search_registers(request):
-    return render(request, "demand/search_registers.html", context={"registers": Register.objects.all()})
+    register_filter = RegisterFilter(
+        request.GET, queryset=Register.objects.all())
+    paginator = Paginator(register_filter.qs, 20)
+    page = request.GET.get('page')
+    registers = paginator.get_page(page)
+    return render(request, "demand/search_registers.html",
+                  context={"register_filter": register_filter,
+                           "registers": registers})
 # 차량번호 검색
 # RO 번호 검색
 #
