@@ -84,6 +84,7 @@ def new_register(request):
 
 @login_required
 def edit_register(request, pk):
+
     register = get_object_or_404(Register, pk=pk)
     register_form = NewRegisterForm(instance=register)
     order_form_factory = modelformset_factory(
