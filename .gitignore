@@ -4,6 +4,6 @@
 uwsgi.ini
 *DS_store
 *.pem
-
+staticfiles/
 src/
 *.xlsx

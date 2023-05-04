@@ -16,7 +16,7 @@ ALLOWED_HOSTS = ["*"]
 # more details on how to customize your logging configuration.
 
 DB_NAME = os.path.join(ROOT_DIR.parent.parent.parent, 'root')
-DB_NAME = os.path.join(DB_NAME, 'db.sqlite3')
+DB_NAME = os.path.join(DB_NAME, 'production.sqlite3')
 
 DATABASES = {
     'default': {
