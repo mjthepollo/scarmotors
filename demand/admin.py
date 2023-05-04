@@ -27,20 +27,21 @@ class InsuranceAgentAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ["indemnity_amount",
+    list_display = ["__str__", "indemnity_amount",
                     "discount_amount", "payment_type", "payment_info"]
     list_filter = ["payment_type"]
 
 
 @admin.register(Charge)
 class ChargeAdmin(admin.ModelAdmin):
-    list_display = ["charge_date", "wage_amount", "component_amount"]
+    list_display = ["__str__", "charge_date",
+                    "wage_amount", "component_amount"]
     search_fields = ["charge_date",]
 
 
 @admin.register(Deposit)
 class DepositAdmin(admin.ModelAdmin):
-    list_display = ["deposit_date", "deposit_amount"]
+    list_display = ["__str__", "deposit_date", "deposit_amount"]
     search_fields = ["deposit_date"]
 
 

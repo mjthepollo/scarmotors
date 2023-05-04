@@ -15,6 +15,8 @@ class Sales(TimeStampedModel):
                               max_length=20, default="미청구", verbose_name="상태")
 
     class Meta:
+        verbose_name = "매출"
+        verbose_name_plural = "매출(들)"
         abstract = True
 
     def get_indemnity_amount(self):
@@ -185,6 +187,9 @@ class Sales(TimeStampedModel):
 
 
 class Supporter(TimeStampedModel):
+    class Meta:
+        verbose_name = "입고 지원 업체"
+        verbose_name_plural = "입고 지원 업체(들)"
     name = models.CharField(max_length=100, verbose_name="지원 업체명")
     active = models.BooleanField(default=True, verbose_name="활성화")
 
@@ -193,6 +198,9 @@ class Supporter(TimeStampedModel):
 
 
 class ChargedCompany(TimeStampedModel):
+    class Meta:
+        verbose_name = "보험회사"
+        verbose_name_plural = "보험회사(들)"
     name = models.CharField(max_length=100, verbose_name="담당 업체명")
     active = models.BooleanField(default=True, verbose_name="활성화")
 
@@ -201,6 +209,9 @@ class ChargedCompany(TimeStampedModel):
 
 
 class InsuranceAgent(TimeStampedModel):
+    class Meta:
+        verbose_name = "보험 담당자"
+        verbose_name_plural = "보험 담당자(들)"
     name = models.CharField(max_length=100, verbose_name="보험 담당자명")
     active = models.BooleanField(default=True, verbose_name="활성화")
 
@@ -209,6 +220,9 @@ class InsuranceAgent(TimeStampedModel):
 
 
 class Payment(TimeStampedModel):
+    class Meta:
+        verbose_name = "면책금 정보"
+        verbose_name_plural = "면책금 정보(들)"
     indemnity_amount = models.IntegerField(
         blank=True, null=True, verbose_name="면책금")
     discount_amount = models.IntegerField(
@@ -238,6 +252,9 @@ class Payment(TimeStampedModel):
 
 
 class Charge(TimeStampedModel):
+    class Meta:
+        verbose_name = "청구 정보"
+        verbose_name_plural = "청구 정보(들)"
     charge_date = models.DateField(verbose_name="청구일")
     wage_amount = models.IntegerField(default=0, verbose_name="공임비")
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
@@ -287,6 +304,9 @@ class Charge(TimeStampedModel):
 
 
 class Deposit(TimeStampedModel):
+    class Meta:
+        verbose_name = "입금 정보"
+        verbose_name_plural = "입금 정보(들)"
     deposit_amount = models.IntegerField(verbose_name="입금액")
     deposit_date = models.DateField(verbose_name="입금일")
 
@@ -306,6 +326,9 @@ class Deposit(TimeStampedModel):
 
 
 class Register(TimeStampedModel):
+    class Meta:
+        verbose_name = "등록"
+        verbose_name_plural = "등록(들)"
     RO_number = models.CharField(verbose_name="RO번호", max_length=10)
     car_number = models.CharField(verbose_name="차량번호", max_length=20)
     day_came_in = models.DateField(verbose_name="입고일")
@@ -361,6 +384,9 @@ class Register(TimeStampedModel):
 
 
 class Order(Sales):
+    class Meta:
+        verbose_name = "주문 매출"
+        verbose_name_plural = "주문 매출(들)"
     register = models.ForeignKey(
         Register, null=True, on_delete=models.CASCADE, verbose_name="등록", related_name="orders")
     charged_company = models.ForeignKey(
@@ -392,6 +418,9 @@ class Order(Sales):
 
 
 class ExtraSales(Sales):
+    class Meta:
+        verbose_name = "기타 매출"
+        verbose_name_plural = "기타 매출(들)"
     car_number = models.CharField(
         verbose_name="차량번호", blank=True, null=True, max_length=20)
     day_came_in = models.DateField(verbose_name="입고일", blank=True, null=True)
