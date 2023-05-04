@@ -4,6 +4,7 @@ from django.db import models
 
 from core.models import TimeStampedModel
 from core.utility import print_colored
+from demand.excel_line_info import *
 
 # Create your models here.
 STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금",

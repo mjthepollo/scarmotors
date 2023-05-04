@@ -15,58 +15,9 @@ from demand.check_value_functions import (check_chargable_amount,
                                           check_paid_turnover,
                                           check_payment_rate, check_status,
                                           check_turnover, check_wage_turnover)
+from demand.excel_line_info import *
 from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
                            InsuranceAgent, Order, Payment, Register, Supporter)
-
-HEADER = 5
-
-RO_NUMBER = 2
-DAY_CAME_IN = 3
-EXPECTED_DAY_CAME_OUT = 4
-REAL_DAY_CAME_OUT = 5
-CAR_NUMBER = 7
-CAR_MODEL = 8
-ABROAD_TYPE = 9
-NUMBER_OF_REPAIRS_WORKS = 10
-NUMBER_OF_EXCHANGE_WORKS = 11
-SUPPORTER = 13
-CLIENT_NAME_AND_INSURANCE_AGENT = 14
-PHONE_NUMBER = 15
-CHARGE_TYPE = 16
-CHARGED_COMPANY = 17
-ORDER_TYPE = 18
-RECEIPT_NUMBER = 19
-FAULT_RATIO = 20
-CHARGE_DATE = 22
-WAGE_AMOUNT = 23
-COMPONENT_AMOUNT = 24
-REPAIR_AMOUNT = 25
-VAT_AMOUNT = 26
-CHARGABLE_AMOUNT = 27
-RENT_CAR_COMPANY_NAME = 28
-INDEMNITY_AMOUNT = 29
-DISCOUNT_AMOUNT = 30
-REFUND_AMOUNT = 31
-PAYMENT_TYPE = 32
-PAYMENT_INFO = 33
-PAYMENT_DATE = 34
-CHARGE_AMOUNT = 35
-# REFUND_DATE = pass
-DEPOSIT_DATE = 37
-DEPOSIT_AMOUNT = 38
-PAYMENT_RATE = 39
-NOT_PAID_AMOUNT = 40
-TURNOVER = 42
-FACTORY_TURNOVER = 44
-NOTE = 46
-STATUS = 47
-PAID_TURNOVER = 51
-NOT_PAID_TURNOVER = 52
-INTEGRATED_TURNOVER = 53
-WAGE_TURNOVER = 55
-COMPONENT_TURNOVER = 56
-END = 57
-
 
 SKIPPED_RO_NUMBERS = ["2-27", "2-128", "4-26", "4-30"]
 
