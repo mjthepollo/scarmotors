@@ -7,11 +7,7 @@
   {{order_filter.form}}
   <input type="submit" value="Search">
 </form>
-<<<<<<< HEAD
 <a href="{{download_url}}" download>Download Excel</a>
-=======
-
->>>>>>> origin/main
 {% for order in orders %}
 <a href="{% url 'demand:edit_order' order.pk %}"><h2>{{order}}</h2></a>
 {% endfor %}

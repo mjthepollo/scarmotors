@@ -16,6 +16,7 @@ class Sales(TimeStampedModel):
                               max_length=20, default="미청구", verbose_name="상태")
 
     class Meta:
+        ordering = ["-created",]
         verbose_name = "매출"
         verbose_name_plural = "매출(들)"
         abstract = True
@@ -189,6 +190,7 @@ class Sales(TimeStampedModel):
 
 class Supporter(TimeStampedModel):
     class Meta:
+        ordering = ["-created",]
         verbose_name = "입고 지원 업체"
         verbose_name_plural = "입고 지원 업체(들)"
     name = models.CharField(max_length=100, verbose_name="지원 업체명")
@@ -200,6 +202,7 @@ class Supporter(TimeStampedModel):
 
 class ChargedCompany(TimeStampedModel):
     class Meta:
+        ordering = ["-created",]
         verbose_name = "보험회사"
         verbose_name_plural = "보험회사(들)"
     name = models.CharField(max_length=100, verbose_name="담당 업체명")
@@ -211,6 +214,7 @@ class ChargedCompany(TimeStampedModel):
 
 class InsuranceAgent(TimeStampedModel):
     class Meta:
+        ordering = ["-created",]
         verbose_name = "보험 담당자"
         verbose_name_plural = "보험 담당자(들)"
     name = models.CharField(max_length=100, verbose_name="보험 담당자명")
@@ -222,6 +226,7 @@ class InsuranceAgent(TimeStampedModel):
 
 class Payment(TimeStampedModel):
     class Meta:
+        ordering = ["-created",]
         verbose_name = "면책금 정보"
         verbose_name_plural = "면책금 정보(들)"
     indemnity_amount = models.IntegerField(
@@ -254,6 +259,7 @@ class Payment(TimeStampedModel):
 
 class Charge(TimeStampedModel):
     class Meta:
+        ordering = ["-created",]
         verbose_name = "청구 정보"
         verbose_name_plural = "청구 정보(들)"
     charge_date = models.DateField(verbose_name="청구일")
@@ -306,6 +312,7 @@ class Charge(TimeStampedModel):
 
 class Deposit(TimeStampedModel):
     class Meta:
+        ordering = ["-created",]
         verbose_name = "입금 정보"
         verbose_name_plural = "입금 정보(들)"
     deposit_amount = models.IntegerField(verbose_name="입금액")
@@ -328,6 +335,7 @@ class Deposit(TimeStampedModel):
 
 class Register(TimeStampedModel):
     class Meta:
+        ordering = ["-created",]
         verbose_name = "등록"
         verbose_name_plural = "등록(들)"
     RO_number = models.CharField(verbose_name="RO번호", max_length=10)
@@ -364,7 +372,10 @@ class Register(TimeStampedModel):
         blank=True, null=True, verbose_name="비고")
 
     def get_work_days(self):
-        return (self.real_day_came_out - self.day_came_in).days
+        if self.real_day_came_out and self.day_came_in:
+            return (self.real_day_came_out - self.day_came_in).days
+        else:
+            return None
 
     def get_number_of_works(self):
         return self.number_of_exchange_works + self.number_of_repair_works
@@ -412,7 +423,7 @@ class Order(Sales):
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
     def to_excel_line(self):
-        pass
+        return dictionary_to_line(order_to_excel_dictionary(self))
 
     def __str__(self):
         return f"{self.register.RO_number} {self.order_type} {self.charge_type}"

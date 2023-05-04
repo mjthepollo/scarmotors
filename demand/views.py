@@ -9,6 +9,7 @@ from django.http import FileResponse  # Create your views here.
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from demand.excel_line_info import INDEXES
 from demand.forms import (ChargeForm, DepositForm, NewRegisterForm,
                           OrderFilter, OrderForm, PaymentForm, RegisterFilter,
                           RegisterFilterForOrderFilter)
@@ -162,7 +163,7 @@ def search_registers(request):
     registers = paginator.get_page(page)
     return render(request, "demand/search_registers.html",
                   context={"register_filter": register_filter,
-                           "download_url": reverse("demand:registers_to_excel")+request.GET.urlencode(),
+                           "download_url": reverse("demand:registers_to_excel")+"?"+request.GET.urlencode(),
                            "registers": registers})
 # 차량번호 검색
 
@@ -171,8 +172,9 @@ def registers_to_excel(request):
     register_filter = RegisterFilter(
         request.GET, queryset=Register.objects.all())
     registers = register_filter.qs
-    # lines = [register.to_excel_lines() for register in registers]
-    df = pd.DataFrame(temp_lines)
+    lines = [order.to_excel_line()
+             for register in registers for order in register.orders.all()]
+    df = pd.DataFrame(lines, columns=INDEXES.values())
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Sheet1')
@@ -196,7 +198,7 @@ def search_orders(request):
     return render(request, "demand/search_orders.html",
                   context={"register_filter": register_filter,
                            "order_filter": order_filter,
-                           "download_url": reverse("demand:orders_to_excel")+request.GET.urlencode(),
+                           "download_url": reverse("demand:orders_to_excel")+"?"+request.GET.urlencode(),
                            "orders": orders})
 
 
@@ -206,8 +208,8 @@ def orders_to_excel(request):
     order_filter = OrderFilter(
         request.GET, queryset=Order.objects.filter(register__in=register_filter.qs))
     orders = order_filter.qs
-    # lines = [order.to_excel_line() for order in orders]
-    df = pd.DataFrame(temp_lines)
+    lines = [order.to_excel_line() for order in orders]
+    df = pd.DataFrame(lines, columns=INDEXES.values())
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Sheet1')
