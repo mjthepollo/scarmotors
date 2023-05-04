@@ -24,6 +24,7 @@ pytest = "*"
 pytest-django = "*"
 sphinx = "*"
 sphinx-autobuild = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"
