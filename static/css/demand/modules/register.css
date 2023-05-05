@@ -23,7 +23,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 70px;
+  width: 80px;
   font-weight: 800;
   height: 30px;
   border-radius: 5px;
@@ -32,7 +32,7 @@
 }
 
 .register_edit.not_complete_class,
-.order_edit.not_complete_class {
+.order_edit.no_charge_class {
   background-color: red;
   color: white;
 }
@@ -44,7 +44,8 @@
 }
 
 .register_edit.complete_class,
-.order_edit.complete_class {
+.order_edit.complete_class,
+.order_edit.manually_complete_class {
   background-color: green;
   color: white;
 }
@@ -54,7 +55,7 @@
   color: white;
 }
 
-.order_edit.no_charge_class {
+.order_edit.not_complete_class {
   background-color: pink;
   color: white;
 }
@@ -95,6 +96,7 @@
   height: 30px;
   border-radius: 5px;
   margin-left: 10px;
+  text-decoration: none;
 }
 
 .order_function.complete_class {
@@ -104,5 +106,11 @@
 
 .order_function.not_complete_class {
   background-color: red;
+  color: white;
+}
+
+.order_function.make_manually_complete {
+  background-color: black;
+  width: 70px;
   color: white;
 }

@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 {% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/demand/modules/register.css' %}">
+<link rel="stylesheet" href="{% static 'css/demand/search.css' %}">
 {% endblock css %} {% block content %}
-<h1>Search</h1>
 <form method="GET">
-  {{register_filter.form}}
-  {{order_filter.form}}
-  <input type="submit" value="Search">
+  {{register_filter.form.as_div}}
+  {{order_filter.form.as_div}}
+  <div id="special_functions">
+    <input type="submit" value="검색" class="btn btn-dark special_function">
+    <a class="btn btn-success special_function" href="{{download_url}}" download>엑셀 다운로드</a>
+    <a class="btn btn-primary special_function" href="{{table_view_url}}" target="_blank">표로 보기</a>
+  </div>
 </form>
-<a href="{{download_url}}" download>Download Excel</a>
 {% for order in orders %}
 {% include "demand/modules/register_for_order.html" %}
 {% endfor %}

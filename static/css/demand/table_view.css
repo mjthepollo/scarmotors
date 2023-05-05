@@ -1,0 +1,15 @@
+body {
+  overflow: scroll;
+}
+.table th {
+  font-weight: 600;
+
+  border-right: 2px solid black;
+
+  white-space: nowrap;
+}
+.table td {
+  text-align: center;
+
+  white-space: nowrap;
+}

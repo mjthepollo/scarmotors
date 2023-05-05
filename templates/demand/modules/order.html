@@ -9,5 +9,8 @@
         <a class="order_function {{order.get_charge_class}}" href="{% url 'demand:order_charge' order.pk %}">청구</a>
         <a class="order_function {{order.get_deposit_class}}" href="{% url 'demand:order_deposit' order.pk %}">입금</a>
         <a class="order_function {{order.get_came_out_class}}" href="{% url 'demand:order_came_out' order.pk %}">출고</a>
+        {% if not order.finished %}
+            <a class="order_function make_manually_complete" href="{% url 'demand:make_manually_complete' order.pk %}">완료 처리</a>
+        {% endif %}
     </div>
 </div>

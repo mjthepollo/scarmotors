@@ -7,16 +7,19 @@ from core.utility import print_colored
 from demand.excel_line_info import *
 
 # Create your models here.
-STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금",
-               "NO_CAME_OUT": "미출고", "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요", "ERROR": "오류"}
+STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금", "NO_CAME_OUT": "미출고",
+               "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요",
+               "ERROR": "오류", "MANUALLY_COMPLETE": "완료(수동)"}
 
 
 NOT_COMPLETE = 0
 PROGRESS = 1
 COMPLETE = 2
 NEED_CHECK = 3
-STATUS_CLASS = ["not_complete", "progress", "complete", "need_check",]
-REGISTER_STAUTS = ["청구 필요", "진행중", "완료", "확인 필요"]
+MANUALLY_COMPLETE = 4
+STATUS_CLASS = ["not_complete", "progress",
+                "complete", "need_check", "manually_complete"]
+REGISTER_STAUTS = ["청구 필요", "진행중", "완료", "확인 필요", "완료(수동)"]
 
 
 def make_to_class_name(name):
@@ -189,17 +192,27 @@ class Sales(TimeStampedModel):
 
             return STATUS_DICT["ERROR"]
 
+    def make_manually_complete(self):
+        self.status = STATUS_DICT["MANUALLY_COMPLETE"]
+        self.save()
+
+    def finished(self):
+        if self.status == STATUS_DICT["COMPLETE"] or self.status == STATUS_DICT["MANUALLY_COMPLETE"]:
+            return True
+        else:
+            return False
+
     def save(self, *args, **kwargs):
-        self.status = self.get_status()
+        if self.status != "완료(수동)":
+            self.status = self.get_status()
         super().save(*args, **kwargs)
 
 # --------------- HTML FUNCTION -----------------#
     def get_status_class(self):
-        status = self.get_status()
         status_key = next(
-            (k for k, v in STATUS_DICT.items() if v == status), None)
+            (k for k, v in STATUS_DICT.items() if v == self.status), None)
         if status_key == None:
-            raise ValueError(f"status_key is None. status:{status}")
+            raise ValueError(f"status_key is None. status:{self.status}")
         else:
             return make_to_class_name(status_key.lower())
 
@@ -448,6 +461,12 @@ class Register(TimeStampedModel):
 # --------------- HTML FUNCTION -----------------#
     def get_status(self):
         orders = self.orders.all()
+        all_finished = True
+        for order in orders:
+            if not order.finished():
+                all_finished = False
+        if all_finished:
+            return REGISTER_STAUTS[COMPLETE]
         for order in orders:
             if order.get_status() in [STATUS_DICT["ERROR"], STATUS_DICT["NEED_CHECK"]]:
                 return REGISTER_STAUTS[NEED_CHECK]
@@ -472,7 +491,7 @@ class Register(TimeStampedModel):
             status_class = "complete"
         else:
             raise ValueError(f"status:{status} is not valid")
-        return status_class + "_class"
+        return make_to_class_name(status_class)
 
     def get_came_out_class(self):
         if self.real_day_came_out:
@@ -548,7 +567,11 @@ class Order(Sales):
 
     def get_description(self):
         try:
-            return f"{self.charged_company.name} {self.charge_type} {self.order_type}"
+            charge = format(self.get_charge_amount(),
+                            ",")+"₩" if self.charge else "청구필요"
+            deposit = format(self.deposit.deposit_amount,
+                             ",")+"₩" if self.deposit else "입금필요"
+            return f"{self.charged_company.name} {self.charge_type} {self.order_type} 청구액:{charge} 입금액:{deposit} "
         except Exception as e:
             print(e)
 

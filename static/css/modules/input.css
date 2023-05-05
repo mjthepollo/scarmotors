@@ -1,0 +1,17 @@
+input,
+select,
+textarea {
+  border-radius: 0px;
+  width: 200px;
+  height: 30px;
+
+  text-align: center;
+
+  border: 1px solid black;
+}
+input[type="checkbox"] {
+  border-radius: 0px;
+  height: 20px;
+
+  border: 1px solid black;
+}

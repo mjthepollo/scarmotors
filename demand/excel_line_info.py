@@ -198,7 +198,8 @@ def order_to_excel_dictionary(order):
     component_amount = order.charge.component_amount if order.charge else 0
     repair_amount = wage_amount + component_amount
     vat_amouunt = int(repair_amount/10)
-    chargable_amount = order.get_chargable_amount()
+    chargable_amount = int(order.get_chargable_amount()
+                           ) if order.get_chargable_amount() else 0
     indemnity_amount = order.get_indemnity_amount()
     discount_amount = order.payment.discount_amount if order.payment else 0
     refund_amount = order.payment.refund_amount if order.payment else 0
@@ -213,18 +214,18 @@ def order_to_excel_dictionary(order):
     deposit_amount = order.deposit.deposit_amount if order.deposit else 0
     payment_rate = int(order.get_payment_rate() *
                        100) if order.get_payment_rate() else "계산불가능"
-    not_paid_amount = order.get_not_paid_amount()
+    not_paid_amount = int(order.get_not_paid_amount())
     not_paid_rate = int(100 - order.get_payment_rate() *
                         100) if order.get_payment_rate() else "계산불가능"
     turnover = order.get_turnover()
-    turnover_vat = turnover*10/11
+    turnover_vat = int(turnover*10/11)
     factory_turnover = order.get_factory_turnover()
     note = register_note + (order.note or "-")
     paid_turnover = order.get_paid_turnover()
-    not_paid_turnover = order.get_not_paid_turnover()
-    integrated_turnover = order.get_integrated_turnover()
-    wage_turnover = order.get_wage_turnover()
-    component_turnover = order.get_component_turnover()
+    not_paid_turnover = int(order.get_not_paid_turnover())
+    integrated_turnover = int(order.get_integrated_turnover())
+    wage_turnover = int(order.get_wage_turnover())
+    component_turnover = int(order.get_component_turnover())
     status = order.get_status()
     return {
         "RO_number": RO_number,

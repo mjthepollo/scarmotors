@@ -10,9 +10,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from demand.excel_line_info import INDEXES
-from demand.forms import (ChargeForm, DepositForm, NewRegisterForm,
-                          OrderFilter, OrderForm, PaymentForm, RegisterFilter,
-                          RegisterFilterForOrderFilter)
+from demand.forms import (ChargeForm, DepositForm, EditRegisterForm,
+                          NewRegisterForm, OrderFilter, OrderForm, PaymentForm,
+                          RegisterFilter, RegisterFilterForOrderFilter)
 from demand.models import Charge, Deposit, ExtraSales, Order, Payment, Register
 
 temp_lines = [['0123', None, '1-1', pd.Timestamp('2023-01-02 00:00:00'), pd.Timestamp('2023-01-09 00:00:00'), datetime(2023, 1, 13, 0, 0), 11.0, '60저0130', '320D', '수입', None, 1.0, 1.0, '이성도(타)', '김석종/구본준', 1031370900, '보험', 'DB', '자차', '22-7881890', 0.4, 1.0, 230123.0, 565320.0, None, 565320.0, 56532.0, 248740.80000000002, '무상7889', 392000.0, None, None, '카드', '우리', pd.Timestamp('2023-01-13 00:00:00'), 0.0, None, None, None, None, 0.0, None, 392000.0, 35636.36363636365, 356363.63636363635, None, "TEST", '완료', None, None, 1.0, 356363.63636363635, 0.0, 356363.63636363635, 0.0, 356363.63636363635, 0.0],
@@ -43,9 +43,7 @@ temp_lines = [['0123', None, '1-1', pd.Timestamp('2023-01-02 00:00:00'), pd.Time
 
 @login_required
 def new_register(request):
-    register_form = NewRegisterForm(initial={
-        'car_number': "TEST",
-        'day_came_in': date.today()})
+    register_form = NewRegisterForm(initial={'day_came_in': date.today()})
     order_form_factory = modelformset_factory(
         Order, form=OrderForm, extra=1)
     if request.method == "GET":
@@ -84,9 +82,8 @@ def new_register(request):
 
 @login_required
 def edit_register(request, pk):
-
     register = get_object_or_404(Register, pk=pk)
-    register_form = NewRegisterForm(instance=register)
+    register_form = EditRegisterForm(instance=register)
     order_form_factory = modelformset_factory(
         Order, form=OrderForm, extra=0)
     if request.method == "GET":
@@ -97,7 +94,7 @@ def edit_register(request, pk):
             "order_formset": order_formset,
         })
     else:
-        register_form = NewRegisterForm(request.POST, instance=register)
+        register_form = EditRegisterForm(request.POST, instance=register)
         order_formset = order_form_factory(
             request.POST, queryset=register.orders.all())
         if register_form.is_valid():
@@ -165,8 +162,21 @@ def search_registers(request):
     return render(request, "demand/search_registers.html",
                   context={"register_filter": register_filter,
                            "download_url": reverse("demand:registers_to_excel")+"?"+request.GET.urlencode(),
+                           "table_view_url": reverse("demand:search_registers_table_view")+"?"+request.GET.urlencode(),
                            "registers": registers})
 # 차량번호 검색
+
+
+def search_registers_table_view(request):
+    register_filter = RegisterFilter(
+        request.GET, queryset=Register.objects.all())
+    registers = register_filter.qs
+    lines = [order.to_excel_line()
+             for register in registers for order in register.orders.all()]
+    df = pd.DataFrame(lines, columns=INDEXES.values())
+    return render(request, "demand/table_view.html", context={
+        "table": df.to_html(classes="table table-striped table-bordered table-hover")
+    })
 
 
 def registers_to_excel(request):
@@ -199,8 +209,22 @@ def search_orders(request):
     return render(request, "demand/search_orders.html",
                   context={"register_filter": register_filter,
                            "order_filter": order_filter,
+                           "table_view_url": reverse("demand:search_orders_table_view")+"?"+request.GET.urlencode(),
                            "download_url": reverse("demand:orders_to_excel")+"?"+request.GET.urlencode(),
                            "orders": orders})
+
+
+def search_orders_table_view(request):
+    register_filter = RegisterFilterForOrderFilter(
+        request.GET, queryset=Register.objects.all())
+    order_filter = OrderFilter(
+        request.GET, queryset=Order.objects.filter(register__in=register_filter.qs))
+    orders = order_filter.qs
+    lines = [order.to_excel_line() for order in orders]
+    df = pd.DataFrame(lines, columns=INDEXES.values())
+    return render(request, "demand/table_view.html", context={
+        "table": df.to_html(classes="table table-striped table-bordered table-hover")
+    })
 
 
 def orders_to_excel(request):
@@ -275,6 +299,17 @@ def order_deposit(request, pk):
             return render(request, "demand/order_deposit.html", context={
                 "deposit_form": deposit_form,
             })
+
+
+@login_required
+def make_manually_complete(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    order.make_manually_complete()
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
 
 
 @login_required

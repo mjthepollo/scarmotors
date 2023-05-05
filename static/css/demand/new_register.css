@@ -1,0 +1,63 @@
+@import url("../modules/input.css");
+
+input,
+select,
+textarea {
+  width: 200px;
+  height: 30px;
+  border-radius: 0px;
+  border: 1px solid black;
+  text-align: center;
+}
+input[type="checkbox"] {
+  width: 200px;
+}
+
+#formset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+h2 {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+#register_form,
+#order_formset {
+  width: 800px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.new_order {
+  margin-bottom: 30px;
+}
+#register_form > div,
+.new_order > div {
+  display: flex;
+  width: 400px;
+  margin-top: 5px;
+}
+
+#register_form > div > label,
+.new_order > div > label {
+  display: flex;
+  justify-content: center;
+  width: 150px;
+}
+
+#add_button {
+  margin-top: 30px;
+  width: 800px;
+  height: 40px;
+}
+
+button#complete {
+  margin-top: 30px;
+  margin-bottom: 50px;
+  width: 800px;
+}
