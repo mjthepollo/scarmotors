@@ -11,6 +11,18 @@ STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금",
                "NO_CAME_OUT": "미출고", "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요", "ERROR": "오류"}
 
 
+NOT_COMPLETE = 0
+PROGRESS = 1
+COMPLETE = 2
+NEED_CHECK = 3
+STATUS_CLASS = ["not_complete", "progress", "complete", "need_check",]
+REGISTER_STAUTS = ["청구 필요", "진행중", "완료", "확인 필요"]
+
+
+def make_to_class_name(name):
+    return name + "_class"
+
+
 class Sales(TimeStampedModel):
     status = models.CharField(choices=[(value, value)for value in STATUS_DICT.values()],
                               max_length=20, default="미청구", verbose_name="상태")
@@ -181,8 +193,50 @@ class Sales(TimeStampedModel):
         self.status = self.get_status()
         super().save(*args, **kwargs)
 
+# --------------- HTML FUNCTION -----------------#
+    def get_status_class(self):
+        status = self.get_status()
+        status_key = next(
+            (k for k, v in STATUS_DICT.items() if v == status), None)
+        if status_key == None:
+            raise ValueError(f"status_key is None. status:{status}")
+        else:
+            return make_to_class_name(status_key.lower())
+
+    def get_came_out_class(self):
+        if isinstance(self, Order):
+            real_day_came_out = self.register.real_day_came_out if self.register else None
+        else:
+            real_day_came_out = self.real_day_came_out
+        if real_day_came_out:
+            status_class = STATUS_CLASS[COMPLETE]
+        else:
+            status_class = STATUS_CLASS[NOT_COMPLETE]
+        return make_to_class_name(status_class)
+
+    def get_charge_class(self):
+        if self.charge:
+            status_class = STATUS_CLASS[COMPLETE]
+        else:
+            status_class = STATUS_CLASS[NOT_COMPLETE]
+        return make_to_class_name(status_class)
+
+    def get_deposit_class(self):
+        if self.deposit:
+            status_class = STATUS_CLASS[COMPLETE]
+        else:
+            status_class = STATUS_CLASS[NOT_COMPLETE]
+        return make_to_class_name(status_class)
+
+    def get_description(self):
+        raise NotImplementedError
+
+# --------------- EXCEL FUNCTION -----------------#
+
     def to_excel_line(self):
         raise NotImplementedError
+
+# --------------- PRINT FUNCTION -----------------#
 
     def __str__(self):
         raise NotImplementedError
@@ -391,6 +445,75 @@ class Register(TimeStampedModel):
         self.RO_number = Register.get_RO_number()
         self.save()
 
+# --------------- HTML FUNCTION -----------------#
+    def get_status(self):
+        orders = self.orders.all()
+        for order in orders:
+            if order.get_status() in [STATUS_DICT["ERROR"], STATUS_DICT["NEED_CHECK"]]:
+                return REGISTER_STAUTS[NEED_CHECK]
+        for order in orders:
+            if order.get_status() == STATUS_DICT["NO_CHARGE"]:
+                return REGISTER_STAUTS[NOT_COMPLETE]
+        for order in orders:
+            if order.get_status() != STATUS_DICT["COMPLETE"]:
+                return REGISTER_STAUTS[PROGRESS]
+        return REGISTER_STAUTS[COMPLETE]
+
+    def get_status_class(self):
+        status = self.get_status()
+        status_class = ""
+        if status == REGISTER_STAUTS[NEED_CHECK]:
+            status_class = "need_check"
+        elif status == REGISTER_STAUTS[NOT_COMPLETE]:
+            status_class = "not_complete"
+        elif status == REGISTER_STAUTS[PROGRESS]:
+            status_class = "progress"
+        elif status == REGISTER_STAUTS[COMPLETE]:
+            status_class = "complete"
+        else:
+            raise ValueError(f"status:{status} is not valid")
+        return status_class + "_class"
+
+    def get_came_out_class(self):
+        if self.real_day_came_out:
+            return STATUS_CLASS[COMPLETE]
+        else:
+            return STATUS_CLASS[NOT_COMPLETE]
+
+    def get_charge_class(self):
+        if self.charge:
+            return STATUS_CLASS[COMPLETE]
+        else:
+            return STATUS_CLASS[NOT_COMPLETE]
+
+    def get_deposit_class(self):
+        if self.deposit:
+            return STATUS_CLASS[COMPLETE]
+        else:
+            return STATUS_CLASS[NOT_COMPLETE]
+
+    def get_description(self):
+        try:
+            day_came_in = self.day_came_in.strftime(
+                "%m-%d") if self.day_came_in else "없음"
+            if not self.real_day_came_out and self.expected_day_came_out:
+                day_came_out = self.expected_day_came_out.strftime(
+                    "%m-%d") + " 예정"
+            elif self.expected_day_came_out:
+                day_came_out = self.expected_day_came_out.strftime(
+                    "%m-%d") + " 출고"
+            else:
+                day_came_out = "없음"
+            client_name = self.client_name if self.client_name else "없음"
+            rentcar = self.rentcar_company_name if self.rentcar_company_name else "없음"
+            supporter = self.supporter.name if self.supporter else "없음"
+            insurance_agent = self.insurance_agent.name if self.insurance_agent else "없음"
+            return f"입고:{day_came_in}/출고:{day_came_out}/차종:{self.car_model}/판수:{self.get_number_of_works()}/입고지원:{supporter}/고객명:{client_name}/담당자:{insurance_agent}/전화번호:{self.phone_number}/렌트:{rentcar}"
+        except Exception as e:
+            return str(e)
+
+# --------------- PRINT FUNCTION -----------------#
+
     def __str__(self):
         return f"[{self.RO_number}]{self.car_number}/{self.phone_number}"
 
@@ -422,6 +545,12 @@ class Order(Sales):
         Deposit, null=True, blank=True, related_name="order", verbose_name="입금", on_delete=models.CASCADE)
 
     note = models.TextField(blank=True, null=True, verbose_name="비고")
+
+    def get_description(self):
+        try:
+            return f"{self.charged_company.name} {self.charge_type} {self.order_type}"
+        except Exception as e:
+            print(e)
 
     def to_excel_line(self):
         return dictionary_to_line(order_to_excel_dictionary(self))
@@ -466,6 +595,9 @@ class ExtraSales(Sales):
 
     wasted = models.BooleanField(default=False, verbose_name="폐차")
     unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
+
+    def get_description(self):
+        return f"기타매출({self.pk})"
 
     def to_excel_line(self):
         pass

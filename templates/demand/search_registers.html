@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/demand/modules/register.css' %}">
 {% endblock css %} {% block content %}
 <h1>Search</h1>
 <form method="GET">
@@ -8,7 +9,7 @@
 </form>
 <a href="{{download_url}}" download>Download Excel</a>
 {% for register in registers %}
-<a href="{% url 'demand:edit_register' register.pk %}"><h2>{{register}}</h2></a>
+{% include "demand/modules/register.html" %}
 {% endfor %}
 {% with request.GET as params %}
   {% with params|remove_page_param as params_without_page %}

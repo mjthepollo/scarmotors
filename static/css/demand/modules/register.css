@@ -1,0 +1,108 @@
+.register {
+  border: 1px solid black;
+  padding: 10px;
+  margin: 5px 0px;
+}
+
+.order {
+  border: 1px solid black;
+}
+
+.register_info,
+.order_info {
+  display: flex;
+}
+
+.register_id {
+  font-weight: 800;
+}
+
+.register_edit,
+.order_edit {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  font-weight: 800;
+  height: 30px;
+  border-radius: 5px;
+  margin-right: 10px;
+  text-decoration: none;
+}
+
+.register_edit.not_complete_class,
+.order_edit.not_complete_class {
+  background-color: red;
+  color: white;
+}
+
+.register_edit.progress_class,
+.order_edit.progress_class {
+  background-color: yellow;
+  color: blue;
+}
+
+.register_edit.complete_class,
+.order_edit.complete_class {
+  background-color: green;
+  color: white;
+}
+.register_edit.need_check_class,
+.order_edit.need_check_class {
+  background-color: black;
+  color: white;
+}
+
+.order_edit.no_charge_class {
+  background-color: pink;
+  color: white;
+}
+
+.order_edit.not_paid_class {
+  background-color: blue;
+  color: white;
+}
+
+.order_edit.over_deposit_class {
+  background-color: purple;
+  color: white;
+}
+
+.order_edit.no_came_out_class {
+  background-color: orange;
+  color: white;
+}
+
+.order {
+  padding: 10px;
+  margin-top: 5px;
+}
+.order:first-child {
+  margin-top: 0px;
+}
+
+.order_functions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.order_function {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 30px;
+  border-radius: 5px;
+  margin-left: 10px;
+}
+
+.order_function.complete_class {
+  background-color: green;
+  color: white;
+}
+
+.order_function.not_complete_class {
+  background-color: red;
+  color: white;
+}

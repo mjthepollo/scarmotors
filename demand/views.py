@@ -223,6 +223,61 @@ def orders_to_excel(request):
 
 
 @login_required
+def order_came_out(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    order.real_day_came_out = date.today()
+    order.save()
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+
+
+@login_required
+def order_charge(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    charge_form = ChargeForm(instance=order.charge)
+    payment_form = PaymentForm(instance=order.payment)
+    if request.method == "GET":
+        return render(request, "demand/order_charge.html", context={
+            "charge_form": charge_form,
+            "payment_form": payment_form,
+        })
+    else:
+        charge_form = ChargeForm(request.POST, instance=order.charge)
+        payment_form = PaymentForm(request.POST, instance=order.payment)
+        if charge_form.is_valid() and payment_form.is_valid():
+            charge_form.save()
+            payment_form.save()
+            return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+        else:
+            return render(request, "demand/order_charge.html", context={
+                "charge_form": charge_form,
+                "payment_form": payment_form,
+            })
+
+
+@login_required
+def order_deposit(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    deposit_form = DepositForm(instance=order.deposit)
+    if request.method == "GET":
+        return render(request, "demand/order_deposit.html", context={
+            "deposit_form": deposit_form,
+        })
+    else:
+        deposit_form = DepositForm(request.POST, instance=order.deposit)
+        if deposit_form.is_valid():
+            deposit_form.save()
+            return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+        else:
+            return render(request, "demand/order_deposit.html", context={
+                "deposit_form": deposit_form,
+            })
+
+
+@login_required
 def extra_sales(request):
     return render(request, "demand/extra_sales.html", context={"extra_sales_queryset": ExtraSales.objects.all()})
 

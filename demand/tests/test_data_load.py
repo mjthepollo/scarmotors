@@ -23,9 +23,9 @@ class DataLoadTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super(DataLoadTest, cls).setUpClass()
-        cls.original_df = load_data("src/230428.xlsx", "23년 본사 상반기")
+        cls.original_df = load_data("src/basic.xlsx", "23년 본사 상반기")
         cls.df = get_effective_data_frame(
-            "src/230428.xlsx", "23년 본사 상반기")
+            "src/basic.xlsx", "23년 본사 상반기")
         cls.lines = df_to_lines(cls.df)
         cls.line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(
             cls.df)
@@ -131,7 +131,7 @@ class DataLoadTest(TestCase):
 
         # call_command('clean_models')
         # not_charged_df = get_effective_data_frame(
-        #     "src/230428.xlsx", "22년 12월 미청구")
+        #     "src/basic.xlsx", "22년 12월 미청구")
         # make_models_from_effective_df(not_charged_df)
         # for month in range(1, current_month+1):
         #     print(f"Month : {month}")

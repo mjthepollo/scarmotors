@@ -1,0 +1,6 @@
+<div class="register {{order.register.get_status_class}}">
+    {% with order.register as register %}
+    {% include "demand/modules/register_info.html"%}
+    {% endwith %}
+    {% include "demand/modules/order.html" %}
+</div>

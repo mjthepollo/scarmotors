@@ -12,6 +12,9 @@ urlpatterns = [
     path("registers_to_excel/", views.registers_to_excel,
          name="registers_to_excel"),
     path("search_orders/", views.search_orders, name="search_orders"),
+    path("order/came_out/<int:pk>/", views.order_came_out, name="order_came_out"),
+    path("order/charge/<int:pk>/", views.order_charge, name="order_charge"),
+    path("order/deposit/<int:pk>/", views.order_deposit, name="order_deposit"),
     path("orders_to_excel/", views.orders_to_excel, name="orders_to_excel"),
     path("extra_sales/", views.extra_sales, name="extra_sales"),
 ]
