@@ -397,6 +397,7 @@ class Register(TimeStampedModel):
 
 class Order(Sales):
     class Meta:
+        ordering = ["-created",]
         verbose_name = "주문 매출"
         verbose_name_plural = "주문 매출(들)"
     register = models.ForeignKey(
@@ -431,6 +432,7 @@ class Order(Sales):
 
 class ExtraSales(Sales):
     class Meta:
+        ordering = ["-created",]
         verbose_name = "기타 매출"
         verbose_name_plural = "기타 매출(들)"
     car_number = models.CharField(
