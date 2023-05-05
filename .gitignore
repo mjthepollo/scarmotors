@@ -7,3 +7,4 @@ uwsgi.ini
 staticfiles/
 src/
 *.xlsx
+!src/basic.xlsx
