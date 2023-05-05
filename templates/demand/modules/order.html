@@ -6,8 +6,8 @@
         <p class="order_description">{{order.get_description}}</p>
     </div>
     <div class="order_functions">
-        <a class="order_function {{order.get_came_out_class}}" href="{% url 'demand:order_came_out' order.pk %}">출고</a>
         <a class="order_function {{order.get_charge_class}}" href="{% url 'demand:order_charge' order.pk %}">청구</a>
         <a class="order_function {{order.get_deposit_class}}" href="{% url 'demand:order_deposit' order.pk %}">입금</a>
+        <a class="order_function {{order.get_came_out_class}}" href="{% url 'demand:order_came_out' order.pk %}">출고</a>
     </div>
 </div>
