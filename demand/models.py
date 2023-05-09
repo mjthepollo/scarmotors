@@ -115,10 +115,11 @@ class Sales(TimeStampedModel):
                 else:
                     return 0
             else:  # 보험
-                if self.deposit:
-                    return self.deposit.deposit_amount/chargable_amount
+                charge_amount = self.get_charge_amount()
+                if self.deposit and charge_amount:
+                    return self.deposit.deposit_amount/charge_amount
                 else:
-                    return 0
+                    return None
 
     def get_chargable_amount(self):
         if self.charge:
