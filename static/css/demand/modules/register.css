@@ -1,116 +1,73 @@
-.register {
-  border: 1px solid black;
-  padding: 10px;
-  margin: 5px 0px;
+.bold {
+  font-weight: 700;
 }
 
-.order {
-  border: 1px solid black;
-}
+.register a,
+.order a,
+.order_function a {
+  font-weight: inherit;
 
-.register_info,
-.order_info {
-  display: flex;
-}
+  color: inherit;
+  background-color: inherit;
 
-.register_id {
-  font-weight: 800;
-}
-
-.register_edit,
-.order_edit {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 80px;
-  font-weight: 800;
-  height: 30px;
-  border-radius: 5px;
-  margin-right: 10px;
   text-decoration: none;
 }
 
-.register_edit.not_complete_class,
-.order_edit.no_charge_class {
+.register.not_complete_class,
+.order.no_charge_class {
+  color: white;
   background-color: red;
-  color: white;
 }
 
-.register_edit.progress_class,
-.order_edit.progress_class {
-  background-color: yellow;
+.register.progress_class,
+.order.progress_class {
   color: blue;
+  background-color: yellow;
 }
 
-.register_edit.complete_class,
-.order_edit.complete_class,
-.order_edit.manually_complete_class {
+.register.complete_class,
+.order.complete_class,
+.order.manually_complete_class {
+  color: white;
   background-color: green;
-  color: white;
 }
-.register_edit.need_check_class,
-.order_edit.need_check_class {
+.register.need_check_class,
+.order.need_check_class {
+  color: white;
   background-color: black;
-  color: white;
 }
 
-.order_edit.not_complete_class {
+.order.not_complete_class {
+  color: white;
   background-color: pink;
-  color: white;
 }
 
-.order_edit.not_paid_class {
+.order.not_paid_class {
+  color: white;
   background-color: blue;
-  color: white;
 }
 
-.order_edit.over_deposit_class {
+.order.over_deposit_class {
+  color: white;
   background-color: purple;
-  color: white;
 }
 
-.order_edit.no_came_out_class {
+.order.no_came_out_class {
+  color: white;
   background-color: orange;
-  color: white;
-}
-
-.order {
-  padding: 10px;
-  margin-top: 5px;
-}
-.order:first-child {
-  margin-top: 0px;
-}
-
-.order_functions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.order_function {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 30px;
-  border-radius: 5px;
-  margin-left: 10px;
-  text-decoration: none;
 }
 
 .order_function.complete_class {
-  background-color: green;
   color: white;
+  background-color: green;
 }
 
 .order_function.not_complete_class {
-  background-color: red;
   color: white;
+  background-color: red;
 }
 
 .order_function.make_manually_complete {
-  background-color: black;
-  width: 70px;
   color: white;
+  background-color: black;
 }

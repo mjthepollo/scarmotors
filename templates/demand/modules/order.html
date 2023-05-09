@@ -1,16 +1,33 @@
-<div class="order {{order.get_status_class}}">
-    <div class="order_info">
-        <a class="order_edit {{order.get_status_class}}" href="{% url 'demand:edit_order' order.pk %}">
-            {{order.status}}
-        </a>
-        <p class="order_description">{{order.get_description}}</p>
-    </div>
-    <div class="order_functions">
-        <a class="order_function {{order.get_charge_class}}" href="{% url 'demand:order_charge' order.pk %}">청구</a>
-        <a class="order_function {{order.get_deposit_class}}" href="{% url 'demand:order_deposit' order.pk %}">입금</a>
-        <a class="order_function {{order.get_came_out_class}}" href="{% url 'demand:order_came_out' order.pk %}">출고</a>
-        {% if not order.finished %}
-            <a class="order_function make_manually_complete" href="{% url 'demand:make_manually_complete' order.pk %}">완료 처리</a>
-        {% endif %}
-    </div>
-</div>
+<tr>
+    {% if forloop.counter0 == 0 %}
+    <td class="register bold {{order.register.get_status_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'edit_register' order.register.pk}">{{order.register.get_status}}</a></td>
+    <td rowspan="{{order.register.orders.count}}">{{order.register.RO_number}}</td>
+    <td rowspan="{{order.register.orders.count}}">{{order.register.day_came_in}}</td>
+    <td rowspan="{{order.register.orders.count}}">{{order.register.car_number}}</td>
+    <td rowspan="{{order.register.orders.count}}">{{order.register.car_model}}</td>
+    <td rowspan="{{order.register.orders.count}}">{{order.register.get_abroad_type_display}}</td>
+    <td rowspan="{{order.register.orders.count}}">{{order.register.insurance_agent.name}}</td>
+    <td>{{order.order_type}}</td>
+    <td>{{order.charged_company.name}}</td>
+    <td>{{order.get_charge_amount}}</td>
+    <td>{{order.deposit.deposit_amount}}</td>
+    <td>{{order.get_payment_rate}}</td>
+    <td class="order {{order.get_came_out_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'demand:order_came_out' order.pk%}">출고</a></td>
+    <td class="order {{order.get_charge_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
+    <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk%}">입금</a></td>
+    <td class="order bold {{order.get_status_class}}"><a href="{% url 'edit_order' order.pk}">{{order.get_status_display}}</td>
+    {% else %}
+    <td>{{order.order_type}}</td>
+    <td>{{order.charged_company.name}}</td>
+    <td>{{order.get_charge_amount}}</td>
+    <td>{{order.deposit.deposit_amount}}</td>
+    <td>{{order.get_payment_rate}}</td>
+    <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk%}">입금</a></td>
+    <td class="order bold {{order.get_status_class}}"><a href="{% url 'edit_order' order.pk}">{{order.get_status_display}}</td>
+    {% endif %}
+    {% if order.finished %}
+    <td class="order_function bold complete_class">완료</td>
+    {% else %}
+    <td class="order_function bold make_manually_complete"><a href="{% url 'demand:make_manually_complete' order.pk %}">완료처리</a></td>
+    {% endif %}
+</tr>

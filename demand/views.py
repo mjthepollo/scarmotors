@@ -156,11 +156,13 @@ def edit_order(request, pk):
 def search_registers(request):
     register_filter = RegisterFilter(
         request.GET, queryset=Register.objects.all())
-    paginator = Paginator(register_filter.qs, 20)
+    page_num = int(request.GET.get('page_num', 20))
+    paginator = Paginator(register_filter.qs, page_num)
     page = request.GET.get('page')
     registers = paginator.get_page(page)
     return render(request, "demand/search_registers.html",
                   context={"register_filter": register_filter,
+                           "page_num": page_num,
                            "download_url": reverse("demand:registers_to_excel")+"?"+request.GET.urlencode(),
                            "table_view_url": reverse("demand:search_registers_table_view")+"?"+request.GET.urlencode(),
                            "registers": registers})

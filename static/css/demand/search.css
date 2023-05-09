@@ -18,7 +18,7 @@ form > div {
 }
 form > div > label {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 
   width: 100px;
 }
@@ -34,4 +34,23 @@ input[type="submit"] {
 }
 .special_function {
   width: 30%;
+}
+
+#search_results td,
+#search_results th {
+  padding: 5px;
+
+  text-align: center;
+
+  border: 1px solid black;
+
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+#search_results th {
+  font-weight: 700;
+
+  color: white;
+  background-color: var(--orange);
 }

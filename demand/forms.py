@@ -158,6 +158,9 @@ class OrderFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='note', lookup_expr='icontains', label="비고(주문)")
 
+    status = django_filters.MultipleChoiceFilter(
+        choices=Order._meta.get_field('status').choices, label="상태")
+
     class Meta:
         model = Order
         fields = ["status", "charged_company", "charge_type", "order_type"]
