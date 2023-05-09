@@ -1,9 +1,0 @@
-<div class="register_info {{register.get_status_class}}">
-    <a class="register_edit {{register.get_status_class}}" href="{% url 'demand:edit_register' register.pk%}">
-        {{register.get_status}}
-    <a>
-    <p class="register_id">{{register}}</p>
-</div>
-<div class="register_desciption">
-    <p>{{register.get_description}}</p>
-</div>

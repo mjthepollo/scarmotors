@@ -205,12 +205,14 @@ def search_orders(request):
         request.GET, queryset=Register.objects.all())
     order_filter = OrderFilter(
         request.GET, queryset=Order.objects.filter(register__in=register_filter.qs))
-    paginator = Paginator(order_filter.qs, 20)
+    page_num = int(request.GET.get('page_num', 20))
+    paginator = Paginator(order_filter.qs, page_num)
     page = request.GET.get('page')
     orders = paginator.get_page(page)
     return render(request, "demand/search_orders.html",
                   context={"register_filter": register_filter,
                            "order_filter": order_filter,
+                           "page_num": page_num,
                            "table_view_url": reverse("demand:search_orders_table_view")+"?"+request.GET.urlencode(),
                            "download_url": reverse("demand:orders_to_excel")+"?"+request.GET.urlencode(),
                            "orders": orders})

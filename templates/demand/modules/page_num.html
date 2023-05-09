@@ -1,0 +1,8 @@
+<div>
+    <label for="page_num">표시 개수:</label>
+    <select name="page_num">
+      <option value="20" {% if page_num == 20 %}selected{% endif %}>20</option>
+      <option value="50" {% if page_num == 50 %}selected{% endif %}>50</option>
+      <option value="100" {% if page_num == 100 %}selected{% endif %}>100</option>
+    </select>
+</div>

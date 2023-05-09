@@ -1,0 +1,23 @@
+<tr>
+    <td class="register bold {{order.register.get_status_class}}"><a href="{% url 'edit_register' order.register.pk}">{{order.register.get_status}}</a></td>
+    <td>{{order.register.RO_number}}</td>
+    <td>{{order.formatted_day_came_in}}</td>
+    <td>{{order.register.car_number}}</td>
+    <td>{{order.register.car_model}}</td>
+    <td>{{order.register.get_abroad_type_display}}</td>
+    <td>{{order.register.insurance_agent.name}}</td>
+    <td>{{order.order_type}}</td>
+    <td>{{order.charged_company.name}}</td>
+    <td>{{order.formatted_charge_amount}}</td>
+    <td>{{order.formatted_deposit_amount}}</td>
+    <td>{{order.formatted_payment_rate}}</td>
+    <td class="order {{order.get_came_out_class}}"><a href="{% url 'demand:order_came_out' order.pk%}">출고</a></td>
+    <td class="order {{order.get_charge_class}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
+    <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk%}">입금</a></td>
+    <td class="order bold {{order.get_status_class}}"><a href="{% url 'edit_order' order.pk}">{{order.get_status_display}}</td>
+    {% if order.finished %}
+    <td class="order_function bold complete_class">완료</td>
+    {% else %}
+    <td class="order_function bold make_manually_complete"><a href="{% url 'demand:make_manually_complete' order.pk %}">완료처리</a></td>
+    {% endif %}
+</tr>

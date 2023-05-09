@@ -5,15 +5,37 @@
 <form method="GET">
   {{register_filter.form.as_div}}
   {{order_filter.form.as_div}}
+  {% include 'demand/modules/page_num.html'%}
   <div id="special_functions">
     <input type="submit" value="검색" class="btn btn-dark special_function">
     <a class="btn btn-success special_function" href="{{download_url}}" download>엑셀 다운로드</a>
     <a class="btn btn-primary special_function" href="{{table_view_url}}" target="_blank">표로 보기</a>
   </div>
 </form>
+<table id="search_results" border="1">
+  <tr>
+    <th>전체상태</th>
+    <th>접수</th>
+    <th>입고일</th>
+    <th>차량번호</th>
+    <th>차종</th>
+    <th>국산/수입</th>
+    <th>담당자</th>
+    <th>타입</th>
+    <th>보험사</th>
+    <th>청구금액</th>
+    <th>입금액</th>
+    <th>지급율</th>
+    <th>출고</th>
+    <th>청구</th>
+    <th>입금</th>
+    <th>상태</th>
+    <th>완료</th>
+  </tr>
 {% for order in orders %}
-{% include "demand/modules/register_for_order.html" %}
+{% include "demand/modules/one_line_order.html" %}
 {% endfor %}
+</table>
 {% with request.GET as params %}
   {% with params|remove_page_param as params_without_page %}
   <div class="pagination">

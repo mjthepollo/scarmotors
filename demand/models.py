@@ -48,6 +48,35 @@ class Sales(TimeStampedModel):
         else:
             return None
 
+    def formatted_day_came_in(self):
+        if isinstance(self, Order):
+            day_came_in = self.register.day_came_in if self.register else None
+        else:
+            day_came_in = self.day_came_in
+        if day_came_in:
+            return day_came_in.strftime("%m/%d")
+        else:
+            return "-"
+
+    def formatted_charge_amount(self):
+        charge_amount = self.get_charge_amount()
+        if charge_amount:
+            return format(charge_amount, ",")+" ₩"
+        else:
+            return "-"
+
+    def formatted_payment_rate(self):
+        payment_rate = self.get_payment_rate()
+        if payment_rate:
+            return str(round(payment_rate*100))+"%"
+        else:
+            return "-"
+
+    def formatted_deposit_amount(self):
+        if self.deposit:
+            return format(self.deposit.deposit_amount, ",")+" ₩"
+        return "-"
+
     def get_payment_rate_for_input(self):
         charge_amount = self.get_charge_amount()
         if not charge_amount:

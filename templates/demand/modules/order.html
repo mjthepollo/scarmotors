@@ -2,16 +2,16 @@
     {% if forloop.counter0 == 0 %}
     <td class="register bold {{order.register.get_status_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'edit_register' order.register.pk}">{{order.register.get_status}}</a></td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.RO_number}}</td>
-    <td rowspan="{{order.register.orders.count}}">{{order.register.day_came_in}}</td>
+    <td rowspan="{{order.register.orders.count}}">{{order.formatted_day_came_in}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.car_number}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.car_model}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.get_abroad_type_display}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.insurance_agent.name}}</td>
     <td>{{order.order_type}}</td>
     <td>{{order.charged_company.name}}</td>
-    <td>{{order.get_charge_amount}}</td>
-    <td>{{order.deposit.deposit_amount}}</td>
-    <td>{{order.get_payment_rate}}</td>
+    <td>{{order.formatted_charge_amount}}</td>
+    <td>{{order.formatted_deposit_amount}}</td>
+    <td>{{order.formatted_payment_rate}}</td>
     <td class="order {{order.get_came_out_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'demand:order_came_out' order.pk%}">출고</a></td>
     <td class="order {{order.get_charge_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
     <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk%}">입금</a></td>
