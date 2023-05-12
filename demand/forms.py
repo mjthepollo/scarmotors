@@ -172,8 +172,8 @@ class OrderForm(forms.ModelForm):
         fields = ["charge_type", "charged_company",
                   "order_type", "receipt_number", "fault_ratio"]
         widgets = {
-            'recipt_number': forms.TextInput(attrs={'placeholder': '12-1234, 회사마다 상이'}),
-            'fault_ratio': forms.NumberInput(attrs={'placeholer': "80"}),
+            'receipt_number': forms.TextInput(),
+            'fault_ratio': forms.NumberInput(),
         }
 
 

@@ -1,5 +1,5 @@
 <tr>
-    <td class="register bold {{order.register.get_status_class}}"><a href="{% url 'edit_register' order.register.pk}">{{order.register.get_status}}</a></td>
+    <td class="register bold {{order.register.get_status_class}}"><a href="{% url 'demand:edit_register' order.register.pk %}">{{order.register.get_status}}</a></td>
     <td>{{order.register.RO_number}}</td>
     <td>{{order.formatted_day_came_in}}</td>
     <td>{{order.register.car_number}}</td>
@@ -14,7 +14,7 @@
     <td class="order {{order.get_came_out_class}}"><a href="{% url 'demand:order_came_out' order.pk%}">출고</a></td>
     <td class="order {{order.get_charge_class}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
     <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk%}">입금</a></td>
-    <td class="order bold {{order.get_status_class}}"><a href="{% url 'edit_order' order.pk}">{{order.get_status_display}}</td>
+    <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk %}">{{order.get_status_display}}</td>
     {% if order.finished %}
     <td class="order_function bold complete_class">완료</td>
     {% else %}

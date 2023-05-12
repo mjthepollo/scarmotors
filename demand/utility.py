@@ -114,6 +114,8 @@ def input_to_date(input_date):
             return None
         elif input_date == "미수리출고":
             return None
+        elif "1센" in input_date:
+            return None
         else:
             return string_to_date(input_date)
     elif isinstance(input_date, float):
@@ -210,13 +212,15 @@ def check_line_numbers_for_registers_have_unique_RO_number(effective_df):
 
 def get_line_numbers_for_registers(effective_df):
     RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
+    line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(
+        effective_df)
     line_numbers_for_registers = []
     for i, RO_number in enumerate(RO_numbers):
         if not RO_number:
-            if not check_wash_car(effective_df, i):
-                line_numbers_for_registers[-1].append(i)
-            else:  # 세차의 경우 RO_number가 없어야 한다.
+            if i in line_numbers_for_extra_sales:
                 pass
+            else:  # 세차의 경우 RO_number가 없어야 한다.
+                line_numbers_for_registers[-1].append(i)
         else:
             if RO_number == RO_numbers[i - 1]:
                 line_numbers_for_registers[-1].append(i)
@@ -229,7 +233,7 @@ def get_line_numbers_for_extra_sales(effective_df):
     line_numbers_for_extra_sales = []
     RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
     for i, RO_number in enumerate(RO_numbers):
-        if pd.isnull(RO_number):
+        if not RO_number:
             if check_wash_car(effective_df, i):  # 현재는 세차만 고려한다.
                 line_numbers_for_extra_sales.append(i)
     return line_numbers_for_extra_sales
@@ -263,7 +267,8 @@ def check_values_of_column(df, lines, line_numbers_for_registers,
     make_models_from_effective_df(df)
     for i, line_number in enumerate(line_numbers_for_extra_sales):
         try:
-            extra_sales = ExtraSales.objects.all()[i]
+            extra_sales = ExtraSales.objects.get(
+                car_number=lines[line_number][CAR_NUMBER])
             compared_value = getattr(extra_sales, METHOD_NAME)()
             expecting_value = lines[line_number][COLUMN_NUMBER]
             CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
@@ -274,7 +279,7 @@ def check_values_of_column(df, lines, line_numbers_for_registers,
 
     for i, line_number in enumerate([line_number for line_numbers_for_register in line_numbers_for_registers for line_number in line_numbers_for_register]):
         try:
-            order = Order.objects.all()[i]
+            order = Order.objects.all().order_by("created")[i]
             compared_value = getattr(order, METHOD_NAME)()
             expecting_value = lines[line_number][COLUMN_NUMBER]
             CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
@@ -412,28 +417,32 @@ def make_register_from_first_line_number(first_line):
 
     if first_line[RO_NUMBER] in SKIPPED_RO_NUMBERS:
         return None
-    return Register.objects.create(
-        RO_number=first_line[RO_NUMBER],
-        car_number=first_line[CAR_NUMBER],
-        day_came_in=input_to_date(first_line[DAY_CAME_IN]),
-        expected_day_came_out=input_to_date(
-            first_line[EXPECTED_DAY_CAME_OUT]),
-        real_day_came_out=input_to_date(first_line[REAL_DAY_CAME_OUT]),
-        car_model=str(first_line[CAR_MODEL]),
-        abroad_type=first_line[ABROAD_TYPE],
-        number_of_repair_works=zero_if_none(
-            first_line[NUMBER_OF_REPAIRS_WORKS]),
-        number_of_exchange_works=zero_if_none(
-            first_line[NUMBER_OF_EXCHANGE_WORKS]),
-        supporter=supporter,
-        client_name=client_name,
-        insurance_agent=insurance_agent,
-        phone_number=input_to_phone_number(first_line[PHONE_NUMBER]),
-        rentcar_company_name=first_line[RENT_CAR_COMPANY_NAME],
-        note=first_line[NOTE],
-        wasted=wasted,
-        unrepaired=unrepaired,
-    )
+    try:
+        return Register.objects.create(
+            RO_number=first_line[RO_NUMBER],
+            car_number=first_line[CAR_NUMBER],
+            day_came_in=input_to_date(first_line[DAY_CAME_IN]),
+            expected_day_came_out=input_to_date(
+                first_line[EXPECTED_DAY_CAME_OUT]),
+            real_day_came_out=input_to_date(first_line[REAL_DAY_CAME_OUT]),
+            car_model=str(first_line[CAR_MODEL]),
+            abroad_type=first_line[ABROAD_TYPE],
+            number_of_repair_works=zero_if_none(
+                first_line[NUMBER_OF_REPAIRS_WORKS]),
+            number_of_exchange_works=zero_if_none(
+                first_line[NUMBER_OF_EXCHANGE_WORKS]),
+            supporter=supporter,
+            client_name=client_name,
+            insurance_agent=insurance_agent,
+            phone_number=input_to_phone_number(first_line[PHONE_NUMBER]),
+            rentcar_company_name=first_line[RENT_CAR_COMPANY_NAME],
+            note=first_line[NOTE],
+            wasted=wasted,
+            unrepaired=unrepaired,
+        )
+    except Exception as e:
+        print(first_line)
+        raise e
 
 
 def make_order_payment_charge_and_deposit_with_line(line, register):

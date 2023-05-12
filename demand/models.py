@@ -302,7 +302,7 @@ class ChargedCompany(TimeStampedModel):
         ordering = ["-created",]
         verbose_name = "보험회사"
         verbose_name_plural = "보험회사(들)"
-    name = models.CharField(max_length=100, verbose_name="담당 업체명")
+    name = models.CharField(max_length=100, verbose_name="보험(렌트)")
     active = models.BooleanField(default=True, verbose_name="활성화")
 
     def __str__(self):
@@ -575,7 +575,7 @@ class Order(Sales):
     register = models.ForeignKey(
         Register, null=True, on_delete=models.CASCADE, verbose_name="등록", related_name="orders")
     charged_company = models.ForeignKey(
-        ChargedCompany, null=True, related_name="orders", verbose_name="담당 업체명", on_delete=models.CASCADE)
+        ChargedCompany, null=True, related_name="orders", verbose_name="보험(렌트)", on_delete=models.CASCADE)
     charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정비", "일반경정비"), (
         "일반판도", "일반판도"), ("렌트판도", "렌트판도"), ("렌트일반", "렌트일반"),
         ("인정매출", "인정매출")), max_length=20, verbose_name="구분")
