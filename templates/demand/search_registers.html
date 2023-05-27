@@ -8,10 +8,16 @@
   <div id="special_functions">
     <input type="submit" value="검색" class="btn btn-dark special_function">
     <a class="btn btn-success special_function" href="{{download_url}}" download>엑셀 다운로드</a>
-    <a class="btn btn-primary special_function" href="{{table_view_url}}" target="_blank">표로 보기</a>
+    <a class="btn btn-primary special_function" href="{{table_view_url}}" target="_blank">전체 보기</a>
   </div>
 </form>
-
+{% with request.GET as params %}
+  {% with params|remove_page_param as params_without_page %}
+    {% with registers as page %}
+      {% include "demand/modules/paginator.html" %}
+    {% endwith %}
+  {% endwith %}
+{%endwith %}
 <table id="search_results" border="1">
   <tr>
     <th>전체상태</th>
@@ -36,23 +42,4 @@
 {% include "demand/modules/register.html" %}
 {% endfor %}
 </table>
-{% with request.GET as params %}
-  {% with params|remove_page_param as params_without_page %}
-  <div class="pagination">
-    <span class="step-links">
-    {% if registers.has_previous %}
-      <a href="?{{ params_without_page }}&page=1">&laquo; first</a>
-      <a href="?{{ params_without_page }}&page={{registers.previous_page_number}}">previous</a>
-    {% endif %}
-    <span class="current">
-      Page {{ registers.number }} of {{ registers.paginator.num_pages }}.
-    </span>
-    {% if registers.has_next %}
-      <a href="?{{ params_without_page }}&page={{registers.next_page_number}}">next</a>
-      <a href="?{{ params_without_page }}&page={{registers.paginator.num_pages}}">last &raquo;</a>
-    {% endif %}
-    </span>
-  </div>
-  {% endwith %}
-{%endwith %}
 {% endblock content %}

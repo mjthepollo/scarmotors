@@ -19,7 +19,9 @@ from demand.utility import (
 
 
 class DataLoadTest(TestCase):
-
+    """
+    데이터를 Load해서 테스트하는 대규모 테스트
+    """
     @classmethod
     def setUpClass(cls):
         super(DataLoadTest, cls).setUpClass()

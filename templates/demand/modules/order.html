@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <tr>
     {% if forloop.counter0 == 0 %}
     <td class="register bold {{order.register.get_status_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'demand:edit_register' order.register.pk %}">{{order.register.get_status}}</a></td>
@@ -7,7 +8,7 @@
     <td rowspan="{{order.register.orders.count}}">{{order.register.car_model}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.get_abroad_type_display}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.insurance_agent.name}}</td>
-    <td>{{order.order_type}}</td>
+    <td>{{order.order_type|none_to_dash}}</td>
     <td>{{order.charged_company.name}}</td>
     <td>{{order.formatted_charge_amount}}</td>
     <td>{{order.formatted_deposit_amount}}</td>

@@ -36,6 +36,31 @@ input[type="submit"] {
   width: 30%;
 }
 
+.paginator {
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+  margin-bottom: 30px;
+
+  font-weight: 600;
+  font-size: 30px;
+}
+.paginator a {
+  color: var(--blue);
+  text-decoration: none;
+}
+.paginator a:hover {
+  text-decoration: underline;
+}
+.paginator a.end_page {
+  color: var(--orange);
+}
+
+#search_results {
+  margin-bottom: 100px;
+}
+
 #search_results td,
 #search_results th {
   padding: 5px;

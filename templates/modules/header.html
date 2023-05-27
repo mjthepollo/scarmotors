@@ -8,7 +8,7 @@
             {% url 'demand:search_registers' as url %}
             <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_registers'%}">등록 검색</a>
             {% url 'demand:search_orders' as url %}
-            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_orders'%}">매출 검색</a>
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_orders'%}">상세 검색</a>
             {% url 'demand:extra_sales' as url %}
             <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:extra_sales'%}">기타 매출</a>
         </div>

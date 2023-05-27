@@ -46,6 +46,10 @@ def createRandomOrdinaryOrder(register, fault_ratio, payment, charge, deposit):
 
 
 class DemandModelTest(TestCase):
+    """
+    Demand 모델 테스트, 직접 테스트케이스를 만들어서 테스트함
+    """
+
     def setUp(self):
         self.supporter = Supporter.objects.create(name="test_supporter")
         self.charged_company = ChargedCompany.objects.create(

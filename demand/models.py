@@ -171,45 +171,55 @@ class Sales(TimeStampedModel):
     def get_wage_turnover(self):
         return self.get_integrated_turnover() - self.get_component_turnover()
 
-    def get_status(self):
-        try:
-            if isinstance(self, Order):
-                real_day_came_out = self.register.real_day_came_out
-            else:  # ExtraSales Case
-                real_day_came_out = self.real_day_came_out
+    def check_no_came_out(self):
+        if isinstance(self, Order):
+            real_day_came_out = self.register.real_day_came_out
+        else:  # ExtraSales Case
+            real_day_came_out = self.real_day_came_out
+        return False if real_day_came_out else True
 
+    def get_status(self):
+        """
+        매출의 상태 순서는 다음과 같다.
+        1. 출고가 안됐으면 미출고(NO_CAME_OUT)
+        2. 출고가 됐지만 charge가 없으면 미청구
+        3. 청구를 했지만 입금이 안됐으면 미입금
+        4. 입금이 됐지만 입금액이 청구액보다 적으면 확인필요
+        5. 입금이 됐지만 입금액이 청구액보다 많으면 과입금(1.01배)
+        6. 입금이 됐고 0.85배보다 많으면 완료
+        7. 입금이 됐고 위의 두 조건이 아니면 확인필요
+        """
+        try:
+            if self.check_no_came_out():
+                return STATUS_DICT["NO_CAME_OUT"]
+            if not self.charge:
+                return STATUS_DICT["NO_CHARGE"]
+
+            # 일반경정, 일반렌트, 기타매출의 경우 입금이 없음
             if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
-                if not self.charge:
-                    return STATUS_DICT["NO_CHARGE"]
-                else:
-                    if self.payment:
-                        if real_day_came_out:
-                            if self.get_payment_rate() > 1.01:
-                                return STATUS_DICT["OVER_DEPOSIT"]
-                            elif self.get_payment_rate() < 0.99:
-                                return STATUS_DICT["NEED_CHECK"]
-                            else:
-                                return STATUS_DICT["COMPLETE"]
-                        else:
-                            return STATUS_DICT["NO_CAME_OUT"]
+                if self.payment:
+                    if self.get_payment_rate() > 1.01:
+                        return STATUS_DICT["OVER_DEPOSIT"]
+                    elif self.get_payment_rate() < 0.99:
+                        return STATUS_DICT["NEED_CHECK"]
                     else:
-                        return STATUS_DICT["NOT_PAID"]
-            else:  # 보험의 경우
-                if not self.charge:
-                    return STATUS_DICT["NO_CHARGE"]
+                        return STATUS_DICT["COMPLETE"]
                 else:
-                    if self.deposit:
-                        if real_day_came_out:
-                            if self.get_payment_rate() > 1.01:
-                                return STATUS_DICT["OVER_DEPOSIT"]
-                            elif self.get_payment_rate() >= 0.85:
-                                return STATUS_DICT["COMPLETE"]
-                            else:
-                                return STATUS_DICT["NEED_CHECK"]
-                        else:
-                            return STATUS_DICT["NO_CAME_OUT"]
+                    return STATUS_DICT["NOT_PAID"]
+
+            if isinstance(self, Order):  # 일반 주문의 경우
+                if self.deposit:
+                    if self.get_payment_rate() > 1.01:
+                        return STATUS_DICT["OVER_DEPOSIT"]
+                    elif self.get_payment_rate() >= 0.85:
+                        return STATUS_DICT["COMPLETE"]
                     else:
-                        return STATUS_DICT["NOT_PAID"]
+                        return STATUS_DICT["NEED_CHECK"]
+                else:
+                    return STATUS_DICT["NOT_PAID"]
+            # 지금까지 해당 사항 없으면 ERROR임
+            raise Exception("NO MATCHING CASE!")
+
         except Exception as e:
             if self == None:
                 print_colored("self is None", "red")

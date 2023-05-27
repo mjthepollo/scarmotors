@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <tr>
     <td class="register bold {{order.register.get_status_class}}"><a href="{% url 'demand:edit_register' order.register.pk %}">{{order.register.get_status}}</a></td>
     <td>{{order.register.RO_number}}</td>
@@ -6,7 +7,7 @@
     <td>{{order.register.car_model}}</td>
     <td>{{order.register.get_abroad_type_display}}</td>
     <td>{{order.register.insurance_agent.name}}</td>
-    <td>{{order.order_type}}</td>
+    <td>{{order.order_type|none_to_dash}}</td>
     <td>{{order.charged_company.name}}</td>
     <td>{{order.formatted_charge_amount}}</td>
     <td>{{order.formatted_deposit_amount}}</td>
