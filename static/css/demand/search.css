@@ -18,9 +18,10 @@ form > div {
 }
 form > div > label {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 
   width: 100px;
+  margin-left: 20px;
 }
 
 input[type="submit"] {
@@ -48,6 +49,7 @@ input[type="submit"] {
 }
 .paginator a {
   color: var(--blue);
+
   text-decoration: none;
 }
 .paginator a:hover {

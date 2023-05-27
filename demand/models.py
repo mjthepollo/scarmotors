@@ -61,7 +61,7 @@ class Sales(TimeStampedModel):
     def formatted_charge_amount(self):
         charge_amount = self.get_charge_amount()
         if charge_amount:
-            return format(charge_amount, ",")+" ₩"
+            return format(charge_amount, ",")
         else:
             return "-"
 
@@ -74,7 +74,7 @@ class Sales(TimeStampedModel):
 
     def formatted_deposit_amount(self):
         if self.deposit:
-            return format(self.deposit.deposit_amount, ",")+" ₩"
+            return format(self.deposit.deposit_amount, ",")
         return "-"
 
     def get_payment_rate_for_input(self):
@@ -608,9 +608,9 @@ class Order(Sales):
     def get_description(self):
         try:
             charge = format(self.get_charge_amount(),
-                            ",")+"₩" if self.charge else "청구필요"
+                            ",") if self.charge else "청구필요"
             deposit = format(self.deposit.deposit_amount,
-                             ",")+"₩" if self.deposit else "입금필요"
+                             ",") if self.deposit else "입금필요"
             return f"{self.charged_company.name} {self.charge_type} {self.order_type} 청구액:{charge} 입금액:{deposit} "
         except Exception as e:
             print(e)
