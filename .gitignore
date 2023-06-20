@@ -8,3 +8,8 @@ uwsgi.ini
 staticfiles/
 src/
 *.xlsx
+
+# cache
+*/__pycache__/*
+__pycache__/*
+.pytest_cache/*
