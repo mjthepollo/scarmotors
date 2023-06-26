@@ -8,7 +8,7 @@ from core.utility import print_colored
 from demand.excel_line_info import (dictionary_to_line,
                                     order_to_excel_dictionary)
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
-                               Payment, Supporter)
+                               Payment, RequestDepartment, Supporter)
 
 STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금", "NO_CAME_OUT": "미출고",
                "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요",
@@ -540,7 +540,8 @@ class RecognizedSales(TimeStampedModel):
     car_number = models.CharField(
         verbose_name="차량번호", blank=True, null=True, max_length=20)
     wage_amount = models.IntegerField(default=0, verbose_name="공임비")
-    request_department = models.CharField(max_length=100, verbose_name="요청부서")
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
+    request_department = models.ForeignKey(
+        RequestDepartment, on_delete=models.SET_NULL, null=True)
     note = models.TextField(default="부가세 별도", blank=True,
                             null=True, verbose_name="비고")

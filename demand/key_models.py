@@ -149,3 +149,15 @@ class Deposit(TimeStampedModel):
                 return f"기타매출({self.extra_sales.pk}) 입금"
             else:
                 return f"주문없음({self.pk})"
+
+
+class RequestDepartment(TimeStampedModel):
+    class Meta:
+        ordering = ["-created",]
+        verbose_name = "요청부서"
+        verbose_name_plural = "요청부서(들)"
+    name = models.CharField(max_length=30, verbose_name="요청부서명")
+    active = models.BooleanField(default=True, verbose_name="활성화")
+
+    def __str__(self):
+        return self.name

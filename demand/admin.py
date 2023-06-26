@@ -1,8 +1,8 @@
 from django.contrib import admin
 
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
-                               Payment, Supporter)
-from demand.sales_models import ExtraSales, Order, Register
+                               Payment, RequestDepartment, Supporter)
+from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
 
 
 @admin.register(Supporter)
@@ -66,3 +66,16 @@ class ExtraSalesAdmin(admin.ModelAdmin):
     list_display = ["car_number", "sort", "day_came_in", "real_day_came_out", "car_model",
                     "phone_number"]
     search_fields = ["sort", "car_number", "note"]
+
+
+@admin.register(RecognizedSales)
+class RecongnizedSalesAdmin(admin.ModelAdmin):
+    list_display = ["day_came_in", "real_day_came_out", "car_number",
+                    "wage_amount", "component_amount", "request_department"]
+
+
+@admin.register(RequestDepartment)
+class RequestDepartmentAdmin(admin.ModelAdmin):
+    list_display = ["name", "active"]
+    list_filter = ["active"]
+    search_fields = ["name"]
