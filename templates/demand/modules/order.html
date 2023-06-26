@@ -14,7 +14,7 @@
     <td>{{order.formatted_deposit_amount}}</td>
     <td>{{order.formatted_payment_rate}}</td>
     <td class="order {{order.get_came_out_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'demand:order_came_out' order.pk%}">출고</a></td>
-    <td class="order {{order.get_charge_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
+    <td class="order {{order.get_charge_class}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
     <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk %}">입금</a></td>
     <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk %}">{{order.get_status_display}}</td>
     {% else %}
@@ -23,6 +23,7 @@
     <td>{{order.formatted_charge_amount}}</td>
     <td>{{order.formatted_deposit_amount}}</td>
     <td>{{order.formatted_payment_rate}}</td>
+    <td class="order {{order.get_charge_class}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
     <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk%}">입금</a></td>
     <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk}">{{order.get_status_display}}</td>
     {% endif %}

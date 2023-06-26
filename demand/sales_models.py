@@ -196,9 +196,12 @@ class Sales(TimeStampedModel):
         try:
             if self.check_no_came_out():
                 return STATUS_DICT["NO_CAME_OUT"]
-            if not self.charge.charge_date:
-                # 부품비의 경우 charge_date가 없어도 존재할 수 있기 때문. 따라서 청구 기준은 청구일로 해야한다.
+            if not self.charge:
                 return STATUS_DICT["NO_CHARGE"]
+            else:
+                # 부품비의 경우 charge_date가 없어도 존재할 수 있다. 따라서 청구 기준은 charge object가 아닌 청구일로 해야한다.
+                if not self.charge.charge_date:
+                    return STATUS_DICT["NO_CHARGE"]
 
             # 일반경정, 일반렌트, 기타매출의 경우 입금이 없음
             if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
@@ -284,7 +287,10 @@ class Sales(TimeStampedModel):
 
     def get_charge_class(self):
         if self.charge:
-            status_class = STATUS_CLASS[COMPLETE]
+            if self.charge.charge_date:
+                status_class = STATUS_CLASS[COMPLETE]
+            else:
+                status_class = STATUS_CLASS[NOT_COMPLETE]
         else:
             status_class = STATUS_CLASS[NOT_COMPLETE]
         return make_to_class_name(status_class)
@@ -410,18 +416,6 @@ class Register(TimeStampedModel):
 
     def get_came_out_class(self):
         if self.real_day_came_out:
-            return STATUS_CLASS[COMPLETE]
-        else:
-            return STATUS_CLASS[NOT_COMPLETE]
-
-    def get_charge_class(self):
-        if self.charge.charge_date:
-            return STATUS_CLASS[COMPLETE]
-        else:
-            return STATUS_CLASS[NOT_COMPLETE]
-
-    def get_deposit_class(self):
-        if self.deposit:
             return STATUS_CLASS[COMPLETE]
         else:
             return STATUS_CLASS[NOT_COMPLETE]
