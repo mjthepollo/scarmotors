@@ -13,6 +13,7 @@ urlpatterns = [
     path("login/", core_views.login, name="login"),
     path("logout/", core_views.logout, name="logout"),
     path("demand/", include("demand.urls", namespace="demand")),
+    path("download_db/", core_views.download_db, name="download_db"),
     path(settings.ADMIN_URL, admin.site.urls),
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)\

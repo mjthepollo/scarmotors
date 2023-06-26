@@ -1,8 +1,10 @@
 from datetime import date
 
+from django.conf import settings
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
 from django.contrib.auth.decorators import login_required
+from django.http import FileResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
@@ -33,3 +35,10 @@ def logout(request):
 @login_required
 def home(request):
     return render(request, "home.html")
+
+
+@login_required
+def download_db(request):
+    db_path = settings.DATABASES['default']['NAME']
+    response = FileResponse(open(db_path, 'rb'))
+    return response

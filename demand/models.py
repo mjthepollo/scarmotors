@@ -478,6 +478,9 @@ class Register(TimeStampedModel):
     note = models.TextField(
         blank=True, null=True, verbose_name="비고")
 
+    first_center_repaired = models.BooleanField(
+        default=False, verbose_name="1센터 수리건")
+
     def get_work_days(self):
         if self.real_day_came_out and self.day_came_in:
             return (self.real_day_came_out - self.day_came_in).days
@@ -603,7 +606,7 @@ class Order(Sales):
     deposit = models.OneToOneField(
         Deposit, null=True, blank=True, related_name="order", verbose_name="입금", on_delete=models.CASCADE)
 
-    note = models.TextField(blank=True, null=True, verbose_name="비고")
+    incentive_paid = models.BooleanField(default=False, verbose_name="인센티브 지급")
 
     def get_description(self):
         try:
@@ -623,10 +626,18 @@ class Order(Sales):
 
 
 class ExtraSales(Sales):
+    """
+    세차, 폐차, 미수리 출고 등 기타 매출은 여기에 잡힙니다.
+    """
     class Meta:
         ordering = ["-created",]
         verbose_name = "기타 매출"
         verbose_name_plural = "기타 매출(들)"
+
+    sort = models.CharField(choices=(
+        ("세차", "세차"), ("폐차", "폐차"), ("미수리 출고", "미수리 출고"), ("기타", "기타")),
+        max_length=20, verbose_name="구분")
+
     car_number = models.CharField(
         verbose_name="차량번호", blank=True, null=True, max_length=20)
     day_came_in = models.DateField(verbose_name="입고일", blank=True, null=True)
@@ -655,9 +666,6 @@ class ExtraSales(Sales):
     deposit = models.OneToOneField(
         Deposit, null=True, blank=True, related_name="extra_sales", verbose_name="입금", on_delete=models.CASCADE)
     note = models.TextField(blank=True, null=True, verbose_name="비고")
-
-    wasted = models.BooleanField(default=False, verbose_name="폐차")
-    unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
 
     def get_description(self):
         return f"기타매출({self.pk})"
