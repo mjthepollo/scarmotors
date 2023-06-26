@@ -326,9 +326,11 @@ class Register(TimeStampedModel):
         InsuranceAgent, related_name="orders", null=True, on_delete=models.SET_NULL, verbose_name="보험 담당자")
     phone_number = models.CharField(
         null=True, blank=True, verbose_name="전화번호", max_length=15)
+
+    # 미수리출고와 폐차 여부는 출고시에 확정시킨다.
     unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
-    wash_car = models.BooleanField(default=False, verbose_name="세차")
     wasted = models.BooleanField(default=False, verbose_name="폐차")
+
     rentcar_company_name = models.CharField(
         blank=True, null=True, max_length=100, verbose_name="렌트 업체명")
     note = models.TextField(
@@ -491,7 +493,7 @@ class ExtraSales(Sales):
         verbose_name_plural = "기타 매출(들)"
 
     sort = models.CharField(choices=(
-        ("세차", "세차"), ("폐차", "폐차"), ("미수리 출고", "미수리 출고"), ("기타", "기타")),
+        ("세차", "세차"), ("기타", "기타")),
         max_length=20, verbose_name="구분")
 
     car_number = models.CharField(

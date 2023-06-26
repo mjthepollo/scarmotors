@@ -47,7 +47,7 @@ class NewRegisterForm(forms.ModelForm):
                   "car_model", "abroad_type", "number_of_repair_works",
                   "number_of_exchange_works", "supporter", "client_name",
                   "insurance_agent", "phone_number", "rentcar_company_name",
-                  "note", "wash_car"]
+                  "note"]
         widgets = {
             'car_number': forms.TextInput(attrs={'placeholder': '12가1234'}),
             'day_came_in': forms.DateInput(attrs={'type': 'date'}),
@@ -67,7 +67,7 @@ class EditRegisterForm(forms.ModelForm):
                   "car_model", "abroad_type", "number_of_repair_works",
                   "number_of_exchange_works", "supporter", "client_name",
                   "insurance_agent", "phone_number", "rentcar_company_name",
-                  "note", "unrepaired", "wasted", "wash_car"]
+                  "note", "unrepaired", "wasted"]
         widgets = {
             'car_number': forms.TextInput(attrs={'placeholder': '12가1234'}),
             'day_came_in': forms.DateInput(attrs={'type': 'date'}),

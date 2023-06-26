@@ -3,18 +3,17 @@ import pandas as pd
 from django.core.management import call_command
 from django.test import TestCase
 
-from demand.excel_load import (CHARGABLE_AMOUNT, CHARGE_AMOUNT,
-                               COMPONENT_TURNOVER, FACTORY_TURNOVER,
-                               INTEGRATED_TURNOVER, NOT_PAID_AMOUNT,
-                               NOT_PAID_TURNOVER, PAID_TURNOVER, PAYMENT_RATE,
-                               TURNOVER, WAGE_TURNOVER, check_values_of_column,
-                               df_to_lines,
-                               get_client_name_and_insurance_agent_name,
-                               get_effective_data_frame,
-                               get_line_numbers_for_extra_sales,
-                               get_line_numbers_for_registers, load_data,
-                               make_extra_sales_from_line,
-                               make_models_from_effective_df)
+from demand.excel_load import (
+    CHARGABLE_AMOUNT, CHARGE_AMOUNT, COMPONENT_TURNOVER, FACTORY_TURNOVER,
+    INTEGRATED_TURNOVER, NOT_PAID_AMOUNT, NOT_PAID_TURNOVER, PAID_TURNOVER,
+    PAYMENT_RATE, TURNOVER, WAGE_TURNOVER,
+    check_line_numbers_for_registers_have_same_car_number,
+    check_line_numbers_for_registers_have_unique_RO_number,
+    check_values_of_column, df_to_lines,
+    get_client_name_and_insurance_agent_name, get_effective_data_frame,
+    get_line_numbers, get_line_numbers_for_extra_sales,
+    get_line_numbers_for_registers, load_data, make_extra_sales_from_line,
+    make_models_from_effective_df)
 from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import ExtraSales, Order, Register
 
@@ -42,29 +41,23 @@ class DataLoadTest(TestCase):
         assert type(pd.DataFrame()) == type(self.original_df)
         assert len(self.lines) == len(self.df)
 
-    def test_get_effective_row_numbers(self):
-        pass
-        # assert get_effective_row_numbers(self.original_df) == 843
+    def test_get_line_numbers(self):
+        # 계산법은 excel기준 마지막줄의 index에서 6을 빼주면 된다.
+        assert get_line_numbers(self.original_df) == 1181
 
     def test_get_effective_data_frame(self):
         num_rows, _ = self.df.shape
-        assert get_effective_row_numbers(self.original_df) == num_rows
+        assert get_line_numbers(self.original_df) == num_rows
         assert "부품매출" == list(self.df.columns)[-1]
-
-    def test_check_wash_car(self):
-        # assert check_wash_car(self.df, 660)
-        # assert check_wash_car(self.df, 673)
-        pass
 
     def test_get_effective_line_numbers(self):
         check_line_numbers_for_registers_have_same_car_number(self.df)
         check_line_numbers_for_registers_have_unique_RO_number(self.df)
-        # assert len(get_line_numbers_for_registers(
-        # self.df)) == 156+145+184+174+47
 
     def test_get_line_numbers_for_extra_sales(self):
-        pass
+        # 폐차, 미수리출고, 세차의 경우의 line_numbers를 구한다. 이는 말그대로 line_numbers이므로, index 기준에서 6을 빼줘야 한다.
         # assert get_line_numbers_for_extra_sales(self.df) == [660, 673]
+        pass
 
     def test_chargable_amount(self):
         check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,

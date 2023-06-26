@@ -23,20 +23,20 @@ from demand.utility import (fault_ratio_to_int, input_to_date,
 SKIPPED_RO_NUMBERS = ["2-27", "2-128", "4-26", "4-30"]
 
 
-def check_wash_car(df, line_number):
-    client_name_and_insurance_agent = df.iloc[line_number,
-                                              CLIENT_NAME_AND_INSURANCE_AGENT]
-    return "세차" in client_name_and_insurance_agent
-
-
 def load_data(file_name, sheet_name):
+    """
+    엑셀 파일을 불러와 DataFrame으로 변환한다.
+    """
     df = pd.read_excel(
         file_name, sheet_name=sheet_name, engine="openpyxl", header=HEADER
     )
     return df
 
 
-def get_effective_row_numbers(df):
+def get_line_numbers(df):
+    """
+    DataFrame의 실질적인 lines 수를 파악한다.
+    """
     days_came_in = df.iloc[:, DAY_CAME_IN]
     for i, day_came_in in enumerate(days_came_in):
         if pd.isnull(day_came_in):
@@ -44,12 +44,81 @@ def get_effective_row_numbers(df):
 
 
 def get_effective_data_frame(file_name, sheet_name):
+    """
+    엑셀 파일을 불러와서 실질적인 데이터를 가진 DataFrame으로 변환한다. 
+    """
     original_df = load_data(file_name, sheet_name)
-    effective_row_numbers = get_effective_row_numbers(original_df)
-    return original_df.iloc[:effective_row_numbers, :END].replace({pd.NaT: None, np.nan: None}, inplace=False)
+    line_numbers = get_line_numbers(original_df)
+    return original_df.iloc[:line_numbers, :END].replace({pd.NaT: None, np.nan: None}, inplace=False)
+
+
+def check_wash_line(df, line_number):
+    """
+    effective DataFrame의 line number에 해당하는 line이 세차를 가리키는 line인지 확인한다.
+    """
+    client_name_and_insurance_agent = df.iloc[line_number,
+                                              CLIENT_NAME_AND_INSURANCE_AGENT]
+    supporter_name = df.iloc[line_number, SUPPORTER]
+    return "세차" in client_name_and_insurance_agent or "세차" in supporter_name
+
+
+def check_wasted_line(df, line_number):
+    """
+    effective DataFrame의 line number에 해당하는 line이 폐차를 가리키는 line인지 확인한다.
+    """
+    pass
+
+
+def check_unrepaired_line(df, line_number):
+    """
+    effective DataFrame의 line number에 해당하는 line이 미수리출고를 가리키는 line인지 확인한다.
+    """
+    pass
+
+
+def get_line_numbers_for_extra_sales(effective_df):
+    """
+    ExtraSales로 평가될 line numbers를 반환한다. 이는 리스트로 반환된다.
+    """
+    line_numbers_for_extra_sales = []
+    RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
+    for i, RO_number in enumerate(RO_numbers):
+        if not RO_number:
+            # 현재는 세차만 고려한다. 현재까지 유일하게 존재하는 extra sales는 세차다.
+            if check_wash_line(effective_df, i):
+                line_numbers_for_extra_sales.append(i)
+    return line_numbers_for_extra_sales
+
+
+def get_line_numbers_for_registers(effective_df):
+    """
+    Register로 평가될 line numbers를 반환한다. 이는 리스트로 반환된다.
+    Excel에서 같은 RO_number가 들어오는 경우가 있으며, 또 ExtraSales도 고려해야 하기 때문에 강건성을 위해 만든 함수다.
+    """
+    RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
+    line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(
+        effective_df)
+    line_numbers_for_registers = []
+    for i, RO_number in enumerate(RO_numbers):
+        if not RO_number:
+            if i in line_numbers_for_extra_sales:
+                # ExtraSales로 평가된 세차, 미수리 출고, 폐차의 경우는 Register에 저장하지 않는다.
+                pass
+            else:  # 일반적으로 RO_number가 없는 경우는 여러 개의 Order가 하나의 Register에 저장되는 경우다.
+                line_numbers_for_registers[-1].append(i)
+        else:  # RO_number가 있는 경우. 특수한 경우에 같은 RO_number가 두 라인에 있을 수 있어서 처리해줘야 한다.
+            if RO_number == RO_numbers[i - 1]:
+                line_numbers_for_registers[-1].append(i)
+            else:
+                line_numbers_for_registers.append([i])
+    return line_numbers_for_registers
 
 
 def check_line_numbers_for_registers_have_same_car_number(effective_df):
+    """
+    RO_number가 같은 경우, 차량번호는 같아야 한다.
+    따라서 하나의 Register에 Line이 여러개인 경우 같은 차량번호를 가지는지를 확인한다.
+    """
     line_numbers_for_registers = get_line_numbers_for_registers(effective_df)
     for line_numbers_for_register in line_numbers_for_registers:
         if len(line_numbers_for_register) > 1:
@@ -60,12 +129,15 @@ def check_line_numbers_for_registers_have_same_car_number(effective_df):
             try:
                 assert all(car_number == all_car_number[0]
                            for car_number in all_car_number)
-            except AssertionError:
+            except AssertionError as e:
                 print(all_car_number[0])
-                raise AssertionError
+                raise e
 
 
 def check_line_numbers_for_registers_have_unique_RO_number(effective_df):
+    """
+    RO_number는 유일해야 한다. 같은 RO_number가 여러 라인에 있지 않은지 확인한다.
+    """
     raw_RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
     line_numbers_for_registers = get_line_numbers_for_registers(effective_df)
     RO_numbers = [raw_RO_numbers[line_numbers_for_register[0]]
@@ -73,41 +145,12 @@ def check_line_numbers_for_registers_have_unique_RO_number(effective_df):
     RO_numbers_set = set(RO_numbers)
     try:
         assert len(RO_numbers) == len(RO_numbers_set)
-    except AssertionError:
+    except AssertionError as e:
         for RO_number in RO_numbers:
             if RO_numbers.count(RO_number) > 1:
                 print(RO_number)
         # print(len(RO_numbers), len(RO_numbers_set))
-        raise AssertionError
-
-
-def get_line_numbers_for_registers(effective_df):
-    RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
-    line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(
-        effective_df)
-    line_numbers_for_registers = []
-    for i, RO_number in enumerate(RO_numbers):
-        if not RO_number:
-            if i in line_numbers_for_extra_sales:
-                pass
-            else:  # 세차의 경우 RO_number가 없어야 한다.
-                line_numbers_for_registers[-1].append(i)
-        else:
-            if RO_number == RO_numbers[i - 1]:
-                line_numbers_for_registers[-1].append(i)
-            else:
-                line_numbers_for_registers.append([i])
-    return line_numbers_for_registers
-
-
-def get_line_numbers_for_extra_sales(effective_df):
-    line_numbers_for_extra_sales = []
-    RO_numbers = effective_df.iloc[:, RO_NUMBER].values.tolist()
-    for i, RO_number in enumerate(RO_numbers):
-        if not RO_number:
-            if check_wash_car(effective_df, i):  # 현재는 세차만 고려한다.
-                line_numbers_for_extra_sales.append(i)
-    return line_numbers_for_extra_sales
+        raise e
 
 
 def df_to_lines(df):
