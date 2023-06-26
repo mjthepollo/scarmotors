@@ -3,8 +3,9 @@ import logging
 from django.core.management.base import BaseCommand
 
 from core.utility import print_colored
-from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
-                           InsuranceAgent, Order, Payment, Register, Supporter)
+from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                               Payment, Supporter)
+from demand.sales_models import ExtraSales, Order, Register
 
 # Create a logger with a custom log level
 

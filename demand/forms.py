@@ -1,8 +1,9 @@
 import django_filters
 from django import forms
 
-from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
-                           Order, Payment, Register, Supporter)
+from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                               Payment, Supporter)
+from demand.sales_models import ExtraSales, Order, Register
 
 
 class SupporterForm(forms.ModelForm):

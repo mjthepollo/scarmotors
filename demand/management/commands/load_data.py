@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
 
-from demand.models import (Charge, ChargedCompany, Insurance, InsuranceAgent,
-                           Order, Payment, Supporter)
+from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                               Payment, Supporter)
+from demand.sales_models import ExtraSales, Order, Register
 
 
 class Command(BaseCommand):

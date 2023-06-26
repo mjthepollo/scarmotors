@@ -3,8 +3,9 @@ import pandas as pd
 from django.core.management import call_command
 from django.test import TestCase
 
-from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
-                           InsuranceAgent, Order, Payment, Register, Supporter)
+from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                               Payment, Supporter)
+from demand.sales_models import ExtraSales, Order, Register
 from demand.utility import (
     CHARGABLE_AMOUNT, CHARGE_AMOUNT, COMPONENT_TURNOVER, FACTORY_TURNOVER,
     INTEGRATED_TURNOVER, NOT_PAID_AMOUNT, NOT_PAID_TURNOVER, PAID_TURNOVER,

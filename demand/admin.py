@@ -1,7 +1,8 @@
 from django.contrib import admin
 
-from demand.models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
-                           Order, Payment, Register, Supporter)
+from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                               Payment, Supporter)
+from demand.sales_models import ExtraSales, Order, Register
 
 
 @admin.register(Supporter)
@@ -58,3 +59,10 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ["charged_company", "order_type", "receipt_number", "register",
                     "charge_type", "receipt_number"]
     search_fields = ["order", "payment", "charge"]
+
+
+@admin.register(ExtraSales)
+class ExtraSalesAdmin(admin.ModelAdmin):
+    list_display = ["car_number", "sort", "day_came_in", "real_day_came_out", "car_model",
+                    "phone_number"]
+    search_fields = ["sort", "car_number", "note"]

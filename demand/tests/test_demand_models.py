@@ -3,9 +3,9 @@ from random import randint
 
 from django.test import TestCase
 
-from demand.models import (STATUS_DICT, Charge, ChargedCompany, Deposit,
-                           ExtraSales, InsuranceAgent, Order, Payment,
-                           Register, Supporter)
+from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                               Payment, Supporter)
+from demand.sales_models import ExtraSales, Order, Register
 from demand.utility import string_to_date
 
 

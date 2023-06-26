@@ -16,8 +16,9 @@ from demand.check_value_functions import (check_chargable_amount,
                                           check_payment_rate, check_status,
                                           check_turnover, check_wage_turnover)
 from demand.excel_line_info import *
-from demand.models import (Charge, ChargedCompany, Deposit, ExtraSales,
-                           InsuranceAgent, Order, Payment, Register, Supporter)
+from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                               Payment, Supporter)
+from demand.sales_models import ExtraSales, Order, Register
 
 SKIPPED_RO_NUMBERS = ["2-27", "2-128", "4-26", "4-30"]
 

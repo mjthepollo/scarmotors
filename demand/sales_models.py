@@ -1,17 +1,18 @@
+
 from datetime import datetime
 
 from django.db import models
 
 from core.models import TimeStampedModel
 from core.utility import print_colored
-from demand.excel_line_info import *
+from demand.excel_line_info import (dictionary_to_line,
+                                    order_to_excel_dictionary)
+from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
+                               Payment, Supporter)
 
-# Create your models here.
 STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금", "NO_CAME_OUT": "미출고",
                "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요",
                "ERROR": "오류", "MANUALLY_COMPLETE": "완료(수동)"}
-
-
 NOT_COMPLETE = 0
 PROGRESS = 1
 COMPLETE = 2
@@ -293,153 +294,6 @@ class Sales(TimeStampedModel):
 
     def __str__(self):
         raise NotImplementedError
-
-
-class Supporter(TimeStampedModel):
-    class Meta:
-        ordering = ["-created",]
-        verbose_name = "입고 지원 업체"
-        verbose_name_plural = "입고 지원 업체(들)"
-    name = models.CharField(max_length=100, verbose_name="지원 업체명")
-    active = models.BooleanField(default=True, verbose_name="활성화")
-    incentive_rate_percent = models.IntegerField(
-        default=15, verbose_name="지급율(%)")
-
-    def __str__(self):
-        return self.name
-
-
-class ChargedCompany(TimeStampedModel):
-    class Meta:
-        ordering = ["-created",]
-        verbose_name = "보험회사"
-        verbose_name_plural = "보험회사(들)"
-    name = models.CharField(max_length=100, verbose_name="보험(렌트)")
-    active = models.BooleanField(default=True, verbose_name="활성화")
-
-    def __str__(self):
-        return self.name
-
-
-class InsuranceAgent(TimeStampedModel):
-    class Meta:
-        ordering = ["-created",]
-        verbose_name = "보험 담당자"
-        verbose_name_plural = "보험 담당자(들)"
-    name = models.CharField(max_length=100, verbose_name="보험 담당자명")
-    active = models.BooleanField(default=True, verbose_name="활성화")
-
-    def __str__(self):
-        return self.name
-
-
-class Payment(TimeStampedModel):
-    class Meta:
-        ordering = ["-created",]
-        verbose_name = "면책금 정보"
-        verbose_name_plural = "면책금 정보(들)"
-    indemnity_amount = models.IntegerField(
-        blank=True, null=True, verbose_name="면책금")
-    discount_amount = models.IntegerField(
-        blank=True, null=True, verbose_name="할인금")
-    refund_amount = models.IntegerField(
-        blank=True, null=True, verbose_name="환불액")
-    payment_type = models.CharField(blank=True, null=True, max_length=30, choices=(
-        ("카드", "카드"), ("현금", "현금"), ("은행", "은행")), verbose_name="결제형태")
-    payment_info = models.CharField(
-        blank=True, null=True, max_length=60, verbose_name="은행사/카드사")
-    payment_date = models.DateField(blank=True, null=True, verbose_name="결제일")
-    refund_date = models.DateField(blank=True, null=True, verbose_name="환불일")
-
-    def __str__(self):
-        if hasattr(self, "order"):
-            order = self.order
-            if order.register != None:
-                order_index = list(order.register.orders.all()).index(order)
-                return f"RO({order.register.RO_number}) 주문[{order_index}] 결제"
-            else:
-                return f"등록없음({self.pk}_주문:{order.pk})"
-        else:
-            if hasattr(self, "extra_sales"):
-                return f"기타매출({self.extra_sales.pk}) 결제"
-            else:
-                return f"주문없음({self.pk})"
-
-
-class Charge(TimeStampedModel):
-    class Meta:
-        ordering = ["-created",]
-        verbose_name = "청구 정보"
-        verbose_name_plural = "청구 정보(들)"
-    charge_date = models.DateField(verbose_name="청구일")
-    wage_amount = models.IntegerField(default=0, verbose_name="공임비")
-    component_amount = models.IntegerField(default=0, verbose_name="부품비")
-
-    def get_indemnity_amount(self):
-        if hasattr(self, "order"):
-            return self.order.get_indemnity_amount()
-        elif hasattr(self, "extra_sales"):
-            return self.extra_sales.get_indemnity_amount()
-        else:
-            raise Exception("Charge에 order나 extra_sales가 없습니다.")
-
-    def get_repair_amount(self):
-        return self.wage_amount+self.component_amount
-
-    def get_charge_amount(self):
-        if hasattr(self, "order"):
-            sales = self.order
-            refund_amount = self.order.payment.refund_amount if self.order.payment else 0
-            refund_amount = refund_amount if refund_amount else 0
-        elif hasattr(self, "extra_sales"):
-            sales = self.extra_sales
-            refund_amount = self.extra_sales.payment.refund_amount if self.extra_sales.payment else 0
-        if not sales:
-            raise Exception("Charge에 order나 extra_sales가 없습니다.")
-        refund_amount = refund_amount if refund_amount else 0
-        charge_amount = sales.get_chargable_amount() - self.get_indemnity_amount() + \
-            refund_amount
-        if charge_amount > 0:
-            return charge_amount
-        else:
-            return 0
-
-    def __str__(self):
-        if hasattr(self, "order"):
-            order = self.order
-            if order.register != None:
-                order_index = list(order.register.orders.all()).index(order)
-                return f"RO({order.register.RO_number}) 주문[{order_index}] 청구"
-            else:
-                return f"등록없음({self.pk}_주문:{order.pk})"
-        else:
-            if hasattr(self, "extra_sales"):
-                return f"기타매출({self.extra_sales.pk}) 청구"
-            else:
-                return f"주문없음({self.pk})"
-
-
-class Deposit(TimeStampedModel):
-    class Meta:
-        ordering = ["-created",]
-        verbose_name = "입금 정보"
-        verbose_name_plural = "입금 정보(들)"
-    deposit_amount = models.IntegerField(verbose_name="입금액")
-    deposit_date = models.DateField(verbose_name="입금일")
-
-    def __str__(self):
-        if hasattr(self, "order"):
-            order = self.order
-            if order.register != None:
-                order_index = list(order.register.orders.all()).index(order)
-                return f"RO({order.register.RO_number}) 주문[{order_index}] 입금"
-            else:
-                return f"등록없음({self.pk}_주문:{order.pk})"
-        else:
-            if hasattr(self, "extra_sales"):
-                return f"기타매출({self.extra_sales.pk}) 입금"
-            else:
-                return f"주문없음({self.pk})"
 
 
 class Register(TimeStampedModel):
