@@ -21,14 +21,14 @@ from demand.utility import (
 
 class DataLoadTest(TestCase):
     """
-    데이터를 Load해서 테스트하는 대규모 테스트
+    이 테스트 클래스는 data_loadxlsx 데이터를 불러와 모든 데이터가 제대로 불려지며, 어떤 위험 요소들이 있는지를 파악해주는 테스트입니다.
     """
     @classmethod
     def setUpClass(cls):
         super(DataLoadTest, cls).setUpClass()
-        cls.original_df = load_data("src/basic.xlsx", "23년 본사 상반기")
+        cls.original_df = load_data("src/data_load.xlsx", "23년 본사 상반기")
         cls.df = get_effective_data_frame(
-            "src/basic.xlsx", "23년 본사 상반기")
+            "src/data_load.xlsx", "23년 본사 상반기")
         cls.lines = df_to_lines(cls.df)
         cls.line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(
             cls.df)
