@@ -1,15 +1,18 @@
 from datetime import datetime
-from random import randint
+from random import choice, randint
 
 from django.test import TestCase
 
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
                                Payment, Supporter)
-from demand.sales_models import ExtraSales, Order, Register
+from demand.sales_models import STATUS_DICT, ExtraSales, Order, Register
 from demand.utility import string_to_date
 
 
 def createRandomRegister():
+    """
+    테스트를 위해 Random한 Register를 만듭니다.
+    """
     randint(1, 9)
     car_number = "RANDOM"
     RO_number = f"TEST_RO"
@@ -23,6 +26,9 @@ def createRandomRegister():
 
 
 def createRandomExtraSales(payment, charge, deposit):
+    """
+    테스트를 위해 Random한 ExtraSales를 만듭니다.
+    """
     return ExtraSales.objects.create(
         day_came_in=string_to_date("2023-04-20"),
         expected_day_came_out=string_to_date("2023-04-25"),
@@ -32,6 +38,9 @@ def createRandomExtraSales(payment, charge, deposit):
 
 
 def createRandomInsuranceOrder(register, fault_ratio, payment, charge, deposit):
+    """
+    테스트를 위해 Random한 보험 타입 Order를 만듭니다.
+    """
     return Order.objects.create(
         register=register, charge_type="보험", receipt_number="TEST_RN",
         fault_ratio=fault_ratio, payment=payment, charge=charge, deposit=deposit,
@@ -39,8 +48,11 @@ def createRandomInsuranceOrder(register, fault_ratio, payment, charge, deposit):
 
 
 def createRandomOrdinaryOrder(register, fault_ratio, payment, charge, deposit):
+    """
+    테스트를 위해 Random한 일반판도 or 일반경정비 타입 Order를 만듭니다.
+    """
     return Order.objects.create(
-        register=register, charge_type="일반판도", receipt_number="TEST_RN",
+        register=register, charge_type=choice(["일반경정비", "일반판도"]), receipt_number="TEST_RN",
         fault_ratio=fault_ratio, payment=payment, charge=charge, deposit=deposit,
     )
 
@@ -51,6 +63,9 @@ class DemandModelTest(TestCase):
     """
 
     def setUp(self):
+        """
+        가장 기본적인 형태의 order와 register를 만듭니다.
+        """
         self.supporter = Supporter.objects.create(name="test_supporter")
         self.charged_company = ChargedCompany.objects.create(
             name="test_charged_company")
@@ -80,7 +95,8 @@ class DemandModelTest(TestCase):
             expected_day_came_out=expected_day_came_out, real_day_came_out=real_day_came_out,
             car_model="아반떼", abroad_type="국산", number_of_repair_works=1,
             number_of_exchange_works=2, supporter=self.supporter, client_name="김민준",
-            insurance_agent=self.insurance_agent, phone_number="010-1234-5678"
+            insurance_agent=self.insurance_agent, phone_number="010-1234-5678",
+            note="test_note"
         )
 
         self.order = Order.objects.create(
@@ -88,10 +104,12 @@ class DemandModelTest(TestCase):
             order_type="자차", charge_type="보험",
             receipt_number="12-1234", fault_ratio=80,
             payment=self.payment, charge=self.charge, deposit=self.deposit,
-            note="test 비고"
         )
 
-    def setUpAbsentCase(self):
+    def setUpKeysAbsentCase(self):
+        """
+        payment, charge, deposit이 register가 없는 경우를 만듭니다.
+        """
         payment_date = string_to_date("2023-04-19")
         refund_date = string_to_date("2023-04-19")
         self.no_order_payment = Payment.objects.create(indemnity_amount=100000,
@@ -118,11 +136,13 @@ class DemandModelTest(TestCase):
             charged_company=self.charged_company,
             order_type="자차", charge_type="보험",
             receipt_number="23-2345", fault_ratio=80,
-            payment=self.no_register_payment, charge=self.no_register_charge, deposit=self.no_register_deposit,
-            note="test 비고"
+            payment=self.no_register_payment, charge=self.no_register_charge, deposit=self.no_register_deposit
         )
 
-    def setUpExtraCase(self):
+    def setUpExtraSales(self):
+        """
+        ExtraSales Test를 위해 ExtraSales를 만듭니다.
+        """
         payment_date = string_to_date("2023-03-19")
         refund_date = string_to_date("2023-03-19")
         charge_date = string_to_date("2023-03-19")
@@ -142,7 +162,22 @@ class DemandModelTest(TestCase):
             note="기타매출"
         )
 
+    def setUpNoChargeDateTestCase(self):
+        """
+        charge data가 없는 경우의 charge를 test하기 위해 TestCase를 만듭니다.
+        """
+        no_charge_date_charge1 = Charge.objects.create(component_amount=10000)
+        no_charge_date_charge2 = Charge.objects.create(component_amount=20000)
+        random_register = createRandomRegister()
+        self.no_charge_date_order = createRandomOrdinaryOrder(
+            register=random_register, fault_ratio=100, charge=no_charge_date_charge1, payment=None, deposit=None)
+        self.no_charge_date_extrasales = createRandomExtraSales(
+            payment=None, charge=no_charge_date_charge2, deposit=None)
+
     def setUpOrderStatusTestCase(self):
+        """
+        Order의 Status를 Test하기 위해 TestCase를 만듭니다.
+        """
         payment_date = string_to_date("2023-03-19")
         refund_date = string_to_date("2023-03-19")
         charge_date = string_to_date("2023-03-19")
@@ -220,7 +255,12 @@ class DemandModelTest(TestCase):
         self.need_check_order2 = createRandomInsuranceOrder(
             register, 100, None, need_check_order_charge2, need_check_order_deposit)
 
+        self.setUpNoChargeDateTestCase()
+
     def setUpExtraSalesStatusTestCase(self):
+        """
+        ExtraSales의 Status를 Test하기 위해 TestCase를 만듭니다.
+        """
         payment_date = string_to_date("2023-03-19")
         refund_date = string_to_date("2023-03-19")
         charge_date = string_to_date("2023-03-19")
@@ -276,6 +316,8 @@ class DemandModelTest(TestCase):
         self.need_check_extra_sales = createRandomExtraSales(
             need_check_extra_sales_payment, need_check_extra_sales_charge, None)
 
+        self.setUpNoChargeDateTestCase()
+
     def test_get_work_days(self):
         self.assertEqual(self.register.get_work_days(), 7)
 
@@ -289,8 +331,8 @@ class DemandModelTest(TestCase):
         self.assertEqual(str(self.insurance_agent), "test_insurance_agent")
 
     def test_payment_str(self):
-        self.setUpAbsentCase()
-        self.setUpExtraCase()
+        self.setUpKeysAbsentCase()
+        self.setUpExtraSales()
         self.assertEqual(str(self.payment), "RO(4-1234) 주문[0] 결제")
         self.assertEqual(str(self.no_register_payment),
                          f"등록없음({self.no_register_payment.pk}_주문:{self.no_register_order.pk})")
@@ -300,8 +342,8 @@ class DemandModelTest(TestCase):
                          f"기타매출({self.extra_sales.pk}) 결제")
 
     def test_charge_str(self):
-        self.setUpAbsentCase()
-        self.setUpExtraCase()
+        self.setUpKeysAbsentCase()
+        self.setUpExtraSales()
         self.assertEqual(str(self.charge), "RO(4-1234) 주문[0] 청구")
         self.assertEqual(str(self.no_register_charge),
                          f"등록없음({self.no_register_charge.pk}_주문:{self.no_register_order.pk})")
@@ -311,8 +353,8 @@ class DemandModelTest(TestCase):
                          f"기타매출({self.extra_sales.pk}) 청구")
 
     def test_deposit_str(self):
-        self.setUpAbsentCase()
-        self.setUpExtraCase()
+        self.setUpKeysAbsentCase()
+        self.setUpExtraSales()
         self.assertEqual(str(self.deposit), "RO(4-1234) 주문[0] 입금")
         self.assertEqual(str(self.no_register_deposit),
                          f"등록없음({self.no_register_deposit.pk}_주문:{self.no_register_order.pk})")
@@ -328,16 +370,16 @@ class DemandModelTest(TestCase):
         self.assertEqual(str(self.order), "4-1234 자차 보험")
 
     def test_extra_sales_str(self):
-        self.setUpExtraCase()
+        self.setUpExtraSales()
         self.assertEqual(str(self.extra_sales), "(2023-03-20)입고: 기타매출")
 
     def test_get_charge_amount(self):
-        self.setUpExtraCase()
+        self.setUpExtraSales()
         self.assertEqual(self.order.get_charge_amount(), 65600)
         self.assertEqual(self.extra_sales.get_charge_amount(), 92000)
 
     def test_get_payment_rate_for_input(self):
-        self.setUpExtraCase()
+        self.setUpExtraSales()
         self.assertAlmostEqual(
             self.order.get_payment_rate_for_input(), 0.625, places=2)
         self.assertAlmostEqual(
@@ -371,6 +413,8 @@ class DemandModelTest(TestCase):
                          STATUS_DICT["NEED_CHECK"])
         self.assertEqual(self.need_check_order2.get_status(),
                          STATUS_DICT["NEED_CHECK"])
+        self.assertEqual(self.no_charge_date_order.get_status(),
+                         STATUS_DICT["NO_CHARGE"])
 
     def test_get_extra_sales_status(self):
         self.setUpExtraSalesStatusTestCase()
@@ -388,3 +432,5 @@ class DemandModelTest(TestCase):
                          STATUS_DICT["COMPLETE"])
         self.assertEqual(self.need_check_extra_sales.get_status(),
                          STATUS_DICT["NEED_CHECK"])
+        self.assertEqual(self.no_charge_date_extrasales.get_status(),
+                         STATUS_DICT["NO_CHARGE"])

@@ -80,7 +80,7 @@ class Charge(TimeStampedModel):
         ordering = ["-created",]
         verbose_name = "청구 정보"
         verbose_name_plural = "청구 정보(들)"
-    charge_date = models.DateField(verbose_name="청구일")
+    charge_date = models.DateField(verbose_name="청구일", blank=True, null=True)
     wage_amount = models.IntegerField(default=0, verbose_name="공임비")
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
 
