@@ -317,6 +317,17 @@ def make_manually_complete(request, pk):
 
 
 @login_required
+def cancel_manually_complete(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    order.cancel_manually_complete()
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+
+
+@login_required
 def extra_sales(request):
     return render(request, "demand/extra_sales.html", context={"extra_sales_queryset": ExtraSales.objects.all()})
 

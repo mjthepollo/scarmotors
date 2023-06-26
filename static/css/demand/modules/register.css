@@ -71,3 +71,8 @@
   color: white;
   background-color: black;
 }
+
+.order_function.cancel_manually_complete {
+  color: white;
+  background-color: darkgreen;
+}

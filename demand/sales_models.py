@@ -197,6 +197,7 @@ class Sales(TimeStampedModel):
             if self.check_no_came_out():
                 return STATUS_DICT["NO_CAME_OUT"]
             if not self.charge.charge_date:
+                # 부품비의 경우 charge_date가 없어도 존재할 수 있기 때문. 따라서 청구 기준은 청구일로 해야한다.
                 return STATUS_DICT["NO_CHARGE"]
 
             # 일반경정, 일반렌트, 기타매출의 경우 입금이 없음
@@ -240,6 +241,16 @@ class Sales(TimeStampedModel):
         self.status = STATUS_DICT["MANUALLY_COMPLETE"]
         self.save()
 
+    def cancel_manually_complete(self):
+        self.status = self.get_status()
+        self.save()
+
+    def manually_completed(self):
+        if self.status == STATUS_DICT["MANUALLY_COMPLETE"]:
+            return True
+        else:
+            return False
+
     def completed(self):
         if self.status == STATUS_DICT["COMPLETE"] or self.status == STATUS_DICT["MANUALLY_COMPLETE"]:
             return True
@@ -247,7 +258,7 @@ class Sales(TimeStampedModel):
             return False
 
     def save(self, *args, **kwargs):
-        if self.status != "완료(수동)":
+        if not self.manually_completed():
             self.status = self.get_status()
         super().save(*args, **kwargs)
 

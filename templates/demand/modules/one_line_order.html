@@ -16,9 +16,11 @@
     <td class="order {{order.get_charge_class}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
     <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk%}">입금</a></td>
     <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk %}">{{order.get_status_display}}</td>
-    {% if order.finished %}
-    <td class="order_function bold complete_class">완료</td>
-    {% else %}
+    {% if not order.completed %}
     <td class="order_function bold make_manually_complete"><a href="{% url 'demand:make_manually_complete' order.pk %}">완료처리</a></td>
+    {% elif order.manually_completed %}
+    <td class="order_function bold cancel_manually_complete"><a href="{% url 'demand:cancel_manually_complete' order.pk %}">완료취소</a></td>
+    {% else %}
+    <td class="order_function bold complete_class">완료</td>
     {% endif %}
 </tr>

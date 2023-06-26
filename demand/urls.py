@@ -21,6 +21,8 @@ urlpatterns = [
     path("order/deposit/<int:pk>/", views.order_deposit, name="order_deposit"),
     path("order/make_manually_complete/<int:pk>/",
          views.make_manually_complete, name="make_manually_complete"),
+    path("order/cancel_manually_complete/<int:pk>/",
+         views.cancel_manually_complete, name="cancel_manually_complete"),
     path("orders_to_excel/", views.orders_to_excel, name="orders_to_excel"),
     path("extra_sales/", views.extra_sales, name="extra_sales"),
 ]
