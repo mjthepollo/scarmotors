@@ -536,6 +536,10 @@ class ExtraSales(Sales):
 
 
 class RecognizedSales(TimeStampedModel):
+    class Meta:
+        ordering = ["-created",]
+        verbose_name = "인정매출"
+        verbose_name_plural = "인정 매출(들)"
     day_came_in = models.DateField(verbose_name="입고일", blank=True, null=True)
     real_day_came_out = models.DateField(
         blank=True, null=True, verbose_name="출고일")
