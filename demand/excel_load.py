@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from django.core.management import call_command
 
+from core.utility import print_colored
 from demand.check_value_functions import (check_chargable_amount,
                                           check_charge_amount,
                                           check_component_turnover,
@@ -18,9 +19,7 @@ from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
 from demand.sales_models import ExtraSales, Order, Register
 from demand.utility import (fault_ratio_to_int, input_to_date,
                             input_to_phone_number, int_or_none, print_fields,
-                            str_or_none, zero_if_none)
-
-SKIPPED_RO_NUMBERS = ["2-27", "2-128", "4-26", "4-30"]
+                            str_or_none, zero_if_none, zero_if_not_number)
 
 
 def load_data(file_name, sheet_name):
@@ -62,18 +61,28 @@ def check_wash_line(df, line_number):
     return "세차" in client_name_and_insurance_agent or "세차" in supporter_name
 
 
-def check_wasted_line(df, line_number):
+def check_wasted_line(line):
     """
     effective DataFrame의 line number에 해당하는 line이 폐차를 가리키는 line인지 확인한다.
     """
-    pass
+    wasted = False
+    if isinstance(line[NOTE], str):
+        wasted = "폐차" in line[NOTE] or "전손" in line[NOTE]
+    if isinstance(line[REAL_DAY_CAME_OUT], str):
+        wasted = "폐차" in line[REAL_DAY_CAME_OUT] or "전손" in line[REAL_DAY_CAME_OUT]
+    return wasted
 
 
-def check_unrepaired_line(df, line_number):
+def check_unrepaired_line(line):
     """
     effective DataFrame의 line number에 해당하는 line이 미수리출고를 가리키는 line인지 확인한다.
     """
-    pass
+    unrepaired = False
+    if isinstance(line[REAL_DAY_CAME_OUT], str):
+        unrepaired = "미수리" in line[REAL_DAY_CAME_OUT]
+    if isinstance(line[NOTE], str):
+        unrepaired = "미수리" in line[NOTE]
+    return unrepaired
 
 
 def get_line_numbers_for_extra_sales(effective_df):
@@ -232,6 +241,9 @@ def check_values_of_column(df, lines, line_numbers_for_registers,
             CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
                 extra_sales, compared_value, expecting_value)
         except Exception as e:
+            print_colored(
+                "Bellow is the extraslaes which occurs problem", "yellow")
+            print_colored(f"LINE : {lines[line_number]}", "magenta")
             print_fields(extra_sales)
             raise e
 
@@ -243,6 +255,8 @@ def check_values_of_column(df, lines, line_numbers_for_registers,
             CHECK_VALUE_FUNCTIONS[COLUMN_NUMBER](
                 order, compared_value, expecting_value)
         except Exception as e:
+            print_colored("Bellow is the order which occurs problem", "yellow")
+            print_colored(f"LINE : {lines[line_number]}", "magenta")
             print_fields(order)
             raise e
 
@@ -260,10 +274,11 @@ def create_order_from_line(line, register):
     else:
         charged_company = None
     fault_ratio = fault_ratio_to_int(line[FAULT_RATIO])
+    charge_type = line[CHARGE_TYPE] or "기타"
     return Order.objects.create(
         register=register,
         charged_company=charged_company,
-        charge_type=line[CHARGE_TYPE],
+        charge_type=charge_type,
         order_type=line[ORDER_TYPE],
         receipt_number=str_or_none(line[RECEIPT_NUMBER]),
         fault_ratio=fault_ratio,
@@ -284,7 +299,7 @@ def create_deposit_from_line(line, sales):
 
 
 def create_charge_from_line(line, sales):
-    if line[CHARGE_DATE]:
+    if line[CHARGE_DATE] or line[COMPONENT_AMOUNT]:
         charge = Charge.objects.create(
             charge_date=input_to_date(line[CHARGE_DATE]),
             wage_amount=zero_if_none(int_or_none(line[WAGE_AMOUNT])),
@@ -347,7 +362,7 @@ def make_extra_sales_from_line(line):
     return extra_sales
 
 
-def make_register_from_first_line_number(first_line):
+def make_register_from_first_line(first_line):
     if first_line[SUPPORTER]:
         supporter, _ = Supporter.objects.get_or_create(
             name=first_line[SUPPORTER])
@@ -361,11 +376,9 @@ def make_register_from_first_line_number(first_line):
     else:
         insurance_agent = None
 
-    wasted = first_line[REAL_DAY_CAME_OUT] == "폐차"
-    unrepaired = first_line[REAL_DAY_CAME_OUT] == "미수리출고"
+    wasted = check_wasted_line(first_line)
+    unrepaired = check_unrepaired_line(first_line)
 
-    if first_line[RO_NUMBER] in SKIPPED_RO_NUMBERS:
-        return None
     try:
         return Register.objects.create(
             RO_number=first_line[RO_NUMBER],
@@ -378,7 +391,7 @@ def make_register_from_first_line_number(first_line):
             abroad_type=first_line[ABROAD_TYPE],
             number_of_repair_works=zero_if_none(
                 first_line[NUMBER_OF_REPAIRS_WORKS]),
-            number_of_exchange_works=zero_if_none(
+            number_of_exchange_works=zero_if_not_number(
                 first_line[NUMBER_OF_EXCHANGE_WORKS]),
             supporter=supporter,
             client_name=client_name,
@@ -390,7 +403,7 @@ def make_register_from_first_line_number(first_line):
             unrepaired=unrepaired,
         )
     except Exception as e:
-        print(first_line)
+        print_colored(f"REGISTER CREATION FAILURE : {first_line}", "magenta")
         raise e
 
 
@@ -405,14 +418,17 @@ def make_order_payment_charge_and_deposit_with_line(line, register):
 
 def make_complete_register_for_line_numbers(df, line_numbers):
     first_line = df.iloc[line_numbers[0], :].values.tolist()
-    register = make_register_from_first_line_number(first_line)
-    try:
-        for line_number in line_numbers:
-            line = df.iloc[line_number, :].values.tolist()
-            make_order_payment_charge_and_deposit_with_line(line, register)
-    except Exception as e:
-        print_fields(register)
-        raise e
+    register = make_register_from_first_line(first_line)
+    if register:
+        try:
+            for line_number in line_numbers:
+                line = df.iloc[line_number, :].values.tolist()
+                make_order_payment_charge_and_deposit_with_line(line, register)
+        except Exception as e:
+            print_fields(register)
+            raise e
+    else:
+        print_colored(f"SKIPPED {str(first_line)}", "red")
 
 
 def make_models_from_effective_df(df):

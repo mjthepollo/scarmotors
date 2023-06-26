@@ -88,7 +88,11 @@ def fault_ratio_to_int(input_data):
 
 
 def input_to_date(input_date):
-    # timestamp is subcalss of date!
+    """
+    pd.Timestamp, date, str, float, int 까지 모두 커버해준다.
+    만약 그 외의 타입이나 적당한 타입이 아니라면 None을 리턴한다.
+    """
+    # timestamp is subcalss of date! d
     if isinstance(input_date, pd.Timestamp):
         return input_date.date()
     elif isinstance(input_date, date):
@@ -97,6 +101,10 @@ def input_to_date(input_date):
         if input_date == "폐차":
             return None
         elif input_date == "미수리출고":
+            return None
+        elif input_date == "전손처리":
+            return None
+        elif "중복" in input_date:
             return None
         elif "1센" in input_date:
             return None
@@ -118,6 +126,13 @@ def zero_if_none(num):
         return 0
     else:
         return num
+
+
+def zero_if_not_number(num):
+    if isinstance(num, int) or isinstance(num, float):
+        return num
+    else:
+        return 0
 
 
 def check_car_number(car_number):

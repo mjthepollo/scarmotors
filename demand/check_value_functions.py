@@ -43,7 +43,11 @@ def check_payment_rate(obj, compared_value, expecting_value):
 
 def check_turnover(obj, compared_value, expecting_value):
     from demand.utility import zero_if_none
-    assert abs(zero_if_none(expecting_value) - compared_value) < 10
+    try:
+        assert abs(zero_if_none(expecting_value) - compared_value) < 10
+    except AssertionError as e:
+        print(compared_value, expecting_value)
+        raise e
 
 
 def check_factory_turnover(obj, compared_value, expecting_value):

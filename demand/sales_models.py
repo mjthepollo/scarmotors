@@ -177,7 +177,10 @@ class Sales(TimeStampedModel):
 
     def check_no_came_out(self):
         if isinstance(self, Order):
-            real_day_came_out = self.register.real_day_came_out
+            if self.register:
+                real_day_came_out = self.register.real_day_came_out
+            else:
+                return True
         else:  # ExtraSales Case
             real_day_came_out = self.real_day_came_out
         return False if real_day_came_out else True
@@ -206,9 +209,12 @@ class Sales(TimeStampedModel):
             # 일반경정, 일반렌트, 기타매출의 경우 입금이 없음
             if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
                 if self.payment:
-                    if self.get_payment_rate() > 1.01:
+                    payment_rate = self.get_payment_rate()
+                    if payment_rate is None:  # 수정 필요할 수 있음. 컨펌 받고 수정할 것
+                        return STATUS_DICT["COMPLETE"]
+                    if payment_rate > 1.01:
                         return STATUS_DICT["OVER_DEPOSIT"]
-                    elif self.get_payment_rate() < 0.99:
+                    elif payment_rate < 0.99:
                         return STATUS_DICT["NEED_CHECK"]
                     else:
                         return STATUS_DICT["COMPLETE"]
@@ -217,9 +223,12 @@ class Sales(TimeStampedModel):
 
             if isinstance(self, Order):  # 일반 주문의 경우
                 if self.deposit:
-                    if self.get_payment_rate() > 1.01:
+                    payment_rate = self.get_payment_rate()
+                    if payment_rate is None:  # 수정 필요할 수 있음. 컨펌 받고 수정할 것
+                        return STATUS_DICT["COMPLETE"]
+                    if payment_rate > 1.01:
                         return STATUS_DICT["OVER_DEPOSIT"]
-                    elif self.get_payment_rate() >= 0.85:
+                    elif payment_rate >= 0.85:
                         return STATUS_DICT["COMPLETE"]
                     else:
                         return STATUS_DICT["NEED_CHECK"]
@@ -233,11 +242,13 @@ class Sales(TimeStampedModel):
                 print_colored("self is None", "red")
             else:
                 try:
-                    print_colored(self.__str__, "red")
+                    print_colored(f"ERROR IN GET STATUS: {str(self)}", "red")
                 except AttributeError:
+                    print_colored(f"ERROR IN GET STATUS: {str(self)}", "red")
                     print_colored("[Below self is not printable]", "red")
                     print_colored(f"{type(self)}:{self.pk}", "red")
-
+                print_colored(str(e), "magenta")
+                raise e
             return STATUS_DICT["ERROR"]
 
     def make_manually_complete(self):
@@ -457,7 +468,7 @@ class Order(Sales):
         ChargedCompany, null=True, related_name="orders", verbose_name="보험(렌트)", on_delete=models.CASCADE)
     charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정비", "일반경정비"), (
         "일반판도", "일반판도"), ("렌트판도", "렌트판도"), ("렌트일반", "렌트일반"),
-        ("인정매출", "인정매출")), max_length=20, verbose_name="구분")
+        ("기타", "기타")), max_length=20, verbose_name="구분")
     order_type = models.CharField(null=True, blank=True, choices=(
         ("자차", "자차"), ("대물", "대물"), ("일반", "일반")), max_length=10, verbose_name="차/대/일")
     receipt_number = models.CharField(
