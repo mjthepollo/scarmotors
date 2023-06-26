@@ -302,6 +302,8 @@ class Supporter(TimeStampedModel):
         verbose_name_plural = "입고 지원 업체(들)"
     name = models.CharField(max_length=100, verbose_name="지원 업체명")
     active = models.BooleanField(default=True, verbose_name="활성화")
+    incentive_rate_percent = models.IntegerField(
+        default=85, verbose_name="지급율")
 
     def __str__(self):
         return self.name
