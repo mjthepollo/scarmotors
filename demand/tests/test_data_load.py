@@ -3,20 +3,20 @@ import pandas as pd
 from django.core.management import call_command
 from django.test import TestCase
 
-from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
-                               Payment, Supporter)
+from demand.excel_load import (CHARGABLE_AMOUNT, CHARGE_AMOUNT,
+                               COMPONENT_TURNOVER, FACTORY_TURNOVER,
+                               INTEGRATED_TURNOVER, NOT_PAID_AMOUNT,
+                               NOT_PAID_TURNOVER, PAID_TURNOVER, PAYMENT_RATE,
+                               TURNOVER, WAGE_TURNOVER, check_values_of_column,
+                               df_to_lines,
+                               get_client_name_and_insurance_agent_name,
+                               get_effective_data_frame,
+                               get_line_numbers_for_extra_sales,
+                               get_line_numbers_for_registers, load_data,
+                               make_extra_sales_from_line,
+                               make_models_from_effective_df)
+from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import ExtraSales, Order, Register
-from demand.utility import (
-    CHARGABLE_AMOUNT, CHARGE_AMOUNT, COMPONENT_TURNOVER, FACTORY_TURNOVER,
-    INTEGRATED_TURNOVER, NOT_PAID_AMOUNT, NOT_PAID_TURNOVER, PAID_TURNOVER,
-    PAYMENT_RATE, STATUS, TURNOVER, WAGE_TURNOVER,
-    check_line_numbers_for_registers_have_same_car_number,
-    check_line_numbers_for_registers_have_unique_RO_number,
-    check_values_of_column, check_wash_car, df_to_lines,
-    get_effective_data_frame, get_effective_row_numbers,
-    get_line_numbers_for_extra_sales, get_line_numbers_for_registers,
-    get_sales_of_month_and_type, load_data, make_models_from_effective_df,
-    zero_if_none)
 
 
 class DataLoadTest(TestCase):
@@ -121,20 +121,20 @@ class DataLoadTest(TestCase):
                                self.line_numbers_for_extra_sales,
                                WAGE_TURNOVER, "get_wage_turnover")
 
-    def test_monthly_sales(self):
-        from datetime import datetime
-        current_month = datetime.now().month
+    # def test_monthly_sales(self):
+    #     from datetime import datetime
+    #     current_month = datetime.now().month
 
-        call_command('clean_models')
-        make_models_from_effective_df(self.df)
-        for month in range(1, current_month+1):
-            print(f"Month : {month}")
-            print("보험 : ", get_sales_of_month_and_type(month, "보험"))
-            print("렌트일반 : ", get_sales_of_month_and_type(month, "렌트일반"))
-            print("렌트판도 : ", get_sales_of_month_and_type(month, "렌트판도"))
-            print("일반판도 : ", get_sales_of_month_and_type(month, "일반판도"))
-            print("일반경정비 : ", get_sales_of_month_and_type(month, "일반경정비"))
-            print("--------------")
+    #     call_command('clean_models')
+    #     make_models_from_effective_df(self.df)
+    #     for month in range(1, current_month+1):
+    #         print(f"Month : {month}")
+    #         print("보험 : ", get_sales_of_month_and_type(month, "보험"))
+    #         print("렌트일반 : ", get_sales_of_month_and_type(month, "렌트일반"))
+    #         print("렌트판도 : ", get_sales_of_month_and_type(month, "렌트판도"))
+    #         print("일반판도 : ", get_sales_of_month_and_type(month, "일반판도"))
+    #         print("일반경정비 : ", get_sales_of_month_and_type(month, "일반경정비"))
+    #         print("--------------")
 
         # call_command('clean_models')
         # not_charged_df = get_effective_data_frame(

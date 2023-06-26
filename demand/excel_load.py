@@ -117,6 +117,27 @@ def df_to_lines(df):
     return lines
 
 
+def register_to_tuple(register):
+    return (register.RO_number,
+            register.car_number,
+            str(register.day_came_in),
+            str(register.expected_day_came_out),
+            str(register.real_day_came_out),
+            register.car_model,
+            register.abroad_type,
+            register.number_of_repair_works,
+            register.number_of_exchange_works,
+            str(register.supporter) if register.supporter else None,
+            register.client_name,
+            str(register.insurance_agent) if register.insurance_agent else None,
+            register.phone_number,
+            register.rentcar_company_name,
+            register.note,
+            register.wasted,
+            register.unrepaired,
+            )
+
+
 def get_client_name_and_insurance_agent_name(first_line):
     client_name_and_insurance_agent = first_line[CLIENT_NAME_AND_INSURANCE_AGENT]
     if isinstance(client_name_and_insurance_agent, str):
@@ -125,7 +146,10 @@ def get_client_name_and_insurance_agent_name(first_line):
         elif "담당" == client_name_and_insurance_agent[-2:]:
             return None, client_name_and_insurance_agent[:-2]
         else:
-            return None, client_name_and_insurance_agent
+            if not client_name_and_insurance_agent:
+                return None, None
+            else:
+                return None, client_name_and_insurance_agent
     else:
         return None, None
 
