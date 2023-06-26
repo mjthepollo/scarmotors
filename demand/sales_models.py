@@ -531,3 +531,16 @@ class ExtraSales(Sales):
 
     def __str__(self):
         return f"({self.day_came_in})입고: {self.note}"
+
+
+class RecognizedSales(TimeStampedModel):
+    day_came_in = models.DateField(verbose_name="입고일", blank=True, null=True)
+    real_day_came_out = models.DateField(
+        blank=True, null=True, verbose_name="출고일")
+    car_number = models.CharField(
+        verbose_name="차량번호", blank=True, null=True, max_length=20)
+    wage_amount = models.IntegerField(default=0, verbose_name="공임비")
+    request_department = models.CharField(max_length=100, verbose_name="요청부서")
+    component_amount = models.IntegerField(default=0, verbose_name="부품비")
+    note = models.TextField(default="부가세 별도", blank=True,
+                            null=True, verbose_name="비고")
