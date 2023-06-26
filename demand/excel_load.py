@@ -248,6 +248,12 @@ def check_values_of_column(df, lines, line_numbers_for_registers,
 
 
 def create_order_from_line(line, register):
+    if line[NOTE]:
+        if register.note:
+            register.note += "\n"+line[NOTE]
+        else:
+            register.note = line[NOTE]
+    register.save()
     if line[CHARGED_COMPANY]:
         charged_company, _ = ChargedCompany.objects.get_or_create(
             name=line[CHARGED_COMPANY])
@@ -379,7 +385,7 @@ def make_register_from_first_line_number(first_line):
             insurance_agent=insurance_agent,
             phone_number=input_to_phone_number(first_line[PHONE_NUMBER]),
             rentcar_company_name=first_line[RENT_CAR_COMPANY_NAME],
-            note=first_line[NOTE],
+            note=None,  # Note is handled in create_order_from_line
             wasted=wasted,
             unrepaired=unrepaired,
         )
