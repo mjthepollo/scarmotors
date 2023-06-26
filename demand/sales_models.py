@@ -79,6 +79,9 @@ class Sales(TimeStampedModel):
         return "-"
 
     def get_payment_rate_for_input(self):
+        """
+        EXCEL에서 사용하는 지급율
+        """
         charge_amount = self.get_charge_amount()
         if not charge_amount:
             return None
@@ -193,7 +196,7 @@ class Sales(TimeStampedModel):
         try:
             if self.check_no_came_out():
                 return STATUS_DICT["NO_CAME_OUT"]
-            if not self.charge:
+            if not self.charge.charge_date:
                 return STATUS_DICT["NO_CHARGE"]
 
             # 일반경정, 일반렌트, 기타매출의 경우 입금이 없음
@@ -237,7 +240,7 @@ class Sales(TimeStampedModel):
         self.status = STATUS_DICT["MANUALLY_COMPLETE"]
         self.save()
 
-    def finished(self):
+    def completed(self):
         if self.status == STATUS_DICT["COMPLETE"] or self.status == STATUS_DICT["MANUALLY_COMPLETE"]:
             return True
         else:
@@ -362,11 +365,11 @@ class Register(TimeStampedModel):
 # --------------- HTML FUNCTION -----------------#
     def get_status(self):
         orders = self.orders.all()
-        all_finished = True
+        all_completed = True
         for order in orders:
-            if not order.finished():
-                all_finished = False
-        if all_finished:
+            if not order.completed():
+                all_completed = False
+        if all_completed:
             return REGISTER_STAUTS[COMPLETE]
         for order in orders:
             if order.get_status() in [STATUS_DICT["ERROR"], STATUS_DICT["NEED_CHECK"]]:
@@ -401,7 +404,7 @@ class Register(TimeStampedModel):
             return STATUS_CLASS[NOT_COMPLETE]
 
     def get_charge_class(self):
-        if self.charge:
+        if self.charge.charge_date:
             return STATUS_CLASS[COMPLETE]
         else:
             return STATUS_CLASS[NOT_COMPLETE]
