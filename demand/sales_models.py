@@ -210,8 +210,6 @@ class Sales(TimeStampedModel):
             if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
                 if self.payment:
                     payment_rate = self.get_payment_rate()
-                    if payment_rate is None:  # 수정 필요할 수 있음. 컨펌 받고 수정할 것
-                        return STATUS_DICT["COMPLETE"]
                     if payment_rate > 1.01:
                         return STATUS_DICT["OVER_DEPOSIT"]
                     elif payment_rate < 0.99:
@@ -224,8 +222,6 @@ class Sales(TimeStampedModel):
             if isinstance(self, Order):  # 일반 주문의 경우
                 if self.deposit:
                     payment_rate = self.get_payment_rate()
-                    if payment_rate is None:  # 수정 필요할 수 있음. 컨펌 받고 수정할 것
-                        return STATUS_DICT["COMPLETE"]
                     if payment_rate > 1.01:
                         return STATUS_DICT["OVER_DEPOSIT"]
                     elif payment_rate >= 0.85:
@@ -248,7 +244,6 @@ class Sales(TimeStampedModel):
                     print_colored("[Below self is not printable]", "red")
                     print_colored(f"{type(self)}:{self.pk}", "red")
                 print_colored(str(e), "magenta")
-                raise e
             return STATUS_DICT["ERROR"]
 
     def make_manually_complete(self):
