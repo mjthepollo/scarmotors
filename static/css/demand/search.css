@@ -1,7 +1,8 @@
 @import url("../modules/input.css");
 @import url("modules/register.css");
+@import url("./modals/came_out_modal.css");
 
-form {
+#search_form {
   display: flex;
 
   width: 100%;
@@ -9,14 +10,14 @@ form {
 
   flex-wrap: wrap;
 }
-form > div {
+#search_form > div {
   display: flex;
   justify-content: space-between;
 
   width: 300px;
   margin-bottom: 5px;
 }
-form > div > label {
+#search_form > div > label {
   display: flex;
   justify-content: flex-start;
 
@@ -27,7 +28,8 @@ form > div > label {
 input[type="submit"] {
   height: auto;
 }
-#special_functions {
+
+#search_form > #special_functions {
   justify-content: space-evenly;
 
   width: 100%;
@@ -84,4 +86,8 @@ input[type="submit"] {
 
 table {
   width: 100%;
+}
+
+.came_out_button {
+  cursor: pointer;
 }

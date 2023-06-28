@@ -2,7 +2,7 @@
 {% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
 <link rel="stylesheet" href="{% static 'css/demand/search.css' %}">
 {% endblock css %} {% block content %}
-<form method="GET">
+<form id="search_form" method="GET">
   {{register_filter.form.as_div}}
   {% include 'demand/modules/page_num.html'%}  
   <div id="special_functions">
@@ -43,3 +43,6 @@
 {% endfor %}
 </table>
 {% endblock content %}
+{% block inline_javascript %}
+<script src="{% static 'js/came_out.js' %}"></script>
+{% endblock inline_javascript %}

@@ -12,7 +12,9 @@
     <td>{{order.formatted_charge_amount}}</td>
     <td>{{order.formatted_deposit_amount}}</td>
     <td>{{order.formatted_payment_rate}}</td>
-    <td class="order {{order.get_came_out_class}}"><a href="{% url 'demand:order_came_out' order.pk%}">출고</a></td>
+    <td class="order {{order.get_came_out_class}}">
+        <div class="came_out_button" data-modal_url="{% url 'demand:came_out_modal' order.register.pk%}">출고</div>
+    </td>
     <td class="order {{order.get_charge_class}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
     <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk%}">입금</a></td>
     <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk %}">{{order.get_status_display}}</td>

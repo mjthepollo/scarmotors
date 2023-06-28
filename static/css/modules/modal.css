@@ -1,0 +1,74 @@
+.custom_modal_background {
+  z-index: 20;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100vw;
+  height: calc(var(--vh, 1vh) * 100);
+
+  background: rgba(0, 0, 0, 0.5);
+
+  animation-duration: 0.5s;
+  animation-name: dissolve;
+}
+
+.custom_modal {
+  border-radius: 15px;
+  padding: 20px;
+
+  border: 1px solid #000;
+}
+.modal-body > div {
+  margin-bottom: 10px;
+}
+
+.custom_modal label {
+  display: flex;
+  justify-content: flex-start;
+
+  width: 100px;
+}
+
+.custom_modal input[type="checkbox"] {
+  border-radius: 0px;
+  width: 20px;
+  height: 20px;
+
+  border: 1px solid black;
+}
+
+.modal_input {
+  display: flex;
+}
+
+.modal_radios,
+.modal_checkboxes {
+  display: flex;
+  align-items: center;
+}
+
+.modal_radio,
+.modal_checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.modal_checkbox {
+  margin-right: 30px;
+}
+
+.custom_modal .modal_radios label {
+  width: auto;
+  margin-left: 10px;
+  margin-right: 30px;
+}
+
+.custom_modal .modal_checkboxes label {
+  width: auto;
+  margin-right: 10px;
+}

@@ -1,0 +1,30 @@
+{% extends "modules/custom_modal.html"%}
+{% block modal_content %}
+<form class="modal-content" method="POST" action="{% url 'demand:came_out_modal' register.pk %}">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h5 class="modal-title">[{{register.RO_number}}] 출고처리</h5>
+        <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="modal_input">
+            <label for="real_day_came_out">출고일</label>
+            <input type="date" value="{% now 'Y-m-d' %}" name="real_day_came_out">
+        </div>
+        <div class="modal_checkboxes">
+            <div class="modal_checkbox">
+                <label for="wasted">폐차</label>
+                <input type="checkbox" name='wasted' id="wasted">
+            </div>
+            <div class="modal_checkbox">
+                <label for="unrepaired">미수리출고</label>
+                <input type="checkbox" name='unrepaired' id="unrepaired">
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary">출고</button>
+    </div>
+</form>
+{% endblock modal_content %}
