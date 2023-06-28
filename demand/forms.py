@@ -84,7 +84,7 @@ class EditRegisterForm(forms.ModelForm):
 class RegisterFilter(django_filters.FilterSet):
     RO_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
-        field_name='car_number', lookup_expr='icontains', label="RO번호")
+        field_name='RO_number', lookup_expr='icontains', label="RO번호")
     car_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='car_number', lookup_expr='icontains', label="차량번호")
@@ -176,6 +176,41 @@ class OrderForm(forms.ModelForm):
             'receipt_number': forms.TextInput(),
             'fault_ratio': forms.NumberInput(),
         }
+
+        labels = {
+            "fault_ratio": "과실분(%)"
+        }
+
+
+class EditOrderForm(forms.ModelForm):
+    # Payment
+    indemnity_amount = forms.IntegerField()
+    discount_amount = forms.IntegerField()
+    refund_amount = forms.IntegerField()
+
+    # Charge
+
+    # Deposit
+
+    class Meta:
+        model = Order
+        fields = ["charge_type", "charged_company",
+                  "order_type", "receipt_number", "fault_ratio"]
+        widgets = {
+            'receipt_number': forms.TextInput(),
+            'fault_ratio': forms.NumberInput(),
+        }
+
+        labels = {
+            "fault_ratio": "과실분(%)"
+        }
+
+    def save(self, commit=True):
+        instance = super(EditOrderForm, self).save(commit=False)
+        instance.flag1 = 'flag1' in self.cleaned_data['multi_choice']  # etc
+        if commit:
+            instance.save()
+        return instance
 
 
 class DepositForm(forms.ModelForm):

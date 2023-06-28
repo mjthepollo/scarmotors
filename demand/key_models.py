@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 
 from core.models import TimeStampedModel
@@ -43,6 +45,10 @@ class InsuranceAgent(TimeStampedModel):
 
 
 class Payment(TimeStampedModel):
+    """
+    Payment 객체. 보통 출고시 기록한다.
+    만약 수정한다면 EditOrderForm은 직접 수정해줘야 한다.
+    """
     class Meta:
         ordering = ["-created",]
         verbose_name = "면책금 정보"
@@ -60,6 +66,21 @@ class Payment(TimeStampedModel):
     payment_date = models.DateField(blank=True, null=True, verbose_name="결제일")
     refund_date = models.DateField(blank=True, null=True, verbose_name="환불일")
 
+    @classmethod
+    def create_mockup(cls):
+        return cls.objects.create()
+
+    def is_mockup(self):
+        result = True
+        result = result and self.indemnity_amount == None
+        result = result and self.discount_amount == None
+        result = result and self.refund_amount == None
+        result = result and self.payment_type == None
+        result = result and self.payment_info == None
+        result = result and self.payment_date == None
+        result = result and self.refund_date == None
+        return result
+
     def __str__(self):
         if hasattr(self, "order"):
             order = self.order
@@ -76,6 +97,10 @@ class Payment(TimeStampedModel):
 
 
 class Charge(TimeStampedModel):
+    """
+    Charge 객체. 청구시 사용한다.
+    만약 수정한다면 EditOrderForm은 직접 수정해줘야 한다.
+    """
     class Meta:
         ordering = ["-created",]
         verbose_name = "청구 정보"
@@ -113,6 +138,17 @@ class Charge(TimeStampedModel):
         else:
             return 0
 
+    @classmethod
+    def create_mockup(cls):
+        return cls.objects.create()
+
+    def is_mockup(self):
+        result = True
+        result = result and self.charge_date == None
+        result = result and self.wage_amount == 0
+        result = result and self.component_amount == 0
+        return result
+
     def __str__(self):
         if hasattr(self, "order"):
             order = self.order
@@ -129,12 +165,23 @@ class Charge(TimeStampedModel):
 
 
 class Deposit(TimeStampedModel):
+    """
+    입금 정보. 수정 시 EditOrderForm은 직접 수정해줘야 한다.
+    """
     class Meta:
         ordering = ["-created",]
         verbose_name = "입금 정보"
         verbose_name_plural = "입금 정보(들)"
     deposit_amount = models.IntegerField(verbose_name="입금액")
     deposit_date = models.DateField(verbose_name="입금일")
+    mockup = models.BooleanField(default=False, verbose_name="모형")
+
+    @classmethod
+    def create_mockup(cls):
+        return cls.objects.create(deposit_amount=0, deposit_date=date.today(), mockup=True)
+
+    def is_mockup(self):
+        return self.mockup
 
     def __str__(self):
         if hasattr(self, "order"):

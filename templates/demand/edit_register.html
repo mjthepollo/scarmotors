@@ -3,15 +3,17 @@
 {% load static %}
 {% block css %}
 {{block.super}}
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/demand/new_register.css' %}">
 {% endblock css %}
 {% block content %}
 <form id="formset" method="POST" data-formset-prefix="{{order_formset.prefix}}">
     {% csrf_token %}
+    <h2>차량 정보</h2>
     <div id="register_form">
         {{register_form.as_div}}
     </div>
     {{order_formset.management_form}}
+    <h2>주문 정보</h2>
     <div data-formset-body id="order_formset">
         {% for form in order_formset %}
         <div data-formset-form class="new_order">
@@ -33,7 +35,7 @@
             reorderMode: 'dom',
         });
     });</script>
-    <button>완료</button>
+    <button id="complete" class="btn btn-dark">완료</button>
 </form>
 {% endblock content %}
 {% block footer%}

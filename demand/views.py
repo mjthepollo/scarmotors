@@ -13,6 +13,7 @@ from demand.excel_line_info import INDEXES
 from demand.forms import (ChargeForm, DepositForm, EditRegisterForm,
                           NewRegisterForm, OrderFilter, OrderForm, PaymentForm,
                           RegisterFilter, RegisterFilterForOrderFilter)
+from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import ExtraSales, Order, Register
 
 
@@ -61,6 +62,12 @@ def edit_register(request, pk):
     register_form = EditRegisterForm(instance=register)
     order_form_factory = modelformset_factory(
         Order, form=OrderForm, extra=0)
+    charge_form_factroy = modelformset_factory(
+        Charge, form=ChargeForm, extra=0)
+    depeosit_form_factory = modelformset_factory(
+        Deposit, form=DepositForm, extra=0)
+    payment_form_factory = modelformset_factory(
+        Payment, form=PaymentForm, extra=0)
     if request.method == "GET":
         order_formset = order_form_factory(
             queryset=register.orders.all())
@@ -125,6 +132,11 @@ def edit_order(request, pk):
                 "charge_form": charge_form,
                 "payment_form": payment_form,
             })
+
+
+@login_required
+def detail_register(request, pk):
+    register = get_object_or_404(Register, pk=pk)
 
 
 @ login_required

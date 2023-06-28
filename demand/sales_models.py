@@ -220,6 +220,8 @@ class Sales(TimeStampedModel):
                     return STATUS_DICT["NOT_PAID"]
 
             if isinstance(self, Order):  # 일반 주문의 경우
+                if self.register.wasted or self.register.unrepaired:
+                    return STATUS_DICT["COMPLETE"]
                 if self.deposit:
                     payment_rate = self.get_payment_rate()
                     if payment_rate > 1.01:
@@ -337,7 +339,7 @@ class Register(TimeStampedModel):
         blank=True, null=True, verbose_name="실제출고일")
     car_model = models.CharField(max_length=90, verbose_name="차종")
     abroad_type = models.CharField(
-        choices=(("domestic", "국산"), ("imported", "수입")), max_length=10, verbose_name="국산/수입")
+        choices=(("국산", "국산"), ("수입", "수입")), max_length=10, verbose_name="국산/수입")
     number_of_repair_works = models.IntegerField(
         null=True, blank=True,
         default=0, verbose_name="보수 작업판수")
@@ -384,8 +386,38 @@ class Register(TimeStampedModel):
     def set_RO_number(self):
         self.RO_number = Register.get_RO_number()
         self.save()
+# --------------- FORMSET FUNCTION -----------------#
+
+    def get_mockups(self, KeyModel, key):
+        """
+        EditRegisterView에서 사용한다. modelformset을 활용하기 위해 mockup Object를 만들어준다.
+        KeyModel은 모델이고 key는 해당하는 모델의 attribute 이름이다.
+        """
+        mockup_keys = []
+        for order in self.orders.all().order_by('created'):
+            mockup_key = getattr(order, key)
+            if not mockup_key:
+                mockup_key = KeyModel.create_mockup()
+                setattr(order, key, mockup_key)
+                order.save()
+            mockup_keys.append(mockup_key)
+        return mockup_keys
+
+    def remove_mockups(self, KeyModel, key):
+        """
+        EditRegisterView에서 사용한다. modelformset을 활용하기 위해 만들어진 mockup들을 지워준다.
+        KeyModel은 모델이고 key는 해당하는 모델의 attribute 이름이다.
+        """
+        for order in self.orders.all():
+            key_model = getattr(order, key)
+            if key_model:
+                if key_model.is_mockup():
+                    key_model.delete()
+
 
 # --------------- HTML FUNCTION -----------------#
+
+
     def get_status(self):
         orders = self.orders.all()
         all_completed = True
@@ -522,7 +554,7 @@ class ExtraSales(Sales):
         blank=True, null=True, max_length=90, verbose_name="차종")
     abroad_type = models.CharField(
         blank=True, null=True,
-        choices=(("domestic", "국산"), ("imported", "수입")), max_length=10, verbose_name="국산/수입")
+        choices=(("국산", "국산"), ("수입", "수입")), max_length=10, verbose_name="국산/수입")
     supporter = models.ForeignKey(
         Supporter, verbose_name="입고지원", blank=True, null=True, on_delete=models.SET_NULL, related_name="all_extra_sales")
     insurance_agent = models.ForeignKey(
