@@ -57,7 +57,8 @@ class KeyModel(TimeStampedModel):
     def create_mockup(cls):
         obj = cls.objects.create()
         for field in cls._meta.fields:
-            if field.name is not "id" and not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
+            if field.name is not "id" and\
+                    not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
                 setattr(obj, field.name, None)
         obj.save()
         return obj
@@ -65,10 +66,19 @@ class KeyModel(TimeStampedModel):
     def is_mockup(self):
         result = True
         for field in self._meta.model._meta.fields:
-            if field.name is not "id" and not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
+            if field.name is not "id" and\
+                    not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
                 result = result and getattr(self, field.name) == None
         print(self, result)
         return result
+
+    def save(self, *args, **kwargs):
+        """
+        for the status consistency save method of order must be called
+        """
+        if hasattr(self, "order"):
+            self.order.save()
+        super().save(*args, **kwargs)
 
 
 class Payment(KeyModel):
@@ -108,14 +118,6 @@ class Payment(KeyModel):
         indemnity_amount = self.indemnity_amount if self.indemnity_amount else 0
         discount_amount = self.discount_amount if self.discount_amount else 0
         return indemnity_amount - discount_amount
-
-    def save(self, *args, **kwargs):
-        """
-        for the status consistency save method of order must be called
-        """
-        if hasattr(self, "order"):
-            self.order.save()
-        super().save(*args, **kwargs)
 
 
 class Charge(KeyModel):
@@ -173,14 +175,6 @@ class Charge(KeyModel):
             else:
                 return f"주문없음({self.pk})"
 
-    def save(self, *args, **kwargs):
-        """
-        for the status consistency save method of order must be called
-        """
-        if hasattr(self, "order"):
-            self.order.save()
-        super().save(*args, **kwargs)
-
 
 class Deposit(KeyModel):
     """
@@ -205,14 +199,6 @@ class Deposit(KeyModel):
                 return f"기타매출({self.extra_sales.pk}) 입금"
             else:
                 return f"주문없음({self.pk})"
-
-    def save(self, *args, **kwargs):
-        """
-        for the status consistency save method of order must be called
-        """
-        if hasattr(self, "order"):
-            self.order.save()
-        super().save(*args, **kwargs)
 
 
 class RequestDepartment(TimeStampedModel):
