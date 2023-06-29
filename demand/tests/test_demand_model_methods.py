@@ -4,6 +4,7 @@ from random import choice, randint
 from django.test import TestCase
 
 from demand.key_models import Charge, Deposit, Payment
+from demand.sales_models import MockupCreated
 from demand.test_utility import (createRandomCharge, createRandomDeposit,
                                  createRandomOrdinaryOrder,
                                  createRandomPayment, createRandomRegister)
@@ -59,17 +60,18 @@ class DemandModelMethodTest(TestCase):
 
     def test_get_mockup(self):
         self.assertEqual(self.full_payments,
-                         self.full_register.get_mockups(Payment, "payment"))
+                         list(self.full_register.get_mockups(Payment, "payment")))
         self.assertTrue(self.not_full_register.get_mockups(
             Payment, "payment")[0].is_mockup())
         self.assertEqual(self.full_charges,
-                         self.full_register.get_mockups(Charge, "charge"))
+                         list(self.full_register.get_mockups(Charge, "charge")))
         self.assertTrue(self.not_full_register.get_mockups(
             Charge, "charge")[1].is_mockup())
         self.assertEqual(self.full_deposits,
-                         self.full_register.get_mockups(Deposit, "deposit"))
+                         list(self.full_register.get_mockups(Deposit, "deposit")))
         self.assertTrue(self.not_full_register.get_mockups(
             Deposit, "deposit")[2].is_mockup())
+        self.assertTrue(len(MockupCreated.objects.all()) == 6)
 
     def test_remove_mockups(self):
         self.not_full_register.get_mockups(
@@ -90,3 +92,15 @@ class DemandModelMethodTest(TestCase):
         self.assertEqual(len(Deposit.objects.all()), 6)
         self.not_full_register.remove_mockups(Deposit, "deposit")
         self.assertEqual(len(Deposit.objects.all()), 5)
+
+    def test_mockup_created_remove_all_mockups(self):
+        self.not_full_register.get_mockups(
+            Payment, "payment")
+        self.not_full_register.get_mockups(
+            Charge, "charge")
+        self.not_full_register.get_mockups(
+            Deposit, "deposit")
+        self.assertTrue(len(MockupCreated.objects.all()) == 3)
+        for mockup in MockupCreated.objects.all():
+            mockup.remove_mockups()
+        self.assertTrue(len(MockupCreated.objects.all()) == 0)

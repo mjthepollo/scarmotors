@@ -44,13 +44,37 @@ class InsuranceAgent(TimeStampedModel):
         return self.name
 
 
-class Payment(TimeStampedModel):
+class KeyModel(TimeStampedModel):
     """
-    Payment 객체. 보통 출고시 기록한다.
-    만약 수정한다면 EditOrderForm은 직접 수정해줘야 한다.
+    KeyModel은 Sales의 OneToOne Field가 되는 모델들이다.
+    Payment, Charge, Deposit이 존재한다.
     """
     class Meta:
-        ordering = ["-created",]
+        ordering = ["-created"]
+        abstract = True
+
+    @classmethod
+    def create_mockup(cls):
+        obj = cls.objects.create()
+        for field in cls._meta.fields:
+            if field.name is not "id" and not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
+                setattr(obj, field.name, None)
+        obj.save()
+        return obj
+
+    def is_mockup(self):
+        result = True
+        for field in self._meta.model._meta.fields:
+            if field.name is not "id" and not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
+                result = result and getattr(self, field.name) == None
+        return result
+
+
+class Payment(KeyModel):
+    """
+    Payment 객체. 보통 출고시 기록한다.
+    """
+    class Meta:
         verbose_name = "면책금 정보"
         verbose_name_plural = "면책금 정보(들)"
     indemnity_amount = models.IntegerField(
@@ -66,21 +90,6 @@ class Payment(TimeStampedModel):
     payment_date = models.DateField(blank=True, null=True, verbose_name="결제일")
     refund_date = models.DateField(blank=True, null=True, verbose_name="환불일")
 
-    @classmethod
-    def create_mockup(cls):
-        return cls.objects.create()
-
-    def is_mockup(self):
-        result = True
-        result = result and self.indemnity_amount == None
-        result = result and self.discount_amount == None
-        result = result and self.refund_amount == None
-        result = result and self.payment_type == None
-        result = result and self.payment_info == None
-        result = result and self.payment_date == None
-        result = result and self.refund_date == None
-        return result
-
     def __str__(self):
         if hasattr(self, "order"):
             order = self.order
@@ -95,19 +104,27 @@ class Payment(TimeStampedModel):
             else:
                 return f"주문없음({self.pk})"
 
+    def save(self, *args, **kwargs):
+        """
+        for the status consistency save method of order must be called
+        """
+        if hasattr(self, "order"):
+            self.order.save()
+        super().save(*args, **kwargs)
 
-class Charge(TimeStampedModel):
+
+class Charge(KeyModel):
     """
     Charge 객체. 청구시 사용한다.
-    만약 수정한다면 EditOrderForm은 직접 수정해줘야 한다.
     """
     class Meta:
-        ordering = ["-created",]
         verbose_name = "청구 정보"
         verbose_name_plural = "청구 정보(들)"
     charge_date = models.DateField(verbose_name="청구일", blank=True, null=True)
-    wage_amount = models.IntegerField(default=0, verbose_name="공임비")
-    component_amount = models.IntegerField(default=0, verbose_name="부품비")
+    wage_amount = models.IntegerField(
+        default=0, verbose_name="공임비", blank=True, null=True)
+    component_amount = models.IntegerField(
+        default=0, verbose_name="부품비", blank=True, null=True)
 
     def get_indemnity_amount(self):
         if hasattr(self, "order"):
@@ -138,17 +155,6 @@ class Charge(TimeStampedModel):
         else:
             return 0
 
-    @classmethod
-    def create_mockup(cls):
-        return cls.objects.create()
-
-    def is_mockup(self):
-        result = True
-        result = result and self.charge_date == None
-        result = result and self.wage_amount == 0
-        result = result and self.component_amount == 0
-        return result
-
     def __str__(self):
         if hasattr(self, "order"):
             order = self.order
@@ -163,25 +169,25 @@ class Charge(TimeStampedModel):
             else:
                 return f"주문없음({self.pk})"
 
+    def save(self, *args, **kwargs):
+        """
+        for the status consistency save method of order must be called
+        """
+        if hasattr(self, "order"):
+            self.order.save()
+        super().save(*args, **kwargs)
 
-class Deposit(TimeStampedModel):
+
+class Deposit(KeyModel):
     """
-    입금 정보. 수정 시 EditOrderForm은 직접 수정해줘야 한다.
+    입금 정보
     """
     class Meta:
-        ordering = ["-created",]
         verbose_name = "입금 정보"
         verbose_name_plural = "입금 정보(들)"
-    deposit_amount = models.IntegerField(verbose_name="입금액")
-    deposit_date = models.DateField(verbose_name="입금일")
-    mockup = models.BooleanField(default=False, verbose_name="모형")
-
-    @classmethod
-    def create_mockup(cls):
-        return cls.objects.create(deposit_amount=0, deposit_date=date.today(), mockup=True)
-
-    def is_mockup(self):
-        return self.mockup
+    deposit_amount = models.IntegerField(
+        verbose_name="입금액", blank=True, null=True)
+    deposit_date = models.DateField(verbose_name="입금일", blank=True, null=True)
 
     def __str__(self):
         if hasattr(self, "order"):
@@ -196,6 +202,14 @@ class Deposit(TimeStampedModel):
                 return f"기타매출({self.extra_sales.pk}) 입금"
             else:
                 return f"주문없음({self.pk})"
+
+    def save(self, *args, **kwargs):
+        """
+        for the status consistency save method of order must be called
+        """
+        if hasattr(self, "order"):
+            self.order.save()
+        super().save(*args, **kwargs)
 
 
 class RequestDepartment(TimeStampedModel):

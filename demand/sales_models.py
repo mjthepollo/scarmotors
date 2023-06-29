@@ -4,7 +4,7 @@ from datetime import datetime
 from django.db import models
 
 from core.models import TimeStampedModel
-from core.utility import print_colored
+from core.utility import list_to_queryset, print_colored
 from demand.excel_line_info import (dictionary_to_line,
                                     order_to_excel_dictionary)
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
@@ -39,9 +39,9 @@ class Sales(TimeStampedModel):
 
     def get_indemnity_amount(self):
         if self.payment:
-            return self.payment.indemnity_amount
-        else:
-            return 0
+            if self.payment.indemnity_amount:
+                return self.payment.indemnity_amount
+        return 0
 
     def get_charge_amount(self):
         if self.charge:
@@ -75,7 +75,8 @@ class Sales(TimeStampedModel):
 
     def formatted_deposit_amount(self):
         if self.deposit:
-            return format(self.deposit.deposit_amount, ",")
+            if self.deposit.deposit_amount:
+                return format(self.deposit.deposit_amount, ",")
         return "-"
 
     def get_payment_rate_for_input(self):
@@ -121,9 +122,9 @@ class Sales(TimeStampedModel):
             else:  # 보험
                 charge_amount = self.get_charge_amount()
                 if self.deposit and charge_amount:
-                    return self.deposit.deposit_amount/charge_amount
-                else:
-                    return None
+                    if self.deposit.deposit_amount:
+                        return self.deposit.deposit_amount/charge_amount
+                return None
 
     def get_chargable_amount(self):
         if self.charge:
@@ -236,6 +237,7 @@ class Sales(TimeStampedModel):
             raise Exception("NO MATCHING CASE!")
 
         except Exception as e:
+
             if self == None:
                 print_colored("self is None", "red")
             else:
@@ -401,7 +403,10 @@ class Register(TimeStampedModel):
                 setattr(order, key, mockup_key)
                 order.save()
             mockup_keys.append(mockup_key)
-        return mockup_keys
+        queryset = list_to_queryset(
+            KeyModel, mockup_keys).order_by("order__pk")
+        MockupCreated.objects.create(register=self)
+        return queryset
 
     def remove_mockups(self, KeyModel, key):
         """
@@ -414,9 +419,12 @@ class Register(TimeStampedModel):
                 if key_model.is_mockup():
                     key_model.delete()
 
+    def remove_all_mockups(self):
+        self.remove_mockups(Payment, "payment")
+        self.remove_mockups(Deposit, "deposit")
+        self.remove_mockups(Charge, "charge")
 
 # --------------- HTML FUNCTION -----------------#
-
 
     def get_status(self):
         orders = self.orders.all()
@@ -484,15 +492,27 @@ class Register(TimeStampedModel):
         return f"[{self.RO_number}]{self.car_number}/{self.phone_number}"
 
 
+class MockupCreated(TimeStampedModel):
+    """
+    demand.middleware의 remove_mockups middleware에서 사용된다.
+    """
+    register = models.ForeignKey(
+        Register, on_delete=models.CASCADE, verbose_name="등록")
+
+    def remove_mockups(self):
+        self.register.remove_all_mockups()
+        self.delete()
+
+
 class Order(Sales):
     class Meta:
         ordering = ["-created",]
         verbose_name = "주문 매출"
         verbose_name_plural = "주문 매출(들)"
     register = models.ForeignKey(
-        Register, null=True, on_delete=models.CASCADE, verbose_name="등록", related_name="orders")
+        Register, null=True, on_delete=models.SET_NULL, verbose_name="등록", related_name="orders")
     charged_company = models.ForeignKey(
-        ChargedCompany, null=True, related_name="orders", verbose_name="보험(렌트)", on_delete=models.CASCADE)
+        ChargedCompany, null=True, related_name="orders", verbose_name="보험(렌트)", on_delete=models.SET_NULL)
     charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정비", "일반경정비"), (
         "일반판도", "일반판도"), ("렌트판도", "렌트판도"), ("렌트일반", "렌트일반"),
         ("기타", "기타")), max_length=20, verbose_name="구분")
@@ -504,11 +524,11 @@ class Order(Sales):
         null=True, blank=True, verbose_name="과실분")
 
     payment = models.OneToOneField(
-        Payment, null=True, blank=True, related_name="order", verbose_name="결제", on_delete=models.CASCADE)
+        Payment, null=True, blank=True, related_name="order", verbose_name="결제", on_delete=models.SET_NULL)
     charge = models.OneToOneField(
-        Charge, null=True, blank=True, related_name="order", verbose_name="청구", on_delete=models.CASCADE)
+        Charge, null=True, blank=True, related_name="order", verbose_name="청구", on_delete=models.SET_NULL)
     deposit = models.OneToOneField(
-        Deposit, null=True, blank=True, related_name="order", verbose_name="입금", on_delete=models.CASCADE)
+        Deposit, null=True, blank=True, related_name="order", verbose_name="입금", on_delete=models.SET_NULL)
 
     incentive_paid = models.BooleanField(default=False, verbose_name="인센티브 지급")
 
@@ -564,15 +584,32 @@ class ExtraSales(Sales):
     phone_number = models.CharField(
         null=True, blank=True, max_length=15, verbose_name="전화번호")
     payment = models.OneToOneField(
-        Payment, null=True, blank=True, related_name="extra_sales", verbose_name="결제", on_delete=models.CASCADE)
+        Payment, null=True, blank=True, related_name="extra_sales", verbose_name="결제", on_delete=models.SET_NULL)
     charge = models.OneToOneField(
-        Charge, null=True, blank=True, related_name="extra_sales", verbose_name="청구", on_delete=models.CASCADE)
+        Charge, null=True, blank=True, related_name="extra_sales", verbose_name="청구", on_delete=models.SET_NULL)
     deposit = models.OneToOneField(
-        Deposit, null=True, blank=True, related_name="extra_sales", verbose_name="입금", on_delete=models.CASCADE)
+        Deposit, null=True, blank=True, related_name="extra_sales", verbose_name="입금", on_delete=models.SET_NULL)
     note = models.TextField(blank=True, null=True, verbose_name="비고")
 
     def get_description(self):
         return f"기타매출({self.pk})"
+
+    def remove_mockups(self, KeyModel, key):
+        """
+        EditRegisterView에서 사용한다. modelformset을 활용하기 위해 만들어진 mockup들을 지워준다.
+        KeyModel은 모델이고 key는 해당하는 모델의 attribute 이름이다.
+        """
+        for order in self.orders.all():
+            key_model = getattr(order, key)
+            if key_model:
+                if key_model.is_mockup():
+                    print(key_model)
+                    key_model.delete()
+
+    def remove_all_mockups(self):
+        self.remove_mockups(Payment, "payment")
+        self.remove_mockups(Deposit, "deposit")
+        self.remove_mockups(Charge, "charge")
 
     def to_excel_line(self):
         pass

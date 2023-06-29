@@ -1,5 +1,6 @@
 # custom_filters.py
 import datetime
+
 from django import template
 
 register = template.Library()
@@ -18,3 +19,8 @@ def none_to_dash(value):
         return '-'
     else:
         return value
+
+
+@register.filter
+def index_form(sequence, position):
+    return sequence[position].as_div()

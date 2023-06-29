@@ -26,8 +26,8 @@
     <td>{{order.formatted_deposit_amount}}</td>
     <td>{{order.formatted_payment_rate}}</td>
     <td class="order {{order.get_charge_class}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
-    <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk%}">입금</a></td>
-    <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk}">{{order.get_status_display}}</td>
+    <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk %}">입금</a></td>
+    <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk %}">{{order.get_status_display}}</td>
     {% endif %}
     {% if not order.completed %}
     <td class="order_function bold make_manually_complete"><a href="{% url 'demand:make_manually_complete' order.pk %}">완료처리</a></td>

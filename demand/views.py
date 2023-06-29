@@ -62,42 +62,61 @@ def edit_register(request, pk):
     register_form = EditRegisterForm(instance=register)
     order_form_factory = modelformset_factory(
         Order, form=OrderForm, extra=0)
-    charge_form_factroy = modelformset_factory(
-        Charge, form=ChargeForm, extra=0)
-    depeosit_form_factory = modelformset_factory(
-        Deposit, form=DepositForm, extra=0)
     payment_form_factory = modelformset_factory(
         Payment, form=PaymentForm, extra=0)
+    charge_form_factory = modelformset_factory(
+        Charge, form=ChargeForm, extra=0)
+    deposit_form_factory = modelformset_factory(
+        Deposit, form=DepositForm, extra=0)
     if request.method == "GET":
         order_formset = order_form_factory(
-            queryset=register.orders.all())
+            queryset=register.orders.all(), prefix="order")
+        payment_formset = payment_form_factory(
+            queryset=register.get_mockups(Payment, "payment"), prefix="payment")
+        charge_formset = charge_form_factory(
+            queryset=register.get_mockups(Charge, "charge"), prefix="charge")
+        deposit_formset = deposit_form_factory(
+            queryset=register.get_mockups(Deposit, "deposit"), prefix="deposit")
         return render(request, "demand/edit_register.html", context={
+            "register": register,
             "register_form": register_form,
             "order_formset": order_formset,
+            "charge_formset": charge_formset,
+            "payment_formset": payment_formset,
+            "deposit_formset": deposit_formset,
         })
     else:
         register_form = EditRegisterForm(request.POST, instance=register)
         order_formset = order_form_factory(
-            request.POST, queryset=register.orders.all())
-        if register_form.is_valid():
+            request.POST, queryset=register.orders.all(), prefix="order")
+        payment_formset = payment_form_factory(
+            request.POST, queryset=register.get_mockups(Payment, "payment"),
+            prefix="payment")
+        charge_formset = charge_form_factory(
+            request.POST, queryset=register.get_mockups(Charge, "charge"),
+            prefix="charge")
+        deposit_formset = deposit_form_factory(
+            request.POST, queryset=register.get_mockups(Deposit, "deposit"),
+            prefix="deposit")
+        if register_form.is_valid() and \
+                order_formset.is_valid() and \
+                payment_formset.is_valid() and \
+                charge_formset.is_valid() and \
+                deposit_formset.is_valid():
             register = register_form.save()
-            if order_formset.is_valid():
-                orders = order_formset.save()
-                for order in orders:
-                    order.register = register
-                    order.save()
-                register.save()
-                return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
-            else:
-                return render(request, "demand/edit_register.html", context={
-                    "register_form": register_form,
-                    "order_formset": order_formset,
-                })
-        else:
-            return render(request, "demand/edit_register.html", context={
-                "register_form": register_form,
-                "order_formset": order_formset,
-            })
+            payment_formset.save()
+            charge_formset.save()
+            deposit_formset.save()
+            order_formset.save()
+            return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
+        return render(request, "demand/edit_register.html", context={
+            "register": register,
+            "register_form": register_form,
+            "order_formset": order_formset,
+            "charge_formset": charge_formset,
+            "payment_formset": payment_formset,
+            "deposit_formset": deposit_formset,
+        })
 
 
 @login_required
