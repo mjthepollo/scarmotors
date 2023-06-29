@@ -62,6 +62,9 @@ class DepositForm(forms.ModelForm):
     class Meta:
         model = Deposit
         fields = ["deposit_date", 'deposit_amount']
+        widgets = {
+            'deposit_date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
     def as_div(self, *args, **kwags):
         original_div = super(DepositForm, self).as_div()
