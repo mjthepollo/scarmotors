@@ -160,3 +160,11 @@ table {
 .came_out_button {
   cursor: pointer;
 }
+
+.charge_button {
+  cursor: pointer;
+}
+
+.deposit_button {
+  cursor: pointer;
+}
