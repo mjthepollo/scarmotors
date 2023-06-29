@@ -489,7 +489,7 @@ class Register(TimeStampedModel):
 # --------------- PRINT FUNCTION -----------------#
 
     def __str__(self):
-        return f"[{self.RO_number}]{self.car_number}/{self.phone_number}"
+        return f"[{self.RO_number}]{self.car_number}({self.day_came_in.year}/{self.day_came_in.month}/{self.day_came_in.day})"
 
 
 class MockupCreated(TimeStampedModel):

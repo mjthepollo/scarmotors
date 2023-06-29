@@ -320,7 +320,7 @@ class DemandModelTest(TestCase):
                          f"기타매출({self.extra_sales.pk}) 입금")
 
     def test_register_str(self):
-        self.assertEqual(str(self.register), "[4-1234]12가1234/010-1234-5678")
+        self.assertEqual(str(self.register), "[4-1234]12가1234(2023/4/20)")
 
     def test_order_str(self):
         self.assertEqual(str(self.order), "4-1234 자차 보험")
