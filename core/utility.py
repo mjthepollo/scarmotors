@@ -37,3 +37,12 @@ def list_to_queryset(model, data):
 
     pk_list = [obj.pk for obj in data]
     return model.objects.filter(pk__in=pk_list)
+
+
+def insert_tag(original_div, field_name, inserting_tag):
+    div_finish_tag = "</div>"
+    discount_amount_index = original_div.find(field_name)
+    discount_amount_finish_index = original_div.find(
+        div_finish_tag, discount_amount_index) + len(div_finish_tag)
+    return original_div[:discount_amount_finish_index] + \
+        inserting_tag + original_div[discount_amount_finish_index:]

@@ -1,6 +1,8 @@
 import django_filters
 from django import forms
+from django.utils.safestring import mark_safe
 
+from core.utility import insert_tag
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
                                Payment, Supporter)
 from demand.sales_models import Order, Register
@@ -33,14 +35,42 @@ class PaymentForm(forms.ModelForm):
             'refund_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
+    def as_div(self, *args, **kwags):
+        original_div = super(PaymentForm, self).as_div()
+        inserting_tag = "<div>SEX MACHINE!</div>"
+        return_div = insert_tag(original_div, "discount_amount", inserting_tag)
+        return mark_safe(return_div)
+
 
 class ChargeForm(forms.ModelForm):
     class Meta:
         model = Charge
-        fields = "__all__"
+        fields = ["charge_date", 'wage_amount', "component_amount"]
         widgets = {
             'charge_date': forms.DateInput(attrs={'type': 'date'}),
         }
+
+    def as_div(self, *args, **kwags):
+        original_div = super(ChargeForm, self).as_div()
+        inserting_tag = "<div>WHOLE AMOUNT!</div>"
+        return_div = insert_tag(
+            original_div, "component_amount", inserting_tag)
+        return mark_safe(return_div)
+
+
+class DepositForm(forms.ModelForm):
+    class Meta:
+        model = Deposit
+        fields = ["deposit_date", 'deposit_amount']
+
+    def as_div(self, *args, **kwags):
+        original_div = super(DepositForm, self).as_div()
+        inserting_tag = "<div>지급율</div>"
+        inserted_div = insert_tag(
+            original_div, "deposit_date", inserting_tag)
+        finishing_tag = "<div>삭감율</div>"
+        return_div = inserted_div + finishing_tag
+        return mark_safe(return_div)
 
 
 class SpecialRegisterForm(forms.ModelForm):
@@ -238,9 +268,3 @@ class EditOrderForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
-
-class DepositForm(forms.ModelForm):
-    class Meta:
-        model = Deposit
-        fields = "__all__"

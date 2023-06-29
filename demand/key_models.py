@@ -104,6 +104,11 @@ class Payment(KeyModel):
             else:
                 return f"주문없음({self.pk})"
 
+    def get_settlement_amount(self):
+        indemnity_amount = self.indemnity_amount if self.indemnity_amount else 0
+        discount_amount = self.discount_amount if self.discount_amount else 0
+        return indemnity_amount - discount_amount
+
     def save(self, *args, **kwargs):
         """
         for the status consistency save method of order must be called
