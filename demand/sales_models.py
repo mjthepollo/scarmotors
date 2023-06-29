@@ -546,7 +546,11 @@ class Order(Sales):
         return dictionary_to_line(order_to_excel_dictionary(self))
 
     def __str__(self):
-        return f"{self.register.RO_number} {self.order_type} {self.charge_type}"
+        try:
+            return f"{self.register.RO_number} {self.order_type} {self.charge_type}"
+        except Exception as e:
+            print(f"Exception in __str__ of Order : {e}")
+            return "Exception in __str__ of Order"
 
 
 class ExtraSales(Sales):

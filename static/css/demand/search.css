@@ -2,9 +2,16 @@
 @import url("modules/register.css");
 @import url("./modals/came_out_modal.css");
 
+main.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 #search_form {
   display: flex;
 
+  max-width: 1200px;
   width: 100%;
   padding: 30px 0px;
 
