@@ -45,11 +45,6 @@
 </table>
 {% endblock content %}
 {% block inline_javascript %}
-{% comment %}
-Script tags with only code, no src (defer by default). To run
-with a "defer" so that you run inline code:
-<script>
-  window.addEventListener('DOMContentLoaded', () => {/* Run whatever you want */});
-</script>
-{% endcomment %}
+<script src="{% static 'js/came_out.js' %}"></script>
+<script src="{% static 'js/paginator.js' %}"></script>
 {% endblock inline_javascript %}

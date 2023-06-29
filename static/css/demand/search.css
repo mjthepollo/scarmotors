@@ -47,6 +47,8 @@ input[type="submit"] {
 }
 
 .paginator {
+  position: relative;
+
   display: flex;
   justify-content: center;
 
@@ -56,7 +58,10 @@ input[type="submit"] {
   font-weight: 600;
   font-size: 30px;
 }
+
 .paginator a {
+  margin: 0px 5px;
+
   color: var(--blue);
 
   text-decoration: none;
@@ -66,6 +71,61 @@ input[type="submit"] {
 }
 .paginator a.end_page {
   color: var(--orange);
+}
+
+.paginator span.step-links {
+  display: flex;
+}
+
+.paginator span.current {
+  display: flex;
+}
+input#page_number_input {
+  width: 80px;
+  margin-left: 15px;
+
+  outline: none;
+  border: none;
+}
+.paginator #page_number_input_box {
+  position: absolute;
+  left: calc(50% - 125px);
+  bottom: 50px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 5px;
+  width: 250px;
+  height: 80px;
+
+  border: 1px solid black;
+  border: 1px solid black;
+
+  background-color: white;
+}
+
+.paginator #page_number_input_box.inactive {
+  display: none;
+}
+
+.paginator #page_number_move_button {
+  margin-right: 10px;
+}
+
+span.current > div {
+  margin: 0px 5px;
+}
+
+span.current #page_number_button {
+  cursor: pointer;
+}
+
+span.current #page_slash {
+}
+
+span.current #number_of_pages {
 }
 
 #search_results {
