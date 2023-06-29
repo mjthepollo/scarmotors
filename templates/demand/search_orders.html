@@ -45,6 +45,8 @@
 </table>
 {% endblock content %}
 {% block inline_javascript %}
-<script src="{% static 'js/came_out.js' %}"></script>
+<script type="module" src="{% static 'js/modal/came_out.js' %}"></script>
+<script type="module" src="{% static 'js/modal/charge.js' %}"></script>
+<script type="module" src="{% static 'js/modal/deposit.js' %}"></script>
 <script src="{% static 'js/paginator.js' %}"></script>
 {% endblock inline_javascript %}
