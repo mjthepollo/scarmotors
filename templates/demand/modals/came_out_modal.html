@@ -1,26 +1,25 @@
 {% extends "modules/custom_modal.html"%}
 {% block modal_content %}
-<form class="modal-content" method="POST" action="{% url 'demand:came_out_modal' register.pk %}">
+<form id="formset" data-formset-prefix="{{payment_formset.prefix}}" class="modal-content" method="POST" action="{% url 'demand:came_out_modal' register.pk %}">
     {% csrf_token %}
     <div class="modal-header">
         <h5 class="modal-title">[{{register.RO_number}}] {% if register.real_day_came_out %}출고 정보 수정{% else %}출고처리{% endif %}</h5>
         <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body">
+        {{payment_formset.management_form}}
         <div class="modal_input">
             <label for="real_day_came_out">출고일</label>
             <input type="date" value="{% now 'Y-m-d' %}" name="real_day_came_out">
         </div>
         <div class="modal_checkboxes">
-            <div class="modal_checkbox">
-                <label for="wasted">폐차</label>
-                <input type="checkbox" name='wasted' id="wasted">
-            </div>
-            <div class="modal_checkbox">
-                <label for="unrepaired">미수리출고</label>
-                <input type="checkbox" name='unrepaired' id="unrepaired">
-            </div>
+            {{special_register_form.as_div}}
         </div>
+        {% for payment_form in payment_formset %}
+        <div class="payment_form">
+            {{payment_form.as_div}}
+        </div>
+        {% endfor %}
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">Close</button>

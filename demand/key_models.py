@@ -67,6 +67,7 @@ class KeyModel(TimeStampedModel):
         for field in self._meta.model._meta.fields:
             if field.name is not "id" and not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
                 result = result and getattr(self, field.name) == None
+        print(self, result)
         return result
 
 
@@ -94,8 +95,7 @@ class Payment(KeyModel):
         if hasattr(self, "order"):
             order = self.order
             if order.register != None:
-                order_index = list(order.register.orders.all()).index(order)
-                return f"RO({order.register.RO_number}) 주문[{order_index}] 결제"
+                return f"RO({order.register.RO_number}) 주문[{order.order_index}] 결제"
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
         else:
@@ -159,8 +159,7 @@ class Charge(KeyModel):
         if hasattr(self, "order"):
             order = self.order
             if order.register != None:
-                order_index = list(order.register.orders.all()).index(order)
-                return f"RO({order.register.RO_number}) 주문[{order_index}] 청구"
+                return f"RO({order.register.RO_number}) 주문[{order.order_index}] 청구"
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
         else:
@@ -193,8 +192,7 @@ class Deposit(KeyModel):
         if hasattr(self, "order"):
             order = self.order
             if order.register != None:
-                order_index = list(order.register.orders.all()).index(order)
-                return f"RO({order.register.RO_number}) 주문[{order_index}] 입금"
+                return f"RO({order.register.RO_number}) 주문[{order.order_index}] 입금"
             else:
                 return f"등록없음({self.pk}_주문:{order.pk})"
         else:

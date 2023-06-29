@@ -532,6 +532,10 @@ class Order(Sales):
 
     incentive_paid = models.BooleanField(default=False, verbose_name="인센티브 지급")
 
+    @property
+    def order_index(self):
+        return list(self.register.orders.all()).index(self)+1
+
     def get_description(self):
         try:
             charge = format(self.get_charge_amount(),

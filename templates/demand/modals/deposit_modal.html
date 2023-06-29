@@ -3,7 +3,7 @@
 <form class="modal-content" method="POST" action="{% url 'demand:deposit_modal' order.pk %}">
     {% csrf_token %}
     <div class="modal-header">
-        <h5 class="modal-title">DEPOSIT MODAL!</h5>
+        <h5 class="modal-title">[{{order.register.RO_number}}] {% if order.deposit %}입금-{{order.order_index}} 정보 수정{% else %}입금 처리{% endif %}</h5>
         <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body">

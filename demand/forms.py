@@ -38,6 +38,21 @@ class ChargeForm(forms.ModelForm):
     class Meta:
         model = Charge
         fields = "__all__"
+        widgets = {
+            'charge_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
+class SpecialRegisterForm(forms.ModelForm):
+    class Meta:
+        model = Register
+        fields = ['wasted', 'unrepaired']
+
+
+class FirstCenterRegisterForm(forms.ModelForm):
+    class Meta:
+        model = Register
+        fields = ['first_center_repaired']
 
 
 class NewRegisterForm(forms.ModelForm):

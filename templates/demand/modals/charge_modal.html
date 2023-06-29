@@ -3,11 +3,15 @@
 <form class="modal-content" method="POST" action="{% url 'demand:charge_modal' order.pk %}">
     {% csrf_token %}
     <div class="modal-header">
-        <h5 class="modal-title">CHARGE MODAL!</h5>
+        <h5 class="modal-title">[{{order.register.RO_number}}] {% if order.charge %}청구-{{order.order_index}} 정보 수정{% else %}청구 처리{% endif %}</h5>
         <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body">
-        <h2>CHARGE MODAL!</h2>
+        <div class="modal_checkboxes">
+            <div class="modal_checkbox">
+                {{first_center_register_form.as_div}}
+            </div>
+        </div>
         {{charge_form.as_div}}
     </div>
     <div class="modal-footer">

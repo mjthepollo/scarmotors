@@ -8,14 +8,17 @@
     <td rowspan="{{order.register.orders.count}}">{{order.register.car_model}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.get_abroad_type_display}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.insurance_agent.name}}</td>
+    {% endif %}
     <td>{{order.order_type|none_to_dash}}</td>
     <td>{{order.charged_company.name}}</td>
     <td>{{order.formatted_charge_amount}}</td>
     <td>{{order.formatted_deposit_amount}}</td>
     <td>{{order.formatted_payment_rate}}</td>
+    {% if forloop.counter0 == 0 %}
     <td class="order {{order.get_came_out_class}}" rowspan="{{order.register.orders.count}}">
         <div class="came_out_button" data-modal_url="{% url 'demand:came_out_modal' order.register.pk%}">출고</div>
     </td>
+    {% endif %}
     <td class="order {{order.get_charge_class}}">
         <div class="charge_button" data-modal_url="{% url 'demand:charge_modal' order.pk%}">청구</div>
     </td>
@@ -23,16 +26,6 @@
         <div class="deposit_button" data-modal_url="{% url 'demand:deposit_modal' order.pk%}">입금</div>
     </td>
     <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk %}">{{order.get_status_display}}</td>
-    {% else %}
-    <td>{{order.order_type}}</td>
-    <td>{{order.charged_company.name}}</td>
-    <td>{{order.formatted_charge_amount}}</td>
-    <td>{{order.formatted_deposit_amount}}</td>
-    <td>{{order.formatted_payment_rate}}</td>
-    <td class="order {{order.get_charge_class}}"><a href="{% url 'demand:order_charge' order.pk%}">청구</a></td>
-    <td class="order {{order.get_deposit_class}}"><a href="{% url 'demand:order_deposit' order.pk %}">입금</a></td>
-    <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk %}">{{order.get_status_display}}</td>
-    {% endif %}
     {% if not order.completed %}
     <td class="order_function bold make_manually_complete"><a href="{% url 'demand:make_manually_complete' order.pk %}">완료처리</a></td>
     {% elif order.manually_completed %}
