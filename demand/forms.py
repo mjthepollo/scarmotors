@@ -3,7 +3,7 @@ from django import forms
 
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
                                Payment, Supporter)
-from demand.sales_models import ExtraSales, Order, Register
+from demand.sales_models import Order, Register
 
 
 class SupporterForm(forms.ModelForm):
@@ -55,14 +55,19 @@ class FirstCenterRegisterForm(forms.ModelForm):
         fields = ['first_center_repaired']
 
 
+class EditSpecialRegisterForm(forms.ModelForm):
+    class Meta:
+        model = Register
+        fields = ['wasted', 'unrepaired', 'first_center_repaired']
+
+
 class NewRegisterForm(forms.ModelForm):
     class Meta:
         model = Register
         fields = ["car_number", "day_came_in", "expected_day_came_out",
                   "car_model", "abroad_type", "number_of_repair_works",
                   "number_of_exchange_works", "supporter", "client_name",
-                  "insurance_agent", "phone_number", "rentcar_company_name",
-                  "note"]
+                  "insurance_agent", "phone_number", "rentcar_company_name",]
         widgets = {
             'car_number': forms.TextInput(attrs={'placeholder': '12가1234'}),
             'day_came_in': forms.DateInput(attrs={'type': 'date'}),
@@ -71,7 +76,15 @@ class NewRegisterForm(forms.ModelForm):
             'client_name': forms.TextInput(attrs={'placeholder': '홍길동'}),
             'phone_number': forms.TextInput(attrs={'placeholder': '01012345678'}),
             'rentcar_company_name': forms.TextInput(attrs={'placeholder': '에스카렌트'}),
-            'note': forms.Textarea(attrs={'placeholder': '메모, 특이사항 등'}),
+        }
+
+
+class RegisterNoteForm(forms.ModelForm):
+    class Meta:
+        model = Register
+        fields = ["note"]
+        widgets = {
+            "note": forms.Textarea(attrs={'placeholder': '메모, 특이사항 등'}),
         }
 
 
@@ -81,8 +94,7 @@ class EditRegisterForm(forms.ModelForm):
         fields = ["car_number", "day_came_in", "expected_day_came_out", "real_day_came_out",
                   "car_model", "abroad_type", "number_of_repair_works",
                   "number_of_exchange_works", "supporter", "client_name",
-                  "insurance_agent", "phone_number", "rentcar_company_name",
-                  "note", "unrepaired", "wasted"]
+                  "insurance_agent", "phone_number", "rentcar_company_name"]
         widgets = {
             'car_number': forms.TextInput(attrs={'placeholder': '12가1234'}),
             'day_came_in': forms.DateInput(attrs={'type': 'date'}),

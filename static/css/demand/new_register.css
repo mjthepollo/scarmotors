@@ -1,8 +1,7 @@
 @import url("../modules/input.css");
 
 input,
-select,
-textarea {
+select {
   border-radius: 0px;
   width: 200px;
   height: 30px;
@@ -11,6 +10,7 @@ textarea {
 
   border: 1px solid black;
 }
+
 input[type="checkbox"] {
   width: 200px;
 }
@@ -28,11 +28,12 @@ h2 {
 }
 
 #register_form,
-#order_formset {
+#order_formset,
+#order_edit_formset {
   display: flex;
   justify-content: space-between;
 
-  width: 800px;
+  width: var(--normal_width);
 
   flex-wrap: wrap;
 }
@@ -57,13 +58,24 @@ h2 {
 }
 
 #add_button {
-  width: 800px;
+  width: var(--normal_width);
   height: 40px;
   margin-top: 30px;
 }
 
 button#complete {
-  width: 800px;
+  width: var(--normal_width);
   margin-top: 30px;
   margin-bottom: 50px;
+}
+
+#register_note_form {
+  display: flex;
+  justify-content: center;
+
+  width: 600px;
+}
+
+#register_note_form textarea {
+  width: 100%;
 }

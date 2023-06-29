@@ -11,22 +11,25 @@ from django.urls import reverse
 
 from demand.excel_line_info import INDEXES
 from demand.forms import (ChargeForm, DepositForm, EditRegisterForm,
-                          NewRegisterForm, OrderFilter, OrderForm, PaymentForm,
-                          RegisterFilter, RegisterFilterForOrderFilter)
+                          EditSpecialRegisterForm, NewRegisterForm,
+                          OrderFilter, OrderForm, PaymentForm, RegisterFilter,
+                          RegisterFilterForOrderFilter, RegisterNoteForm)
 from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import ExtraSales, Order, Register
 
 
 @login_required
 def new_register(request):
-    register_form = NewRegisterForm(initial={'day_came_in': date.today()})
     order_form_factory = modelformset_factory(
         Order, form=OrderForm, extra=1)
     if request.method == "GET":
+        register_form = NewRegisterForm(initial={'day_came_in': date.today()})
+        register_note_form = RegisterNoteForm()
         order_formset = order_form_factory(
             queryset=Order.objects.none())
         return render(request, "demand/new_register.html", context={
             "register_form": register_form,
+            "register_note_form": register_note_form,
             "order_formset": order_formset,
         })
     else:
@@ -41,7 +44,9 @@ def new_register(request):
                     order.register = register
                     order.save()
                 register.RO_number = Register.get_RO_number()
-                register.save()
+                register = register.save()
+                register_note_form = RegisterNoteForm(
+                    request.POST, instance=register)
                 return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
             else:
                 register.delete()
@@ -59,7 +64,6 @@ def new_register(request):
 @login_required
 def edit_register(request, pk):
     register = get_object_or_404(Register, pk=pk)
-    register_form = EditRegisterForm(instance=register)
     order_form_factory = modelformset_factory(
         Order, form=OrderForm, extra=0)
     payment_form_factory = modelformset_factory(
@@ -69,6 +73,9 @@ def edit_register(request, pk):
     deposit_form_factory = modelformset_factory(
         Deposit, form=DepositForm, extra=0)
     if request.method == "GET":
+        register_form = EditRegisterForm(instance=register)
+        edit_special_register_form = EditSpecialRegisterForm(instance=register)
+        register_note_form = RegisterNoteForm(instance=register)
         order_formset = order_form_factory(
             queryset=register.orders.all(), prefix="order")
         payment_formset = payment_form_factory(
@@ -80,6 +87,8 @@ def edit_register(request, pk):
         return render(request, "demand/edit_register.html", context={
             "register": register,
             "register_form": register_form,
+            'edit_special_register_form': edit_special_register_form,
+            "register_note_form": register_note_form,
             "order_formset": order_formset,
             "charge_formset": charge_formset,
             "payment_formset": payment_formset,
@@ -87,6 +96,9 @@ def edit_register(request, pk):
         })
     else:
         register_form = EditRegisterForm(request.POST, instance=register)
+        edit_special_register_form = EditSpecialRegisterForm(
+            request.POST, instance=register)
+        register_note_form = RegisterNoteForm(request.POST, instance=register)
         order_formset = order_form_factory(
             request.POST, queryset=register.orders.all(), prefix="order")
         payment_formset = payment_form_factory(
@@ -104,6 +116,8 @@ def edit_register(request, pk):
                 charge_formset.is_valid() and \
                 deposit_formset.is_valid():
             register = register_form.save()
+            edit_special_register_form.save()
+            register_note_form.save()
             payment_formset.save()
             charge_formset.save()
             deposit_formset.save()

@@ -26,6 +26,25 @@
   width: 400px;
 }
 
+#edit_special_register_form {
+  display: flex;
+  justify-content: space-between;
+
+  width: 600px;
+  margin-bottom: 30px;
+}
+
+#edit_special_register_form > div {
+  display: flex;
+  align-items: center;
+
+  width: 200px;
+}
+
+#edit_special_register_form input[type="checkbox"] {
+  width: 50px;
+}
+
 #register_form > div > label,
 .edit_order > div > label {
   display: flex;

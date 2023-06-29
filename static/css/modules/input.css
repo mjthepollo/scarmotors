@@ -1,6 +1,5 @@
 input,
-select,
-textarea {
+select {
   border-radius: 0px;
   width: 200px;
   height: 30px;
@@ -22,4 +21,8 @@ input[type="radio"] {
   height: 20px;
 
   border: 1px solid black;
+}
+textarea {
+  padding: 20px;
+  height: 150px;
 }

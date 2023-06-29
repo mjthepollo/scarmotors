@@ -5,6 +5,7 @@
 * {
   --blue: #009cff;
   --orange: #ff6300;
+  --normal_width: 800px;
   font-family: "Noto Sans KR", sans-serif;
   font-weight: 400;
 }

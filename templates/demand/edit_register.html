@@ -10,6 +10,9 @@
 <form id="formset" method="POST" data-formset-prefix="{{order_formset.prefix}}">
     {% csrf_token %}
     <h2>RO [{{register.RO_number}}]</h2>
+    <div id="edit_special_register_form">
+        {{edit_special_register_form.as_div}}
+    </div>
     <div id="register_form">
         {{register_form.as_div}}
     </div>
@@ -18,7 +21,7 @@
     {{charge_formset.management_form}}
     {{deposit_formset.management_form}}
     <h2>INFO</h2>
-    <div data-formset-body id="order_formset">
+    <div id="order_edit_formset">
         {% for form in order_formset %}
         <div data-formset-form class="edit_order">
             <h3>주문</h3>
@@ -35,6 +38,9 @@
         {% endif %}
         {% endfor %}
     </div>
+    <h2>추가주문</h2>
+    <div data-formset-body id="order_formset">
+    </div>
     <script type="form-template" data-formset-empty-form>
         {% escapescript %}
         <div data-formset-form class="new_order">
@@ -42,12 +48,17 @@
         </div>
         {% endescapescript %}
     </script>
+    <input id="add_button" type="button" class="btn btn-success" value="주문 추가하기" data-formset-add>
     <script>jQuery(function($) {
         $("#formset").formset({
             animateForms: true,
             reorderMode: 'dom',
         });
     });</script>
+    <h2>비고</h2>
+    <div id="register_note_form">
+        {{register_note_form.note}}
+    </div>
     <button id="complete" class="btn btn-dark">수정 완료</button>
 </form>
 {% endblock content %}
