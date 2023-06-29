@@ -1,6 +1,7 @@
 import django_filters
 from django import forms
 from django.utils.safestring import mark_safe
+from django_filters.widgets import BooleanWidget
 
 from core.utility import insert_tag
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
@@ -141,6 +142,13 @@ class EditRegisterForm(forms.ModelForm):
         }
 
 
+class NoteBooleanWidget(BooleanWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.choices = (("", "-"), ("false", "O"),
+                        ("true", "X"))
+
+
 class RegisterFilter(django_filters.FilterSet):
     RO_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
@@ -166,15 +174,14 @@ class RegisterFilter(django_filters.FilterSet):
     client_name = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='client_name', lookup_expr='icontains', label="고객명")
-
-    note = django_filters.CharFilter(
-        widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
-        field_name='note', lookup_expr='icontains', label="비고(차)")
+    note = django_filters.BooleanFilter(
+        field_name='note', label="비고여부", lookup_expr="isnull",
+        widget=NoteBooleanWidget())
 
     class Meta:
         model = Register
         fields = ["RO_number", "car_number",
-                  "supporter", "client_name", "insurance_agent", "note"]
+                  "supporter", "client_name", "insurance_agent"]
 
 
 class RegisterFilterForOrderFilter(django_filters.FilterSet):
@@ -200,9 +207,9 @@ class RegisterFilterForOrderFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='client_name', lookup_expr='icontains', label="고객명")
 
-    note = django_filters.CharFilter(
-        widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
-        field_name='note', lookup_expr='icontains', label="비고(차)")
+    note = django_filters.BooleanFilter(
+        field_name='note', label="비고여부", lookup_expr="isnull",
+        widget=NoteBooleanWidget())
 
     class Meta:
         model = Register
@@ -215,16 +222,12 @@ class OrderFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='receipt_number', lookup_expr='icontains', label="접수번호")
 
-    note = django_filters.CharFilter(
-        widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
-        field_name='note', lookup_expr='icontains', label="비고(주문)")
-
     status = django_filters.MultipleChoiceFilter(
         choices=Order._meta.get_field('status').choices, label="상태")
 
     class Meta:
         model = Order
-        fields = ["status", "charged_company", "charge_type", "order_type"]
+        fields = ["charged_company", "charge_type", "order_type"]
 
 
 class OrderForm(forms.ModelForm):
