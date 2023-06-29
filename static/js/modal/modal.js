@@ -5,6 +5,7 @@ function closeModal(e) {
 
 function modalFuctionFactory(preprocessFunction, postprocessFunction) {
   return function (e) {
+    preprocessFunction(e);
     const url = e.currentTarget.dataset.modal_url;
     fetch(url)
       .then((data) => {
@@ -15,7 +16,6 @@ function modalFuctionFactory(preprocessFunction, postprocessFunction) {
         }
       })
       .then((html) => {
-        preprocessFunction(e);
         var parser = new DOMParser();
         var doc = parser.parseFromString(html, "text/html");
         const modal = doc.documentElement.querySelector("div.custom_modal");

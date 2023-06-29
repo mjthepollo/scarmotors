@@ -1,5 +1,6 @@
 import django_filters
 from django import forms
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django_filters.widgets import BooleanWidget
 
@@ -111,6 +112,16 @@ class NewRegisterForm(forms.ModelForm):
             'phone_number': forms.TextInput(attrs={'placeholder': '01012345678'}),
             'rentcar_company_name': forms.TextInput(attrs={'placeholder': '에스카렌트'}),
         }
+
+    def as_div(self, *args, **kwags):
+        original_div = super(NewRegisterForm, self).as_div()
+        inserting_tag = f"<div id='car_number_button_box'>\
+            <button type='button' id='car_number_button'\
+            class='btn btn-info'\
+            data-modal_default_url='{reverse('demand:car_number_modal')}?car_number='>차량 번호 확인</button></div>"
+        return_div = insert_tag(
+            original_div, "car_number", inserting_tag)
+        return mark_safe(return_div)
 
 
 class RegisterNoteForm(forms.ModelForm):

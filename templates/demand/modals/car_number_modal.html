@@ -1,0 +1,21 @@
+{% extends "modules/custom_modal.html"%}
+{% block modal_content %}
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">차 번호 조회</h5>
+        <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        {% for register in registers %}
+        <div class="car_number_modal_register">
+            <span class="car_number_modal_register_info">{{register}}</span><a class='btn btn-warning' href="{% url 'demand:edit_register' register.pk%}">수정</a>
+        </div>
+        {% empty %}
+        <p>차량이 없습니다.</p>
+        {% endfor%}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">Close</button>
+    </div>
+</div>
+{% endblock modal_content %}

@@ -12,6 +12,15 @@ from demand.sales_models import Order, Register
 
 
 @login_required
+def car_number_modal(request):
+    car_number = request.GET.get("car_number", None)
+    registers = Register.objects.filter(car_number=car_number)
+    return TemplateResponse(
+        request, "demand/modals/car_number_modal.html",
+        context={'registers': registers})
+
+
+@login_required
 def came_out_modal(request, pk):
     register = Register.objects.get(pk=pk)
     payment_form_factory = modelformset_factory(

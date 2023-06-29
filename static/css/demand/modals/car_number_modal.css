@@ -1,0 +1,11 @@
+.car_number_modal_register {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0px 30px;
+}
+
+.car_number_modal_register_info {
+  font-size: 20px;
+}
