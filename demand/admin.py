@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
                                Payment, RequestDepartment, Supporter)
-from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
+from demand.sales_models import (ExtraSales, MockupCreated, Order,
+                                 RecognizedSales, Register)
 
 
 @admin.register(Supporter)
@@ -52,6 +53,11 @@ class RegisterAdmin(admin.ModelAdmin):
     list_filter = ["day_came_in", "expected_day_came_out",
                    "real_day_came_out", "phone_number"]
     search_fields = ["RO_number", "insurance_agent"]
+
+
+@admin.register(MockupCreated)
+class MockupCreatedAdmin(admin.ModelAdmin):
+    list_display = ["register"]
 
 
 @admin.register(Order)

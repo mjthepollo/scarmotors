@@ -289,7 +289,7 @@ class DemandModelTest(TestCase):
     def test_payment_str(self):
         self.setUpKeysAbsentCase()
         self.setUpExtraSales()
-        self.assertEqual(str(self.payment), "RO(4-1234) 주문[0] 결제")
+        self.assertEqual(str(self.payment), "RO(4-1234) 주문[1] 결제")
         self.assertEqual(str(self.no_register_payment),
                          f"등록없음({self.no_register_payment.pk}_주문:{self.no_register_order.pk})")
         self.assertEqual(str(self.no_order_payment),
@@ -300,7 +300,7 @@ class DemandModelTest(TestCase):
     def test_charge_str(self):
         self.setUpKeysAbsentCase()
         self.setUpExtraSales()
-        self.assertEqual(str(self.charge), "RO(4-1234) 주문[0] 청구")
+        self.assertEqual(str(self.charge), "RO(4-1234) 주문[1] 청구")
         self.assertEqual(str(self.no_register_charge),
                          f"등록없음({self.no_register_charge.pk}_주문:{self.no_register_order.pk})")
         self.assertEqual(str(self.no_order_charge),
@@ -311,7 +311,7 @@ class DemandModelTest(TestCase):
     def test_deposit_str(self):
         self.setUpKeysAbsentCase()
         self.setUpExtraSales()
-        self.assertEqual(str(self.deposit), "RO(4-1234) 주문[0] 입금")
+        self.assertEqual(str(self.deposit), "RO(4-1234) 주문[1] 입금")
         self.assertEqual(str(self.no_register_deposit),
                          f"등록없음({self.no_register_deposit.pk}_주문:{self.no_register_order.pk})")
         self.assertEqual(str(self.no_order_deposit),
