@@ -5,10 +5,58 @@
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock css %}
 {% block content %}
+
 <h1>Summary</h1>
-<h2>{% lorem 1 b random %}</h2>
-<h3>{% lorem 2 b random %}</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>월</th>
+            <th>[입금]보험</th>
+            <th>[입금]일반경정비</th>
+            <th>[입금]일반판도</th>
+            <th>[입금]렌트일반</th>
+            <th>[입금]렌트판도</th>
+            <th>[미입금]보험</th>
+            <th>[미입금]일반경정비</th>
+            <th>[미입금]일반판도</th>
+            <th>[미입금]렌트일반</th>
+            <th>[미입금]일반판도</th>
+            <th>공임매출</th>
+            <th>부품매출</th>
+            <th>청구</th>
+            <th>입금</th>
+            <th>면책금</th>
+        </tr>
+</thead>
+<tbody>
+    {% for monthly_sale in monthly_sales%}
+    <tr>
+        <td>{{monthly_sale.month}}월</td>
+        <td>{{monthly_sale.paid_insurance_sales}}</td>
+        <td>{{monthly_sale.paid_general_expense}}</td>
+        <td>{{monthly_sale.paid_general_pando}}</td>
+        <td>{{monthly_sale.paid_general_rent}}</td>
+        <td>{{monthly_sale.paid_rent_pando}}</td>
+        <td>{{monthly_sale.not_paid_insurance_sales}}</td>
+        <td>{{monthly_sale.not_paid_general_expense}}</td>
+        <td>{{monthly_sale.not_paid_general_pando}}</td>
+        <td>{{monthly_sale.not_paid_general_rent}}</td>
+        <td>{{monthly_sale.not_paid_rent_pando}}</td>
+        <td>{{monthly_sale.wage_turnover}}</td>
+        <td>{{monthly_sale.component_turnover}}</td>
+        <td>{{monthly_sale.charge_amount}}</td>
+        <td>{{monthly_sale.deposit_amount}}</td>
+        <td>{{monthly_sale.net_payment_amount}}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+
 {% endblock content %}
 {% block footer%}
 {% include "modules/footer.html" %}
 {% endblock footer%}
+
+{% block inline_javascript %}
+<script type="module" src="{% static 'js/home.js' %}"></script>
+{% endblock inline_javascript %}

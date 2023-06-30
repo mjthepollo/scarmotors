@@ -8,6 +8,7 @@ from django.http import FileResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
+from period_sales.models import MonthlySales, StatisticSales
 from users.forms import CustomAuthForm
 
 
@@ -34,7 +35,8 @@ def logout(request):
 
 @login_required
 def home(request):
-    return render(request, "home.html")
+    monthly_sales = MonthlySales.objects.all()
+    return render(request, "home.html", {"monthly_sales": monthly_sales})
 
 
 @login_required

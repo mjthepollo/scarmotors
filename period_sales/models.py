@@ -121,6 +121,10 @@ class MonthlySales(PeriodSales):
     이는 Summary에서 보여지며, Sales의 updated 정보를 기반으로 업데이트 된다.
     """
 
+    @property
+    def month(self):
+        return self.start_date.month
+
     @classmethod
     def create_monthly_sales(cls, year, month):
         start_date = date(year, month, 1)

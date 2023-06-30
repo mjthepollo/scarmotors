@@ -17,7 +17,8 @@ PAID_SALES_LIST_DISPLAY = [
     "wage_turnover",
     "component_turnover",
     "charge_amount",
-    "deposit_amount", "net_payment_amount"
+    "deposit_amount",
+    "net_payment_amount"
 ]
 
 
