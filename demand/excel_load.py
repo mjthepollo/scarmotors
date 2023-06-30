@@ -332,7 +332,8 @@ def create_payment_from_line(line, sales):
 
 def make_extra_sales_from_line(line):
     if line[SUPPORTER]:
-        supporter, _ = Supporter.objects.get_or_create(name=line[SUPPORTER])
+        supporter, _ = Supporter.objects.get_or_create(
+            name=line[SUPPORTER].replace(" ", ""))
     else:
         supporter = None
     client_name, insurance_agent_name = get_client_name_and_insurance_agent_name(
@@ -365,7 +366,7 @@ def make_extra_sales_from_line(line):
 def make_register_from_first_line(first_line):
     if first_line[SUPPORTER]:
         supporter, _ = Supporter.objects.get_or_create(
-            name=first_line[SUPPORTER])
+            name=first_line[SUPPORTER].replace(" ", ""))
     else:
         supporter = None
     client_name, insurance_agent_name = get_client_name_and_insurance_agent_name(
@@ -397,7 +398,8 @@ def make_register_from_first_line(first_line):
             client_name=client_name,
             insurance_agent=insurance_agent,
             phone_number=input_to_phone_number(first_line[PHONE_NUMBER]),
-            rentcar_company_name=first_line[RENT_CAR_COMPANY_NAME],
+            rentcar_company_name=first_line[RENT_CAR_COMPANY_NAME].replace(
+                " ", ""),
             note=None,  # Note is handled in create_order_from_line
             wasted=wasted,
             unrepaired=unrepaired,
