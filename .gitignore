@@ -1,13 +1,20 @@
+#basic Resource!
 !src/basic.xlsx
+!src/data_load.xlsx
+
+#Except basicResource!
+src/
+*.xlsx
+
 db.sqlite3
+
 *test/*
 *.env
 uwsgi.ini
 *DS_store
 *.pem
+
 staticfiles/
-src/
-*.xlsx
 
 # cache
 */__pycache__/*
