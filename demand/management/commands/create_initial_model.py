@@ -85,4 +85,4 @@ class Command(BaseCommand):
         print_colored(f"Payment Created Count: {payment_count}", "green")
         print_colored(f"Register Created Count: {register_count}", "green")
         print_colored(f"Supporter Created Count: {supporter_count}", "green")
-        print_colored("All models deleted", "blue")
+        print_colored("All models created", "magenta")
