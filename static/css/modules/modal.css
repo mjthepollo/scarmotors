@@ -103,3 +103,20 @@ p.modal_sector_info {
   width: auto;
   margin-right: 10px;
 }
+
+.modal_additional_info_box {
+  /* justify-content: flex-start !important; */
+}
+
+.modal_additional_info_label {
+  font-weight: 600;
+}
+
+.modal_additional_info {
+  width: 140px;
+
+  font-weight: 600;
+  text-align: center;
+
+  color: var(--blue);
+}

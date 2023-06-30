@@ -43,7 +43,8 @@ class PaymentForm(forms.ModelForm):
 
     def as_div(self, *args, **kwags):
         original_div = super(PaymentForm, self).as_div()
-        inserting_tag = "<div>SEX MACHINE!</div>"
+        inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+            결제금액:</label><span class='modal_additional_info settlement_amount_info'></span></div>"
         return_div = insert_tag(original_div, "discount_amount", inserting_tag)
         return mark_safe(return_div)
 
@@ -58,7 +59,8 @@ class ChargeForm(forms.ModelForm):
 
     def as_div(self, *args, **kwags):
         original_div = super(ChargeForm, self).as_div()
-        inserting_tag = "<div>WHOLE AMOUNT!</div>"
+        inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+            수리금액:</label><span class='modal_additional_info repair_amount_info'></span></div>"
         return_div = insert_tag(
             original_div, "component_amount", inserting_tag)
         return mark_safe(return_div)
@@ -74,10 +76,12 @@ class DepositForm(forms.ModelForm):
 
     def as_div(self, *args, **kwags):
         original_div = super(DepositForm, self).as_div()
-        inserting_tag = "<div>지급율</div>"
+        inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+            지급율:</label><span class='modal_additional_info payment_rate_info'></span></div>"
         inserted_div = insert_tag(
             original_div, "deposit_date", inserting_tag)
-        finishing_tag = "<div>삭감율</div>"
+        finishing_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+            삭감율:</label><span class='modal_additional_info cut_rate_info'></span></div>"
         return_div = inserted_div + finishing_tag
         return mark_safe(return_div)
 
