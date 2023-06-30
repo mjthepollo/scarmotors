@@ -96,6 +96,13 @@ class Sales(TimeStampedModel):
         else:
             return "-"
 
+    def formatted_wage_turnover(self):
+        wage_turnover = self.get_wage_turnover()
+        if wage_turnover:
+            return format(int(wage_turnover), ",")
+        else:
+            return "-"
+
     def get_payment_rate_for_input(self):
         """
         EXCEL에서 사용하는 지급율
@@ -566,7 +573,7 @@ class Order(Sales):
     def get_incentive(self):
         if self.register:
             if self.register.supporter:
-                return int(self.get_turnover() * self.register.supporter.incentive_rate_percent/100)
+                return int(self.get_wage_turnover() * self.register.supporter.incentive_rate_percent/100)
         return 0
 
     def to_excel_line(self):

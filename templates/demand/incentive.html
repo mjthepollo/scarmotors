@@ -37,7 +37,7 @@
         <th>차량번호</th>
         <th>담당자</th>
         <th>타입</th>
-        <th>매출</th>
+        <th>공임매출</th>
     </tr>
     {% for incentive_form in incentive_formset %}
     {% with incentive_form.instance as order%}
@@ -51,7 +51,7 @@
         <td>{{order.register.car_number}}</td>
         <td>{{order.register.insurance_agent.name}}</td>
         <td>{{order.order_type|none_to_dash}}</td>
-        <td>{{order.formatted_turnover}}</td>
+        <td>{{order.formatted_wage_turnover}}</td>
     </tr>
     {% endwith %}
     {% endfor %}
