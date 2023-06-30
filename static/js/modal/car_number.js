@@ -2,8 +2,6 @@ import {modalFuctionFactory} from "./modal.js";
 
 const carNumberInput = document.querySelector("input[name=car_number]");
 const carNumberButton = document.querySelector("#car_number_button");
-console.log(carNumberInput);
-console.log(carNumberButton);
 
 function carNumberModalPreprocess(e) {
   const carNumber = carNumberInput.value;
@@ -12,7 +10,7 @@ function carNumberModalPreprocess(e) {
   console.log(modalUrl);
   e.currentTarget.dataset.modal_url = modalUrl;
 }
-function carNumberModalPostprocess(e) {}
+function carNumberModalPostprocess(e, modal) {}
 
 const carNumberButtonHandler = modalFuctionFactory(carNumberModalPreprocess, carNumberModalPostprocess);
 

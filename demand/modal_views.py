@@ -6,7 +6,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from demand.forms import (ChargeForm, DepositForm, FirstCenterRegisterForm,
-                          PaymentForm, SpecialRegisterForm)
+                          PaymentForm, RealDayCameOutForm, SpecialRegisterForm)
 from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import Order, Register
 
@@ -26,18 +26,23 @@ def came_out_modal(request, pk):
     payment_form_factory = modelformset_factory(
         Payment, form=PaymentForm, extra=0)
     if request.method == "GET":
+        real_day_came_out_form = RealDayCameOutForm(instance=register)
         special_register_form = SpecialRegisterForm(instance=register)
         payment_formset = payment_form_factory(
             queryset=register.get_mockups(Payment, "payment"), prefix="payment")
         return TemplateResponse(
             request, "demand/modals/came_out_modal.html",
             context={"register": register,
+                     "real_day_came_out_form": real_day_came_out_form,
                      "special_register_form": special_register_form,
                      "payment_formset": payment_formset})
     else:
         register = get_object_or_404(Register, pk=pk)
+        real_day_came_out_form = RealDayCameOutForm(
+            request.POST, instance=register)
         special_register_form = SpecialRegisterForm(
             request.POST, instance=register)
+        real_day_came_out_form.save()
         special_register_form.save()
         payment_formset = payment_form_factory(
             request.POST, queryset=register.get_mockups(Payment, "payment"),

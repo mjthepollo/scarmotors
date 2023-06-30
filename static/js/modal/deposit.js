@@ -3,7 +3,7 @@ import {modalFuctionFactory} from "./modal.js";
 const depositButtons = document.querySelectorAll(".deposit_button");
 
 function depositModalPreprocess(e) {}
-function depositModalPostprocess(e) {}
+function depositModalPostprocess(e, modal) {}
 
 const depositButtonHandler = modalFuctionFactory(depositModalPreprocess, depositModalPostprocess);
 

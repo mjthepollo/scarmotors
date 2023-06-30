@@ -24,7 +24,7 @@ function modalFuctionFactory(preprocessFunction, postprocessFunction) {
         for (let i = 0; i < closeButtons.length; i++) {
           closeButtons[i].addEventListener("click", closeModal);
         }
-        postprocessFunction(e);
+        postprocessFunction(e, modal);
       })
       .catch((e) => {
         alert(e);

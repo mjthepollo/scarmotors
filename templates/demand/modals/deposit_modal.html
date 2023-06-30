@@ -7,8 +7,10 @@
         <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body">
-        <h2>DEPOSIT MODAL!</h2>
-        {{deposit_form.as_div}}
+        <p class="modal_sector_info">입금 정보</p>
+        <div class="modal_inputs">
+            {{deposit_form.as_div}}
+        </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">Close</button>

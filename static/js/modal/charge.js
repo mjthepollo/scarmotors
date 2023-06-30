@@ -3,7 +3,7 @@ import {modalFuctionFactory} from "./modal.js";
 const chargeButtons = document.querySelectorAll(".charge_button");
 
 function chargeModalPreprocess(e) {}
-function chargeModalPostprocess(e) {}
+function chargeModalPostprocess(e, modal) {}
 
 const chargeButtonHandler = modalFuctionFactory(chargeModalPreprocess, chargeModalPostprocess);
 

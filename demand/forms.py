@@ -31,10 +31,14 @@ class InsuranceAgentForm(forms.ModelForm):
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
-        fields = "__all__"
+        fields = ["indemnity_amount", "discount_amount", "refund_amount",
+                  "payment_type", 'payment_info', "payment_date", "refund_date"]
         widgets = {
             'payment_date': forms.DateInput(attrs={'type': 'date'}),
             'refund_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+        labels = {
+            "payment_info": "은행/카드"
         }
 
     def as_div(self, *args, **kwags):
@@ -76,6 +80,15 @@ class DepositForm(forms.ModelForm):
         finishing_tag = "<div>삭감율</div>"
         return_div = inserted_div + finishing_tag
         return mark_safe(return_div)
+
+
+class RealDayCameOutForm(forms.ModelForm):
+    class Meta:
+        model = Register
+        fields = ["real_day_came_out"]
+        widgets = {
+            'real_day_came_out': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 
 class SpecialRegisterForm(forms.ModelForm):

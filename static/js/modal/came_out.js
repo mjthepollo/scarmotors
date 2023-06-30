@@ -3,7 +3,7 @@ import {modalFuctionFactory} from "./modal.js";
 const cameOutButtons = document.querySelectorAll(".came_out_button");
 
 function cameOutModalPreprocess(e) {}
-function cameOutModalPostprocess(e) {}
+function cameOutModalPostprocess(e, modal) {}
 
 const cameOutButtonHandler = modalFuctionFactory(cameOutModalPreprocess, cameOutModalPostprocess);
 

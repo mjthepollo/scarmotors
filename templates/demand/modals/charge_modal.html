@@ -7,12 +7,14 @@
         <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body">
+        <p class="modal_sector_info">1센터 처리 여부</p>
         <div class="modal_checkboxes">
-            <div class="modal_checkbox">
-                {{first_center_register_form.as_div}}
-            </div>
+            {{first_center_register_form.as_div}}
         </div>
-        {{charge_form.as_div}}
+        <p class="modal_sector_info">청구</p>
+        <div class="modal_inputs">
+            {{charge_form.as_div}}
+        </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">Close</button>
