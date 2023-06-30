@@ -59,6 +59,16 @@ class Sales(TimeStampedModel):
         else:
             return "-"
 
+    def formatted_real_day_came_out(self):
+        if isinstance(self, Order):
+            real_day_came_out = self.register.real_day_came_out if self.register else None
+        else:
+            real_day_came_out = self.real_day_came_out
+        if real_day_came_out:
+            return real_day_came_out.strftime("%m/%d")
+        else:
+            return "-"
+
     def formatted_charge_amount(self):
         charge_amount = self.get_charge_amount()
         if charge_amount:
@@ -78,6 +88,13 @@ class Sales(TimeStampedModel):
             if self.deposit.deposit_amount:
                 return format(self.deposit.deposit_amount, ",")
         return "-"
+
+    def formatted_turnover(self):
+        turnover = self.get_turnover()
+        if turnover:
+            return format(turnover, ",")
+        else:
+            return "-"
 
     def get_payment_rate_for_input(self):
         """
@@ -545,6 +562,12 @@ class Order(Sales):
             return f"{self.charged_company.name} {self.charge_type} {self.order_type} 청구액:{charge} 입금액:{deposit} "
         except Exception as e:
             print(e)
+
+    def get_incentive(self):
+        if self.register:
+            if self.register.supporter:
+                return int(self.get_turnover() * self.register.supporter.incentive_rate_percent/100)
+        return 0
 
     def to_excel_line(self):
         return dictionary_to_line(order_to_excel_dictionary(self))

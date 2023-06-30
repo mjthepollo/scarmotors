@@ -1,8 +1,62 @@
-<form method="GET">
-{{incentive_filter.form.as_div}}
-<input type="submit" value="검색" class="btn btn-dark special_function">
+{% extends "base.html" %}
+{% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/demand/incentive.css' %}">
+{% endblock css %} {% block content %}
+<form id="incentive_search_form" method="GET">
+    {{incentive_filter.form.as_div}}
+    <div><input id="incentive_search_button" type="submit" value="검색" class="btn btn-dark"></div>
 </form>
-{% for incentive_form in incentive_formset %}
-<p>{{incentive_form.instance}}</p>
-<p>{{incentive_form.incentive_paid}}</p>
-{% endfor %}
+<form id="formset" method='POST' data-formset-prefix="{{payment_formset.prefix}}">
+{% csrf_token %}
+{{incentive_formset.management_form}}
+<div id="info_box">
+    {% if supporter %}
+    <div class="info">
+        <label>지급율({{supporter}})</label>
+        <p>{{supporter.incentive_rate_percent}}%</p>
+    </div>
+    {% endif %}
+    <div class="info">
+        <label>매출 총액</label>
+        <p id="turnover_info"></p>
+    </div>
+    <div class="info">
+        <label>지급 금액</label>
+        <p id="incentive_info"></p>
+    </div>
+    <button class="btn btn-warning">지급처리</button>
+</div>
+<table id="search_results" border="1">
+    <tr>
+        <th id="turnover_header" class="incentive">매출확인</th>
+        <th id="incentive_header" class="incentive">지급여부</th>
+        <th>상태</th>
+        <th>보험사</th>
+        <th>접수</th>
+        <th>출고일</th>
+        <th>차량번호</th>
+        <th>담당자</th>
+        <th>타입</th>
+        <th>매출</th>
+    </tr>
+    {% for incentive_form in incentive_formset %}
+    {% with incentive_form.instance as order%}
+    <tr>
+        <td data-incentive="{{order.get_incentive}}" data-turnover="{{order.get_turnover}}" class="incentive_check incentive"><input type='checkbox' checked></td>
+        <td data-incentive="{{order.get_incentive}}" data-turnover="{{order.get_turnover}}" class="incentive_paid incentive">{{incentive_form.incentive_paid}}{{incentive_form.id}}</td>
+        <td class="order bold {{order.get_status_class}}">{{order.get_status_display}}</td>
+        <td>{{order.register.supporter}}</td>
+        <td>{{order.register.RO_number}}</td>
+        <td>{{order.formatted_real_day_came_out}}</td>
+        <td>{{order.register.car_number}}</td>
+        <td>{{order.register.insurance_agent.name}}</td>
+        <td>{{order.order_type|none_to_dash}}</td>
+        <td>{{order.formatted_turnover}}</td>
+    </tr>
+    {% endwith %}
+    {% endfor %}
+</table>
+{% endblock content %}
+{% block inline_javascript %}
+<script type="module" src="{% static 'js/incentive.js' %}"></script>
+{% endblock inline_javascript %}

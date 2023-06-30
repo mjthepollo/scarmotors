@@ -1,7 +1,3 @@
-function numberWithCommas(x) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
 function getIdOfField(prefix, field, index) {
   return `id_${prefix}-${index}-${field}`;
 }
@@ -45,4 +41,4 @@ function modalFuctionFactory(preprocessFunction, postprocessFunction) {
   };
 }
 
-export {getIdOfField, getNumberOfForms, modalFuctionFactory, numberWithCommas};
+export {getIdOfField, getNumberOfForms, modalFuctionFactory};

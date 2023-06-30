@@ -1,4 +1,5 @@
-import {getIdOfField, getNumberOfForms, modalFuctionFactory, numberWithCommas} from "./modal.js";
+import {numberWithCommas} from "../utility.js";
+import {getIdOfField, getNumberOfForms, modalFuctionFactory} from "./modal.js";
 
 const cameOutButtons = document.querySelectorAll(".came_out_button");
 const prefix = "payment";

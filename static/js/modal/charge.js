@@ -1,4 +1,5 @@
-import {modalFuctionFactory, numberWithCommas} from "./modal.js";
+import {numberWithCommas} from "../utility.js";
+import {modalFuctionFactory} from "./modal.js";
 
 const chargeButtons = document.querySelectorAll(".charge_button");
 

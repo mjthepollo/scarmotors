@@ -238,9 +238,9 @@ class RegisterFilterForOrderFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='client_name', lookup_expr='icontains', label="고객명")
 
-    note = django_filters.BooleanFilter(
-        field_name='note', label="비고여부", lookup_expr="isnull",
-        widget=NullBooleanWidget())
+    note = django_filters.CharFilter(
+        widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
+        field_name='note', label="비고", lookup_expr="icontains")
 
     class Meta:
         model = Register
@@ -277,6 +277,8 @@ class OXBooleanWidget(BooleanWidget):
 
 
 class IncentiveFilter(django_filters.FilterSet):
+    register__supporter = django_filters.ModelChoiceFilter(
+        queryset=Supporter.objects.all(), label="업체명")
     real_day_came_out_gt = django_filters.ChoiceFilter(
         choices=INCENTIVE_FILTER_CHOICES, label="기간",
         lookup_expr='gt', field_name='register__real_day_came_out')

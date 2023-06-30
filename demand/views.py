@@ -349,17 +349,19 @@ def incentive(request):
         orders = Order.objects.none()
     incentive_form_factory = modelformset_factory(
         Order, form=IncentiveForm, extra=0)
+    supporter = orders.first().register.supporter if orders.exists() else None
     if request.method == "GET":
         incentive_formset = incentive_form_factory(
             queryset=orders, prefix="incentive")
-        return render(request, "demand/incentive.html", context={
-            "orders":  orders, "incentive_filter": incentive_filter,
-            "incentive_formset": incentive_formset,
-        })
     else:
-        return render(request, "demand/incentive.html", context={
-            "orders":  orders, "incentive_filter": incentive_filter,
-        })
+        incentive_formset = incentive_form_factory(
+            request.POST, queryset=orders, prefix="incentive")
+        orders = incentive_formset.save()
+    return render(request, "demand/incentive.html", context={
+        "orders":  orders, "incentive_filter": incentive_filter,
+        "supporter": supporter,
+        "incentive_formset": incentive_formset,
+    })
 
 
 @login_required

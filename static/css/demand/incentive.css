@@ -1,0 +1,88 @@
+@import url("./search.css");
+
+#incentive_search_form {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 700px;
+  margin-top: 40px;
+}
+
+#incentive_search_form input,
+#incentive_search_form select {
+  width: 100px;
+}
+
+#incentive_search_form label {
+  margin-right: 20px;
+}
+#incentive_search_form > div {
+  display: flex;
+  align-items: center;
+}
+
+#incentive_search_form #incentive_search_button {
+  width: 60px;
+}
+
+#formset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 800px;
+}
+
+#info_box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 700px;
+  margin: 20px 0px;
+
+  font-size: 20px;
+}
+#info_box button {
+  max-height: 60px;
+}
+
+.info {
+  display: flex;
+  justify-content: center;
+}
+
+.info p {
+  margin: 0px;
+
+  font-weight: 600;
+}
+
+.info label {
+  margin-right: 10px;
+}
+
+#turnover_info {
+  color: var(--orange);
+}
+
+#incentive_info {
+  color: var(--blue);
+}
+
+#formset .incentive {
+  width: 60px;
+}
+
+th#turnover_header {
+  background-color: #ffc107;
+}
+
+th#incentive_header {
+  background-color: var(--blue);
+}
+
+#formset .incentive input {
+  width: 60px;
+}
