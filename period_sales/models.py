@@ -93,6 +93,19 @@ class PeriodSales(TimeStampedModel):
             "not_paid_rent_pando": not_paid_rent_pando,
         }
 
+    @property
+    def whole_turnover(self):
+        return self.paid_general_expense +\
+            self.paid_general_pando +\
+            self.paid_general_rent +\
+            self.paid_insurance_sales +\
+            self.paid_rent_pando +\
+            self.not_paid_general_expense +\
+            self.not_paid_general_pando +\
+            self.not_paid_general_rent +\
+            self.not_paid_insurance_sales +\
+            self.not_paid_rent_pando
+
     @classmethod
     def create(cls, start_date, end_date):
         exist_sales = cls.objects.filter(

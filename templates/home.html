@@ -4,9 +4,38 @@
 {{block.super}}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock css %}
+{% block javascript %}
+{{block.super}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock javascript %}
 {% block content %}
 
 <h1>Summary</h1>
+<div>
+    <canvas id="myChart"></canvas>
+</div>
+<script>
+    const ctx = document.getElementById('myChart');
+  
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [{% for monthly_sale in monthly_sales %}"{{monthly_sale.month}}월",{% endfor %}],
+        datasets: [{
+          label: 'Whole Sales',
+          data: [{% for monthly_sale in monthly_sales %}{{monthly_sale.whole_turnover}},{% endfor %}],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+</script>
 <table class="table">
     <thead>
         <tr>
