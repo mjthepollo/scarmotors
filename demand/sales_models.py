@@ -529,6 +529,9 @@ class MockupCreated(TimeStampedModel):
 
 
 class Order(Sales):
+    """
+    charge_type 수정시에 SalesInfo Model도 바꾸어야 한다.
+    """
     class Meta:
         ordering = ["-created",]
         verbose_name = "주문 매출"

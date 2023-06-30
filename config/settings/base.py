@@ -88,7 +88,8 @@ INSTALLED_APPS = [
 
 LOCAL_APPS = [
     "users",
-    "demand"
+    "demand",
+    "period_sales",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + INSTALLED_APPS
