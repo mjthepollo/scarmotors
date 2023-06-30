@@ -21,25 +21,29 @@
     {{charge_formset.management_form}}
     {{deposit_formset.management_form}}
     <h2>INFO</h2>
-    <div id="order_edit_formset">
+    <div data-formset-body id="order_edit_formset">
         {% for form in order_formset %}
-        <div data-formset-form class="edit_order">
-            <h3>주문</h3>
+        <h3>주문</h3>
+        <div data-formset-form class="order_edit_formset_entity">
             {{order_formset|index_form:forloop.counter0}}
-            <h3>출고</h3>
+        </div>
+        <h3>출고</h3>
+        <div class='order_edit_formset_entity'>
             {{payment_formset|index_form:forloop.counter0}}
-            <h3>청구</h3>
+        </div>
+        <h3>청구</h3>
+        <div class="order_edit_formset_entity">
             {{charge_formset|index_form:forloop.counter0}}
-            <h3>입금</h3>
+        </div>
+        <h3>입금</h3>
+        <div class="order_edit_formset_entity">
             {{deposit_formset|index_form:forloop.counter0}}
         </div>
         {% if not forloop.last%}
-            <hr>
+        <hr>
         {% endif %}
         {% endfor %}
-    </div>
-    <h2>추가주문</h2>
-    <div data-formset-body id="order_formset">
+        <h2 id="additional_order">추가주문</h2>
     </div>
     <script type="form-template" data-formset-empty-form>
         {% escapescript %}

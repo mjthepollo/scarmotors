@@ -6,7 +6,7 @@
             {% url 'demand:new_register' as url %}
             <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:new_register'%}">입고</a>
             {% url 'demand:search_registers' as url %}
-            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_registers'%}">등록 검색</a>
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_registers'%}">매출 검색</a>
             {% url 'demand:search_orders' as url %}
             <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_orders'%}">상세 검색</a>
             {% url 'demand:extra_sales' as url %}

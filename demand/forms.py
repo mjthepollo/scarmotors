@@ -247,6 +247,8 @@ class OrderForm(forms.ModelForm):
         fields = ["charge_type", "charged_company",
                   "order_type", "receipt_number", "fault_ratio"]
         widgets = {
+            "charge_type": forms.Select(attrs={'required': 'required'}),
+            "charged_company": forms.Select(attrs={'required': 'required'}),
             'receipt_number': forms.TextInput(),
             'fault_ratio': forms.NumberInput(),
         }

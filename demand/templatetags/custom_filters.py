@@ -2,6 +2,7 @@
 import datetime
 
 from django import template
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -23,4 +24,7 @@ def none_to_dash(value):
 
 @register.filter
 def index_form(sequence, position):
-    return sequence[position].as_div()
+    if len(sequence) > position:
+        return sequence[position].as_div()
+    else:
+        return mark_safe("")

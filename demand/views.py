@@ -121,7 +121,10 @@ def edit_register(request, pk):
             payment_formset.save()
             charge_formset.save()
             deposit_formset.save()
-            order_formset.save()
+            orders = order_formset.save()
+            for order in orders:
+                order.register = register
+                order.save()
             return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
         return render(request, "demand/edit_register.html", context={
             "register": register,
