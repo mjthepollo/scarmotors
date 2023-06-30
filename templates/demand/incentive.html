@@ -1,0 +1,8 @@
+<form method="GET">
+{{incentive_filter.form.as_div}}
+<input type="submit" value="검색" class="btn btn-dark special_function">
+</form>
+{% for incentive_form in incentive_formset %}
+<p>{{incentive_form.instance}}</p>
+<p>{{incentive_form.incentive_paid}}</p>
+{% endfor %}

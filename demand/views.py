@@ -11,8 +11,9 @@ from django.urls import reverse
 
 from demand.excel_line_info import INDEXES
 from demand.forms import (ChargeForm, DepositForm, EditRegisterForm,
-                          EditSpecialRegisterForm, NewRegisterForm,
-                          OrderFilter, OrderForm, PaymentForm, RegisterFilter,
+                          EditSpecialRegisterForm, IncentiveFilter,
+                          IncentiveForm, NewRegisterForm, OrderFilter,
+                          OrderForm, PaymentForm, RegisterFilter,
                           RegisterFilterForOrderFilter, RegisterNoteForm)
 from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import ExtraSales, Order, Register
@@ -336,6 +337,29 @@ def cancel_manually_complete(request, pk):
         return redirect(previous_url)
     else:
         return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+
+
+@login_required
+def incentive(request):
+    incentive_filter = IncentiveFilter(
+        request.GET, queryset=Order.objects.all())
+    if request.GET.get("register__supporter", None):
+        orders = incentive_filter.qs
+    else:
+        orders = Order.objects.none()
+    incentive_form_factory = modelformset_factory(
+        Order, form=IncentiveForm, extra=0)
+    if request.method == "GET":
+        incentive_formset = incentive_form_factory(
+            queryset=orders, prefix="incentive")
+        return render(request, "demand/incentive.html", context={
+            "orders":  orders, "incentive_filter": incentive_filter,
+            "incentive_formset": incentive_formset,
+        })
+    else:
+        return render(request, "demand/incentive.html", context={
+            "orders":  orders, "incentive_filter": incentive_filter,
+        })
 
 
 @login_required

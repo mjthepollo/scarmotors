@@ -24,5 +24,6 @@ views_urlpatterns = [
     path("order/cancel_manually_complete/<int:pk>/",
          views.cancel_manually_complete, name="cancel_manually_complete"),
     path("orders_to_excel/", views.orders_to_excel, name="orders_to_excel"),
+    path("incentive/", views.incentive, name="incentive"),
     path("extra_sales/", views.extra_sales, name="extra_sales"),
 ]

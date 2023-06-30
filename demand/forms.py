@@ -1,4 +1,7 @@
+from datetime import date
+
 import django_filters
+from dateutil.relativedelta import relativedelta
 from django import forms
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -170,7 +173,7 @@ class EditRegisterForm(forms.ModelForm):
         }
 
 
-class NoteBooleanWidget(BooleanWidget):
+class NullBooleanWidget(BooleanWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.choices = (("", "-"), ("false", "O"),
@@ -204,7 +207,7 @@ class RegisterFilter(django_filters.FilterSet):
         field_name='client_name', lookup_expr='icontains', label="고객명")
     note = django_filters.BooleanFilter(
         field_name='note', label="비고여부", lookup_expr="isnull",
-        widget=NoteBooleanWidget())
+        widget=NullBooleanWidget())
 
     class Meta:
         model = Register
@@ -237,7 +240,7 @@ class RegisterFilterForOrderFilter(django_filters.FilterSet):
 
     note = django_filters.BooleanFilter(
         field_name='note', label="비고여부", lookup_expr="isnull",
-        widget=NoteBooleanWidget())
+        widget=NullBooleanWidget())
 
     class Meta:
         model = Register
@@ -256,6 +259,40 @@ class OrderFilter(django_filters.FilterSet):
     class Meta:
         model = Order
         fields = ["charged_company", "charge_type", "order_type"]
+
+
+INCENTIVE_FILTER_CHOICES = (
+    (date.today()+relativedelta(months=-1), "1개월"),
+    (date.today()+relativedelta(months=-3), "3개월"),
+    (date.today()+relativedelta(months=-6), "6개월"),
+    (date.today()+relativedelta(months=-12), "1년"),
+)
+
+
+class OXBooleanWidget(BooleanWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.choices = (("", "-"), ("true", "O"),
+                        ("false", "X"))
+
+
+class IncentiveFilter(django_filters.FilterSet):
+    real_day_came_out_gt = django_filters.ChoiceFilter(
+        choices=INCENTIVE_FILTER_CHOICES, label="기간",
+        lookup_expr='gt', field_name='register__real_day_came_out')
+    incentive_paid = django_filters.BooleanFilter(
+        field_name='incentive_paid', label="지급여부",
+        widget=OXBooleanWidget())
+
+    class Meta:
+        model = Order
+        fields = ["register__supporter", 'incentive_paid']
+
+
+class IncentiveForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ["incentive_paid"]
 
 
 class OrderForm(forms.ModelForm):
