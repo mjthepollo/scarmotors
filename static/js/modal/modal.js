@@ -1,3 +1,16 @@
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function getIdOfField(prefix, field, index) {
+  return `id_${prefix}-${index}-${field}`;
+}
+
+function getNumberOfForms(prefix, modal) {
+  const totalForm = modal.querySelector(`input[name=${prefix}-TOTAL_FORMS]`);
+  return parseInt(totalForm.value);
+}
+
 function closeModal(e) {
   const modal = e.currentTarget.closest(".custom_modal");
   modal.remove();
@@ -32,4 +45,4 @@ function modalFuctionFactory(preprocessFunction, postprocessFunction) {
   };
 }
 
-export {modalFuctionFactory};
+export {getIdOfField, getNumberOfForms, modalFuctionFactory, numberWithCommas};
