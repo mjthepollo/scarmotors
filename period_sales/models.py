@@ -14,6 +14,9 @@ class SalesInfo(TimeStampedModel):
         ordering = ["-created"]
         abstract = True
 
+    start_date = models.DateField(verbose_name="시작일")
+    end_date = models.DateField(verbose_name="종료일")
+
     insurance_sales = models.IntegerField(default=0, verbose_name="보험")
     general_expense = models.IntegerField(default=0, verbose_name="일반경정비")
     general_pando = models.IntegerField(default=0, verbose_name="일반판도")
@@ -25,6 +28,9 @@ class SalesInfo(TimeStampedModel):
 
     def set_info(self, start_date, end_date):
         raise NotImplementedError
+
+    def __str__(self):
+        return f"{self.start_date} ~ {self.end_date}"
 
 
 class PaidTurnoverSalesInfo(SalesInfo):
@@ -133,6 +139,9 @@ class MonthlySales(PeriodSales):
     def set_info(self, start_date, end_date):
         pass
 
+    def __str__(self):
+        return f"{self.start_date.year}년{self.start_date.month}월 매출"
+
 
 class StatisticSales(PeriodSales):
     """
@@ -142,3 +151,6 @@ class StatisticSales(PeriodSales):
 
     def set_info(self, start_date, end_date):
         pass
+
+    def __str__(self):
+        return f"{self.start_date} ~ {self.end_date} 매출"
