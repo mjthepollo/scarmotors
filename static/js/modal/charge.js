@@ -14,7 +14,6 @@ function setRepairAmountInfoFactory(e, repairAmountInfo, wageAmountInput, compon
 
 function chargeModalPreprocess(e) {}
 function chargeModalPostprocess(e, modal) {
-  console.log("FUCK?!");
   const wageAmountInput = modal.querySelector("#id_wage_amount");
   const componentAmountInput = modal.querySelector("#id_component_amount");
   const repairAmountInfo = modal.querySelector(".repair_amount_info");

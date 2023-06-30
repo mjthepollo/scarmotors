@@ -4,7 +4,7 @@
     {% csrf_token %}
     <div class="modal-header">
         <h5 class="modal-title">[{{order.register.RO_number}}] {% if order.charge %}청구-{{order.order_index}} 정보 수정{% else %}청구 처리{% endif %}</h5>
-        <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="닫기"></button>
     </div>
     <div class="modal-body">
         <p class="modal_sector_info">1센터 처리 여부</p>
@@ -17,8 +17,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">Close</button>
-        <button class="btn btn-primary">청구</button>
+        <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">닫기</button>
+        <button class="btn btn-success">청구</button>
     </div>
 </form>
 {% endblock modal_content %}

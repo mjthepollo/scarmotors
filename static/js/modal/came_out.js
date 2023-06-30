@@ -14,7 +14,6 @@ function setSettlementAmountInfoFactory(e, settlementAmountInfo, indemnityAmount
 
 function cameOutModalPreprocess(e) {}
 function cameOutModalPostprocess(e, modal) {
-  console.log("HELO!");
   const numberOfForms = getNumberOfForms(prefix, modal);
   const settlementAmountInfos = modal.querySelectorAll(".settlement_amount_info");
   for (let i = 0; i < numberOfForms; i++) {
