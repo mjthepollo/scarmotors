@@ -7,7 +7,7 @@ from config.settings.base import env
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["*", "azurewebsites.net"]
+ALLOWED_HOSTS = ["scartech.site", "azurewebsites.net"]
 
 # LOGGING
 # ------------------------------------------------------------------------------
@@ -21,6 +21,8 @@ DATABASES = {
         'NAME': os.path.join(ROOT_DIR, 'db.sqlite3'),
     }
 }
+
+DEBUG = False
 
 
 LOGGING = {

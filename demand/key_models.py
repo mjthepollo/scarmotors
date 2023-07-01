@@ -57,7 +57,7 @@ class KeyModel(TimeStampedModel):
     def create_mockup(cls):
         obj = cls.objects.create()
         for field in cls._meta.fields:
-            if field.name is not "id" and\
+            if field.name != "id" and\
                     not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
                 setattr(obj, field.name, None)
         obj.save()
@@ -66,7 +66,7 @@ class KeyModel(TimeStampedModel):
     def is_mockup(self):
         result = True
         for field in self._meta.model._meta.fields:
-            if field.name is not "id" and\
+            if field.name != "id" and\
                     not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
                 result = result and getattr(self, field.name) == None
         print(self, result)
