@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from django.db import models
+from django.db.models import Case, When
 
 from core.models import TimeStampedModel
 from core.utility import list_to_queryset, print_colored
@@ -420,15 +421,19 @@ class Register(TimeStampedModel):
         KeyModel은 모델이고 key는 해당하는 모델의 attribute 이름이다.
         """
         mockup_keys = []
-        for order in self.orders.all().order_by('created'):
+        key_pk_list = []
+        for order in self.orders.all():
             mockup_key = getattr(order, key)
             if not mockup_key:
                 mockup_key = KeyModel.create_mockup()
                 setattr(order, key, mockup_key)
                 order.save()
             mockup_keys.append(mockup_key)
-        queryset = list_to_queryset(
-            KeyModel, mockup_keys).order_by("order__pk")
+            key_pk_list.append(mockup_key.pk)
+        preserved = Case(*[When(pk=pk, then=pos)
+                         for pos, pk in enumerate(key_pk_list)])
+        queryset = KeyModel.objects.filter(
+            pk__in=key_pk_list).order_by(preserved)
         MockupCreated.objects.create(register=self)
         return queryset
 
@@ -584,7 +589,7 @@ class Order(Sales):
 
     def __str__(self):
         try:
-            return f"{self.register.RO_number} {self.order_type} {self.charge_type}"
+            return f"{self.register.RO_number}[{self.order_index}] {self.order_type} {self.charge_type}"
         except Exception as e:
             print(f"Exception in __str__ of Order : {e}")
             return "Exception in __str__ of Order"

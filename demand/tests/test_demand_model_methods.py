@@ -4,7 +4,7 @@ from random import choice, randint
 from django.test import TestCase
 
 from demand.key_models import Charge, Deposit, Payment
-from demand.sales_models import MockupCreated
+from demand.sales_models import MockupCreated, Order
 from demand.test_utility import (createRandomCharge, createRandomDeposit,
                                  createRandomOrdinaryOrder,
                                  createRandomPayment, createRandomRegister)
@@ -72,6 +72,39 @@ class DemandModelMethodTest(TestCase):
         self.assertTrue(self.not_full_register.get_mockups(
             Deposit, "deposit")[2].is_mockup())
         self.assertTrue(len(MockupCreated.objects.all()) == 6)
+
+    def test_ordering_of_get_mockup(self):
+        full_orders_by_query = Order.objects.filter(
+            register=self.full_register)
+        full_payment_mockups = self.full_register.get_mockups(
+            Payment, "payment")
+        full_charge_mockups = self.full_register.get_mockups(
+            Charge, "charge")
+        full_deposit_mockups = self.full_register.get_mockups(
+            Deposit, "deposit")
+        for i, payment in enumerate(full_payment_mockups):
+            self.assertEqual(payment.order, full_orders_by_query[i])
+        for i, charge in enumerate(full_charge_mockups):
+            self.assertEqual(charge.order, full_orders_by_query[i])
+        for i, full_deposit_mockups in enumerate(full_deposit_mockups):
+            self.assertEqual(full_deposit_mockups.order,
+                             full_orders_by_query[i])
+
+        not_full_orders_by_query = Order.objects.filter(
+            register=self.not_full_register)
+        not_full_payment_mockups = self.not_full_register.get_mockups(
+            Payment, "payment")
+        not_full_charge_mockups = self.not_full_register.get_mockups(
+            Charge, "charge")
+        not_full_deposit_mockups = self.not_full_register.get_mockups(
+            Deposit, "deposit")
+        for i, payment in enumerate(not_full_payment_mockups):
+            self.assertEqual(payment.order, not_full_orders_by_query[i])
+        for i, charge in enumerate(not_full_charge_mockups):
+            self.assertEqual(charge.order, not_full_orders_by_query[i])
+        for i, not_full_deposit_mockups in enumerate(not_full_deposit_mockups):
+            self.assertEqual(not_full_deposit_mockups.order,
+                             not_full_orders_by_query[i])
 
     def test_remove_mockups(self):
         self.not_full_register.get_mockups(

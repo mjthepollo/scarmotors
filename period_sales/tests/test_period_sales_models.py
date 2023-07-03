@@ -1,12 +1,8 @@
 from django.test import TestCase
 
-from demand.key_models import Charge, Deposit, Payment
-from demand.sales_models import ExtraSales, Order, Register
 from demand.test_utility import (createRandomCharge, createRandomDeposit,
                                  createRandomOrdinaryOrder,
                                  createRandomPayment, createRandomRegister)
-from period_sales.models import (MonthlySales, NotPaidTurnoverSalesInfo,
-                                 PaidTurnoverSalesInfo, StatisticSales)
 
 
 class PeriodSalesModelTest(TestCase):
