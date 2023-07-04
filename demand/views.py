@@ -78,7 +78,7 @@ def edit_register(request, pk):
         edit_special_register_form = EditSpecialRegisterForm(instance=register)
         register_note_form = RegisterNoteForm(instance=register)
         order_formset = order_form_factory(
-            queryset=register.orders.all(), prefix="order")
+            queryset=register.all_orders, prefix="order")
         payment_formset = payment_form_factory(
             queryset=register.get_mockups(Payment, "payment"), prefix="payment")
         charge_formset = charge_form_factory(

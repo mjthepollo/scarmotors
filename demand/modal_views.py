@@ -64,7 +64,7 @@ def charge_modal(request, pk):
     if request.method == "GET":
         first_center_register_form = FirstCenterRegisterForm(
             instance=order.register)
-        charge_form = ChargeForm(instance=order.charge)
+        charge_form = ChargeForm(instance=order.charge, order=order)
         return TemplateResponse(request, "demand/modals/charge_modal.html",
                                 context={"order": order,
                                          "first_center_register_form": first_center_register_form,
@@ -73,7 +73,8 @@ def charge_modal(request, pk):
         first_center_register_form = FirstCenterRegisterForm(
             request.POST, instance=order.register)
         first_center_register_form.save()
-        charge_form = ChargeForm(request.POST, instance=order.charge)
+        charge_form = ChargeForm(
+            request.POST, instance=order.charge, order=order)
         if charge_form.is_valid():
             charge = charge_form.save()
             order.charge = charge

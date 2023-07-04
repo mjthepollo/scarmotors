@@ -46,8 +46,8 @@
     {% for incentive_form in incentive_formset %}
     {% with incentive_form.instance as order%}
     <tr>
-        <td data-incentive="{{order.get_incentive}}" data-turnover="{{order.get_turnover}}" class="incentive_check incentive"><input type='checkbox' {% if order.incentive_paid %}checked{% endif%}></td>
-        <td data-incentive="{{order.get_incentive}}" data-turnover="{{order.get_turnover}}" class="incentive_paid incentive">
+        <td data-incentive="{{order.get_incentive}}" data-turnover="{{order.get_wage_turnover}}" class="incentive_check incentive"><input type='checkbox' {% if order.incentive_paid %}checked{% endif%}></td>
+        <td class="incentive_paid incentive">
             {% if not incentive_form.instance.incentive_paid %}
             {{incentive_form.incentive_paid}}{{incentive_form.id}}
             {% else %}
@@ -60,7 +60,9 @@
         <td>{{order.formatted_real_day_came_out}}</td>
         <td class="car_number">{{order.register.car_number}}
             {% if order.register.note %}
-            <div class="incentive_note hidden">{{order.register.note}}</div>
+            <div class="hover_note hidden">{{order.register.note}}</div>
+            {% else %}
+            <div class="hover_note hidden hover_blurred_note">비고 없음</div>
             {% endif %}
         </td>
         <td>{{order.register.insurance_agent.name}}</td>
@@ -75,4 +77,5 @@
 {% endblock content %}
 {% block inline_javascript %}
 <script type="module" src="{% static 'js/incentive.js' %}"></script>
+<script type="module" src="{% static 'js/hover_note.js' %}"></script>
 {% endblock inline_javascript %}

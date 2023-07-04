@@ -4,7 +4,14 @@
     <td class="register bold {{order.register.get_status_class}}" rowspan="{{order.register.orders.count}}"><a href="{% url 'demand:edit_register' order.register.pk %}">{{order.register.get_status}}</a></td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.RO_number}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.formatted_day_came_in}}</td>
-    <td rowspan="{{order.register.orders.count}}">{{order.register.car_number}}</td>
+    <td rowspan="{{order.register.orders.count}}" class="car_number">
+        {{order.register.car_number}}
+        {% if order.register.note %}
+        <div class="hover_note hidden">{{order.register.note}}</div>
+        {% else %}
+        <div class="hover_note hidden hover_blurred_note">비고 없음</div>
+        {% endif %}
+    </td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.car_model}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.get_abroad_type_display}}</td>
     <td rowspan="{{order.register.orders.count}}">{{order.register.insurance_agent.name}}</td>

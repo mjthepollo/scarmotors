@@ -59,29 +59,22 @@ class DemandModelMethodTest(TestCase):
         self.assertFalse(self.depoist.is_mockup())
 
     def test_get_mockup(self):
-        self.full_payments.reverse()
         self.assertEqual(self.full_payments,
                          list(self.full_register.get_mockups(Payment, "payment")))
-        self.not_full_payments.reverse()
         self.assertTrue(self.not_full_register.get_mockups(
-            Payment, "payment")[2].is_mockup())
-        self.full_charges.reverse()
+            Payment, "payment")[0].is_mockup())
         self.assertEqual(self.full_charges,
                          list(self.full_register.get_mockups(Charge, "charge")))
-        self.not_full_charges.reverse()
         self.assertTrue(self.not_full_register.get_mockups(
             Charge, "charge")[1].is_mockup())
-        self.full_deposits.reverse()
         self.assertEqual(self.full_deposits,
                          list(self.full_register.get_mockups(Deposit, "deposit")))
-        self.not_full_deposits.reverse()
         self.assertTrue(self.not_full_register.get_mockups(
-            Deposit, "deposit")[0].is_mockup())
+            Deposit, "deposit")[2].is_mockup())
         self.assertTrue(len(MockupCreated.objects.all()) == 6)
 
     def test_ordering_of_get_mockup(self):
-        full_orders_by_query = Order.objects.filter(
-            register=self.full_register)
+        full_orders_by_query = self.full_register.all_orders
         full_payment_mockups = self.full_register.get_mockups(
             Payment, "payment")
         full_charge_mockups = self.full_register.get_mockups(
@@ -96,8 +89,7 @@ class DemandModelMethodTest(TestCase):
             self.assertEqual(full_deposit_mockups.order,
                              full_orders_by_query[i])
 
-        not_full_orders_by_query = Order.objects.filter(
-            register=self.not_full_register)
+        not_full_orders_by_query = self.not_full_register.all_orders
         not_full_payment_mockups = self.not_full_register.get_mockups(
             Payment, "payment")
         not_full_charge_mockups = self.not_full_register.get_mockups(

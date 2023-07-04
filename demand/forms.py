@@ -60,13 +60,31 @@ class ChargeForm(forms.ModelForm):
             'charge_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
-    def as_div(self, *args, **kwags):
+    def as_div(self, *args, **kwargs):
         original_div = super(ChargeForm, self).as_div()
         inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
             수리금액:</label><span class='modal_additional_info repair_amount_info'></span></div>"
         return_div = insert_tag(
             original_div, "component_amount", inserting_tag)
+        VAT_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+            부가세:</label><span class='modal_additional_info VAT_info'></span></div>"
+        chargable_amount_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+            청구가능액:</label><span class='modal_additional_info chargable_amount_info'></span></div>"
+        fault_ratio = self.order
+        try:
+            print(self.order, self.instance, "SEX")
+        except Exception as e:
+            print(e)
+        charge_amount_tag = f"<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+            청구금액:</label><span class='modal_additional_info charge_amount_info'>{self.order}</span></div>"
+        return_div = return_div + VAT_tag + chargable_amount_tag + charge_amount_tag
         return mark_safe(return_div)
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('order', None):
+            self.order = kwargs["order"]
+        kwargs.pop('order', None)
+        super(ChargeForm, self).__init__(*args, **kwargs)
 
 
 class DepositForm(forms.ModelForm):

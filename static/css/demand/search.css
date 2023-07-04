@@ -3,6 +3,7 @@
 @import url("./modals/came_out_modal.css");
 @import url("./modals/charge_modal.css");
 @import url("./modals/deposit_modal.css");
+@import url("../demand/hover_note.css");
 
 main.container {
   display: flex;

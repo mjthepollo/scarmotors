@@ -3,7 +3,14 @@
     <td class="register bold {{order.register.get_status_class}}"><a href="{% url 'demand:edit_register' order.register.pk %}">{{order.register.get_status}}</a></td>
     <td>{{order.register.RO_number}}</td>
     <td>{{order.formatted_day_came_in}}</td>
-    <td>{{order.register.car_number}}</td>
+    <td class="car_number">
+        {{order.register.car_number}}
+        {% if order.register.note %}
+        <div class="hover_note hidden">{{order.register.note}}</div>
+        {% else %}
+        <div class="hover_note hidden hover_blurred_note">비고 없음</div>
+        {% endif %}
+    </td>
     <td>{{order.register.car_model}}</td>
     <td>{{order.register.get_abroad_type_display}}</td>
     <td>{{order.register.insurance_agent.name}}</td>

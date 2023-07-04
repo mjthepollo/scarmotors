@@ -1,6 +1,7 @@
 
 from datetime import datetime
 
+from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.db.models import Case, When
 
@@ -422,7 +423,7 @@ class Register(TimeStampedModel):
         """
         mockup_keys = []
         key_pk_list = []
-        for order in self.orders.all():
+        for order in self.all_orders:
             mockup_key = getattr(order, key)
             if not mockup_key:
                 mockup_key = KeyModel.create_mockup()
@@ -454,6 +455,10 @@ class Register(TimeStampedModel):
         self.remove_mockups(Charge, "charge")
 
 # --------------- HTML FUNCTION -----------------#
+
+    @property
+    def all_orders(self):
+        return self.orders.all().order_by("created")
 
     def get_status(self):
         orders = self.orders.all()
@@ -592,7 +597,8 @@ class Order(Sales):
 
     def get_incentive_paid_month_display(self):
         if self.incentive_paid_date:
-            return self.incentive_paid_date.strftime("%y/%m")
+            paid_date = self.incentive_paid_date - relativedelta(months=1)
+            return paid_date.strftime("%y/%m")
         else:
             return "미지급"
 

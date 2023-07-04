@@ -22,7 +22,7 @@ class Supporter(TimeStampedModel):
 
 class ChargedCompany(TimeStampedModel):
     class Meta:
-        ordering = ["-created",]
+        ordering = ["name",]
         verbose_name = "보험회사"
         verbose_name_plural = "보험회사(들)"
     name = models.CharField(max_length=100, verbose_name="보험(렌트)")
@@ -34,7 +34,7 @@ class ChargedCompany(TimeStampedModel):
 
 class InsuranceAgent(TimeStampedModel):
     class Meta:
-        ordering = ["-created",]
+        ordering = ["name",]
         verbose_name = "보험 담당자"
         verbose_name_plural = "보험 담당자(들)"
     name = models.CharField(max_length=100, verbose_name="보험 담당자명")

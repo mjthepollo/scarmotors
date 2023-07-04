@@ -1,4 +1,5 @@
 @import url("./search.css");
+@import url("../demand/hover_note.css");
 
 #incentive_search_form {
   display: flex;
@@ -89,33 +90,4 @@ th#incentive_header {
 
 #formset .incentive input {
   width: 60px;
-}
-
-.car_number {
-  position: relative;
-}
-
-.incentive_note {
-  z-index: 1;
-  position: absolute;
-  left: 95%;
-  bottom: 95%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  border-radius: 3px;
-  width: 200%;
-  height: 60px;
-
-  border: 1px solid black;
-
-  background: #ffff99;
-
-  border-bottom-left-radius: 0px;
-}
-
-.incentive_note.hidden {
-  display: none;
 }
