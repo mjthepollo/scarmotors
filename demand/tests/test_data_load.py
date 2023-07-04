@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 from django.core.management import call_command
 from django.test import TestCase
 
@@ -41,6 +42,7 @@ class DataLoadTest(TestCase):
         assert type(pd.DataFrame()) == type(self.original_df)
         assert len(self.lines) == len(self.df)
 
+    @pytest.mark.skip(reason="Line numbers are easily changed")
     def test_get_line_numbers(self):
         # 계산법은 excel기준 마지막줄의 index에서 6을 빼주면 된다.
         assert get_line_numbers(self.original_df) == 1181

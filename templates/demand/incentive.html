@@ -36,6 +36,8 @@
         <th>출고일</th>
         <th>차량번호</th>
         <th>담당자</th>
+        <th>보험사</th>
+        <th>과실</th>
         <th>타입</th>
         <th>공임매출</th>
     </tr>
@@ -50,6 +52,8 @@
         <td>{{order.formatted_real_day_came_out}}</td>
         <td>{{order.register.car_number}}</td>
         <td>{{order.register.insurance_agent.name}}</td>
+        <td>{{order.charged_company}}</td>
+        <td>{{order.fault_ratio}}</td>
         <td>{{order.order_type|none_to_dash}}</td>
         <td>{{order.formatted_wage_turnover}}</td>
     </tr>

@@ -45,7 +45,7 @@ def new_register(request):
                     order.register = register
                     order.save()
                 register.RO_number = Register.get_RO_number()
-                register = register.save()
+                register.save()
                 register_note_form = RegisterNoteForm(
                     request.POST, instance=register)
                 return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)

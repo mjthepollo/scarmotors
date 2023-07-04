@@ -80,7 +80,7 @@ class ExcelLoadTest(TestCase):
                         ("1-80", "21하3555", "2023-01-02", "2023-02-03", "None", "SM7", "국산",
                          4, 4, "이성도", "김용연", "백준호", "01072230486", "스타렌트", "폐차처리", True, False),
                         ("1-103", "48노5927", "2023-01-21", "2023-01-26", "None", "클리오", "국산",
-                         1, 1, "김일한", None, "김장현", "01031717367", "롯데렌탈 용인영업소", "미수리출고", False, True)]
+                         1, 1, "김일한", None, "김장현", "01031717367", "롯데렌탈용인영업소", "미수리출고", False, True)]
         test_answers.reverse()  # Because of the ordering
         for i, register in enumerate(Register.objects.all()):
             object_to_tuple = register_to_tuple(register)

@@ -323,7 +323,7 @@ class DemandModelTest(TestCase):
         self.assertEqual(str(self.register), "[4-1234]12가1234(2023/4/20)")
 
     def test_order_str(self):
-        self.assertEqual(str(self.order), "4-1234 자차 보험")
+        self.assertEqual(str(self.order), "4-1234[1] 자차 보험")
 
     def test_extra_sales_str(self):
         self.setUpExtraSales()

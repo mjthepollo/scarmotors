@@ -253,7 +253,7 @@ class OrderFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='receipt_number', lookup_expr='icontains', label="접수번호")
 
-    status = django_filters.MultipleChoiceFilter(
+    status = django_filters.ChoiceFilter(
         choices=Order._meta.get_field('status').choices, label="상태")
 
     class Meta:

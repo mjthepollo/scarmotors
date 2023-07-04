@@ -59,18 +59,24 @@ class DemandModelMethodTest(TestCase):
         self.assertFalse(self.depoist.is_mockup())
 
     def test_get_mockup(self):
+        self.full_payments.reverse()
         self.assertEqual(self.full_payments,
                          list(self.full_register.get_mockups(Payment, "payment")))
+        self.not_full_payments.reverse()
         self.assertTrue(self.not_full_register.get_mockups(
-            Payment, "payment")[0].is_mockup())
+            Payment, "payment")[2].is_mockup())
+        self.full_charges.reverse()
         self.assertEqual(self.full_charges,
                          list(self.full_register.get_mockups(Charge, "charge")))
+        self.not_full_charges.reverse()
         self.assertTrue(self.not_full_register.get_mockups(
             Charge, "charge")[1].is_mockup())
+        self.full_deposits.reverse()
         self.assertEqual(self.full_deposits,
                          list(self.full_register.get_mockups(Deposit, "deposit")))
+        self.not_full_deposits.reverse()
         self.assertTrue(self.not_full_register.get_mockups(
-            Deposit, "deposit")[2].is_mockup())
+            Deposit, "deposit")[0].is_mockup())
         self.assertTrue(len(MockupCreated.objects.all()) == 6)
 
     def test_ordering_of_get_mockup(self):

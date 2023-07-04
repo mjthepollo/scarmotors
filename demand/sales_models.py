@@ -566,7 +566,7 @@ class Order(Sales):
 
     @property
     def order_index(self):
-        return list(self.register.orders.all()).index(self)+1
+        return list(self.register.orders.all().order_by("created")).index(self)+1
 
     def get_description(self):
         try:

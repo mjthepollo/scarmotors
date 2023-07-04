@@ -33,7 +33,7 @@ test_lines = [['0123', None, '1-1', pd.Timestamp('2023-01-02 00:00:00'), pd.Time
               [None, None, '1-80', pd.Timestamp('2023-01-02 00:00:00'), pd.Timestamp('2023-02-03 00:00:00'), '폐차', None, '21하3555', 'SM7', '국산', 4.0, 4.0, 8.0, '이성도', '김용연/백준호', 1072230486, '보험', '현대', '대물', '12-109185', 1.0,
                None, None, None, None, 0.0, 0.0, 0.0, '스타렌트', None, None, None, None, None, None, 0.0, None, None, None, None, 0.0, None, 0.0, 0.0, 0.0, None, '폐차처리', '미청구', None, None, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
               [None, None, '1-103', pd.Timestamp('2023-01-21 00:00:00'), pd.Timestamp('2023-01-26 00:00:00'), '미수리출고', None, '48노5927', '클리오', '국산', 1.0, 1.0, 2.0, '김일한', '김장현담당', 1031717367, '보험', '현대', '대물', '23-01063895', None,
-               None, None, None, None, 0.0, 0.0, 0.0, '롯데렌탈 용인영업소', None, None, None, None, None, None, 0.0, None, None, None, None, 0.0, None, 0.0, 0.0, 0.0, None, None, '미청구', None, None, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+               None, None, None, None, 0.0, 0.0, 0.0, '롯데렌탈용인영업소', None, None, None, None, None, None, 0.0, None, None, None, None, 0.0, None, 0.0, 0.0, 0.0, None, None, '미청구', None, None, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
               ]
 
 
