@@ -12,4 +12,10 @@ modal_urlpatterns = [
          modal_views.charge_modal, name="charge_modal"),
     path("deposit_modal/<int:pk>/",
          modal_views.deposit_modal, name="deposit_modal"),
+    path("delete_payment/<int:pk>/",
+         modal_views.delete_payment, name="delete_payment"),
+    path("delete_charge/<int:pk>/",
+         modal_views.delete_charge, name="delete_charge"),
+    path("delete_deposit/<int:pk>/",
+         modal_views.delete_deposit, name="delete_deposit"),
 ]

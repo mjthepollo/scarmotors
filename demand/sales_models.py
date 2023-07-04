@@ -19,9 +19,10 @@ NOT_COMPLETE = 0
 PROGRESS = 1
 COMPLETE = 2
 NEED_CHECK = 3
-MANUALLY_COMPLETE = 4
+WARNING = 4
+MANUALLY_COMPLETE = 5
 STATUS_CLASS = ["not_complete", "progress",
-                "complete", "need_check", "manually_complete"]
+                "complete", "need_check", "warning", "manually_complete"]
 REGISTER_STAUTS = ["청구 필요", "진행중", "완료", "확인 필요", "완료(수동)"]
 
 
@@ -326,14 +327,17 @@ class Sales(TimeStampedModel):
             if self.charge.charge_date:
                 status_class = STATUS_CLASS[COMPLETE]
             else:
-                status_class = STATUS_CLASS[NOT_COMPLETE]
+                status_class = STATUS_CLASS[WARNING]
         else:
             status_class = STATUS_CLASS[NOT_COMPLETE]
         return make_to_class_name(status_class)
 
     def get_deposit_class(self):
         if self.deposit:
-            status_class = STATUS_CLASS[COMPLETE]
+            if self.deposit.deposit_date:
+                status_class = STATUS_CLASS[COMPLETE]
+            else:
+                status_class = STATUS_CLASS[WARNING]
         else:
             status_class = STATUS_CLASS[NOT_COMPLETE]
         return make_to_class_name(status_class)

@@ -108,3 +108,39 @@ def deposit_modal(request, pk):
             return redirect(previous_url)
         else:
             return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+
+
+@login_required
+def delete_payment(request, pk):
+    payment = Payment.objects.get(pk=pk)
+    order = payment.order
+    payment.delete()
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+
+
+@login_required
+def delete_charge(request, pk):
+    charge = Charge.objects.get(pk=pk)
+    order = charge.order
+    charge.delete()
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+
+
+@login_required
+def delete_deposit(request, pk):
+    deposit = Deposit.objects.get(pk=pk)
+    order = deposit.order
+    deposit.delete()
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)

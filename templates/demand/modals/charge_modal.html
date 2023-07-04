@@ -18,6 +18,9 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">닫기</button>
+        {% if order.charge %}
+        <a type="button" href="{% url 'demand:delete_charge' order.charge.pk %}" class="btn btn-danger">삭제</a>
+        {% endif %}
         <button class="btn btn-success">청구</button>
     </div>
 </form>

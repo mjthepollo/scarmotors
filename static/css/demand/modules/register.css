@@ -42,6 +42,11 @@
   background-color: pink;
 }
 
+.order.warning_class {
+  color: white;
+  background-color: magenta;
+}
+
 .order.not_paid_class {
   color: white;
   background-color: blue;
