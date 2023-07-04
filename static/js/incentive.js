@@ -23,3 +23,21 @@ for (let i = 0; i < incentiveChecks.length; i++) {
   incentiveChecks[i].addEventListener("click", setIncentiveInfo);
 }
 setIncentiveInfo();
+
+const incentiveNotes = document.querySelectorAll(".incentive_note");
+
+function showIncentiveNotes(e) {
+  const incentiveNote = e.currentTarget.querySelector(".incentive_note");
+  incentiveNote.classList.remove("hidden");
+}
+
+function hideIncentiveNotes(e) {
+  const incentiveNote = e.currentTarget.querySelector(".incentive_note");
+  incentiveNote.classList.add("hidden");
+}
+
+console.log(incentiveNotes);
+for (let i = 0; i < incentiveNotes.length; i++) {
+  incentiveNotes[i].parentElement.addEventListener("mouseover", showIncentiveNotes);
+  incentiveNotes[i].parentElement.addEventListener("mouseout", hideIncentiveNotes);
+}

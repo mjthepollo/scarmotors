@@ -562,7 +562,10 @@ class Order(Sales):
     deposit = models.OneToOneField(
         Deposit, null=True, blank=True, related_name="order", verbose_name="입금", on_delete=models.SET_NULL)
 
-    incentive_paid = models.BooleanField(default=False, verbose_name="인센티브 지급")
+    incentive_paid = models.BooleanField(
+        default=False, verbose_name="인센티브 지급여부")
+    incentive_paid_date = models.DateField(
+        blank=True, null=True, verbose_name="인센티브 지급일")
 
     @property
     def order_index(self):
@@ -586,6 +589,12 @@ class Order(Sales):
 
     def to_excel_line(self):
         return dictionary_to_line(order_to_excel_dictionary(self))
+
+    def get_incentive_paid_month_display(self):
+        if self.incentive_paid_date:
+            return self.incentive_paid_date.strftime("%y/%m")
+        else:
+            return "미지급"
 
     def __str__(self):
         try:

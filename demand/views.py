@@ -341,6 +341,8 @@ def cancel_manually_complete(request, pk):
 
 @login_required
 def incentive(request):
+    if request.path == request.get_full_path():
+        return redirect(reverse("demand:incentive")+f"?day_came_in__gt={date.today().replace(day=1)}&day_came_in__ls={date.today()}")
     incentive_filter = IncentiveFilter(
         request.GET, queryset=Order.objects.all())
     if request.GET.get("register__supporter", None):
@@ -357,6 +359,9 @@ def incentive(request):
         incentive_formset = incentive_form_factory(
             request.POST, queryset=orders, prefix="incentive")
         orders = incentive_formset.save()
+        for order in orders:
+            order.incentive_paid_date = date.today()
+            order.save()
     return render(request, "demand/incentive.html", context={
         "orders":  orders, "incentive_filter": incentive_filter,
         "supporter": supporter,

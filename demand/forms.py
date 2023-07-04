@@ -72,9 +72,10 @@ class ChargeForm(forms.ModelForm):
 class DepositForm(forms.ModelForm):
     class Meta:
         model = Deposit
-        fields = ["deposit_date", 'deposit_amount']
+        fields = ["deposit_date", 'deposit_amount', "deposit_note"]
         widgets = {
             'deposit_date': forms.DateInput(attrs={'type': 'date'}),
+            'deposit_note': forms.Textarea(attrs={'class': 'deposit_note'}),
         }
 
     def as_div(self, *args, **kwags):
@@ -83,9 +84,10 @@ class DepositForm(forms.ModelForm):
             지급율:</label><span class='modal_additional_info payment_rate_info'></span></div>"
         inserted_div = insert_tag(
             original_div, "deposit_date", inserting_tag)
-        finishing_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+        inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
             삭감율:</label><span class='modal_additional_info cut_rate_info'></span></div>"
-        return_div = inserted_div + finishing_tag
+        return_div = insert_tag(
+            inserted_div, "deposit_amount", inserting_tag)
         return mark_safe(return_div)
 
 
@@ -279,12 +281,15 @@ class OXBooleanWidget(BooleanWidget):
 class IncentiveFilter(django_filters.FilterSet):
     register__supporter = django_filters.ModelChoiceFilter(
         queryset=Supporter.objects.all(), label="업체명")
-    real_day_came_out_gt = django_filters.ChoiceFilter(
-        choices=INCENTIVE_FILTER_CHOICES, label="기간",
-        lookup_expr='gt', field_name='register__real_day_came_out')
     incentive_paid = django_filters.BooleanFilter(
         field_name='incentive_paid', label="지급여부",
         widget=OXBooleanWidget())
+    day_came_in__gt = django_filters.DateFilter(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        field_name='register__day_came_in', lookup_expr='gt', label="입고일(부터)")
+    day_came_in__ls = django_filters.DateFilter(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        field_name='register__day_came_in', lookup_expr='lt', label="입고일(까지)")
 
     class Meta:
         model = Order

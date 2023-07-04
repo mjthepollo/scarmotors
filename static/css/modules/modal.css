@@ -73,8 +73,15 @@ p.modal_sector_info {
 .modal_inputs > div > input[type="number"],
 .modal_inputs > div > input[type="date"],
 .modal_inputs > div > input[type="text"],
+.modal_inputs > div > textarea,
 .modal_inputs > div > select {
   width: 140px;
+  width: 140px;
+}
+
+.modal_inputs > div > textarea {
+  height: 60px;
+  padding: 5px;
 }
 
 .modal_radios,

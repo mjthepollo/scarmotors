@@ -8,7 +8,7 @@ from demand.excel_line_info import *
 
 class Supporter(TimeStampedModel):
     class Meta:
-        ordering = ["-created",]
+        ordering = ["name",]
         verbose_name = "입고 지원 업체"
         verbose_name_plural = "입고 지원 업체(들)"
     name = models.CharField(max_length=100, verbose_name="지원 업체명")
@@ -69,7 +69,6 @@ class KeyModel(TimeStampedModel):
             if field.name != "id" and\
                     not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
                 result = result and getattr(self, field.name) == None
-        print(self, result)
         return result
 
     def save(self, *args, **kwargs):
@@ -186,6 +185,8 @@ class Deposit(KeyModel):
     deposit_amount = models.IntegerField(
         verbose_name="입금액", blank=True, null=True)
     deposit_date = models.DateField(verbose_name="입금일", blank=True, null=True)
+    deposit_note = models.TextField(
+        verbose_name="입금 정보", blank=True, null=True)
 
     def __str__(self):
         if hasattr(self, "order"):
