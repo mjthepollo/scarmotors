@@ -5,9 +5,10 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from demand.forms import (ChargeForm, DepositForm, FirstCenterRegisterForm,
-                          PaymentForm, RealDayCameOutForm, SpecialRegisterForm)
+from demand.key_model_forms import ChargeForm, DepositForm, PaymentForm
 from demand.key_models import Charge, Deposit, Payment
+from demand.sales_model_forms import (FirstCenterRegisterForm,
+                                      RealDayCameOutForm, SpecialRegisterForm)
 from demand.sales_models import Order, Register
 
 

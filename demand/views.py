@@ -10,12 +10,14 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from demand.excel_line_info import INDEXES
-from demand.forms import (ChargeForm, DepositForm, EditRegisterForm,
-                          EditSpecialRegisterForm, IncentiveFilter,
-                          IncentiveForm, NewRegisterForm, OrderFilter,
-                          OrderForm, PaymentForm, RegisterFilter,
-                          RegisterFilterForOrderFilter, RegisterNoteForm)
+from demand.filter_forms import (IncentiveFilter, OrderFilter, RegisterFilter,
+                                 RegisterFilterForOrderFilter)
+from demand.key_model_forms import ChargeForm, DepositForm, PaymentForm
 from demand.key_models import Charge, Deposit, Payment
+from demand.sales_model_forms import (EditRegisterForm,
+                                      EditSpecialRegisterForm, IncentiveForm,
+                                      NewRegisterForm, OrderForm,
+                                      RegisterNoteForm)
 from demand.sales_models import ExtraSales, Order, Register
 
 
@@ -34,6 +36,7 @@ def new_register(request):
             "order_formset": order_formset,
         })
     else:
+        print(request.POST)
         register_form = NewRegisterForm(request.POST)
         order_formset = order_form_factory(
             request.POST, queryset=Order.objects.none())
