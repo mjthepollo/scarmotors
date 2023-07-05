@@ -1,9 +1,9 @@
 {% extends "modules/custom_modal.html"%}
 {% block modal_content %}
-<form id="formset" data-formset-prefix="{{payment_formset.prefix}}" class="modal-content" method="POST" action="{% url 'demand:came_out_modal' register.pk %}">
+<form class="modal-content" method="POST" action="{% url 'demand:came_out_modal' order.pk %}">
     {% csrf_token %}
     <div class="modal-header">
-        <h5 class="modal-title">[{{register.RO_number}}] {% if register.real_day_came_out %}출고 정보 수정{% else %}출고처리{% endif %}</h5>
+        <h5 class="modal-title">{{order}} {% if order.register.real_day_came_out %}출고 정보 수정{% else %}출고처리{% endif %}</h5>
         <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="닫기"></button>
     </div>
     <div class="modal-body">

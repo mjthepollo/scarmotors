@@ -75,7 +75,9 @@ def edit_register(request, pk):
         edit_special_register_form = EditSpecialRegisterForm(instance=register)
         register_note_form = RegisterNoteForm(instance=register)
         order_formset = order_form_factory(
-            queryset=register.all_orders, prefix="order")
+            queryset=Order.objects.none(), prefix="order_formset")
+        order_forms = [OrderForm(instance=order, prefix=f"order-{i}")
+                       for i, order in enumerate(register.all_orders)]
         payment_forms = [PaymentForm(
             instance=order.payment, prefix=f"payment-{i}")
             for i, order in enumerate(register.all_orders)]
@@ -91,6 +93,7 @@ def edit_register(request, pk):
             'edit_special_register_form': edit_special_register_form,
             "register_note_form": register_note_form,
             "order_formset": order_formset,
+            "order_forms": order_forms,
             "payment_forms": payment_forms,
             "charge_forms": charge_forms,
             "deposit_forms": deposit_forms,
@@ -101,7 +104,9 @@ def edit_register(request, pk):
             request.POST, instance=register)
         register_note_form = RegisterNoteForm(request.POST, instance=register)
         order_formset = order_form_factory(
-            request.POST, queryset=register.all_orders, prefix="order")
+            request.POST, queryset=Order.objects.none(), prefix="order_formset")
+        order_forms = [OrderForm(request.POST, instance=order, prefix=f"order-{i}")
+                       for i, order in enumerate(register.all_orders)]
         payment_forms = [PaymentForm(
             request.POST, instance=order.payment, prefix=f"payment-{i}")
             for i, order in enumerate(register.all_orders)]
@@ -111,6 +116,8 @@ def edit_register(request, pk):
         deposit_forms = [DepositForm(
             request.POST, instance=order.deposit, prefix=f"deposit-{i}")
             for i, order in enumerate(register.all_orders)]
+        order_forms_are_valid = not (
+            False in [form.is_valid() for form in order_forms])
         payment_forms_are_valid = not (
             False in [form.is_valid() for form in payment_forms])
         charge_forms_are_valid = not (
@@ -121,6 +128,7 @@ def edit_register(request, pk):
                 edit_special_register_form.is_valid() and \
                 register_note_form.is_valid() and \
                 order_formset.is_valid() and \
+                order_forms_are_valid and \
                 payment_forms_are_valid and \
                 charge_forms_are_valid and \
                 deposit_forms_are_valid:
@@ -128,6 +136,7 @@ def edit_register(request, pk):
             edit_special_register_form.save()
             register_note_form.save()
             for i, order in enumerate(register.all_orders):
+                order = order_forms[i].save()
                 payment = payment_forms[i].save()
                 deposit = deposit_forms[i].save()
                 charge = charge_forms[i].save()
@@ -158,6 +167,7 @@ def edit_register(request, pk):
             'edit_special_register_form': edit_special_register_form,
             "register_note_form": register_note_form,
             "order_formset": order_formset,
+            "order_forms": order_forms,
             "payment_forms": payment_forms,
             "charge_forms": charge_forms,
             "deposit_forms": deposit_forms,

@@ -19,10 +19,10 @@
     {{order_formset.management_form}}
     <h2>INFO</h2>
     <div data-formset-body id="order_edit_formset">
-        {% for form in order_formset %}
+        {% for order_form in order_forms %}
         <h3>주문</h3>
         <div data-formset-form class="order_edit_formset_entity">
-            {{form.render}}
+            {{order_form.render}}
         </div>
         <h3>결제 정보</h3>
         <div class='order_edit_formset_entity'>

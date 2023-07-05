@@ -107,9 +107,8 @@ class Payment(KeyModel):
     refund_date = models.DateField(blank=True, null=True, verbose_name="환불일")
 
     def is_default(self):
-        return (self.indemnity_amount == None and self.indemnity_amount == 0) and\
-            (self.discount_amount == None and self.discount_amount == 0) and\
-            (self.refund_amount == None and self.indemnity_amount == 0) and\
+        return self.indemnity_amount == None and self.discount_amount == None and\
+            self.refund_amount == None and\
             self.payment_type == None and self.payment_info == None and\
             self.payment_date == None and self.refund_date == None
 
@@ -187,10 +186,7 @@ class Deposit(KeyModel):
         verbose_name="입금 정보", blank=True, null=True)
 
     def is_default(self):
-        print(f"{self.deposit_amount}, {self.deposit_date}, {self.deposit_note}")
-        return (self.deposit_amount == 0 or
-                self.deposit_amount == None) and\
-            self.deposit_date == None and\
+        return self.deposit_amount == None and self.deposit_date == None and\
             (self.deposit_note == None or self.deposit_note == "")
 
     def is_stable(self):
