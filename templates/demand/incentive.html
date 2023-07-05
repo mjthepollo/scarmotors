@@ -32,8 +32,8 @@
     <tr>
         <th id="turnover_header" class="incentive">매출확인</th>
         <th id="incentive_header" class="incentive">지급처리</th>
-        <th>상태</th>
-        <th>보험사</th>
+        {% comment %} <th>상태</th> {% endcomment %}
+        <th>입고지원</th>
         <th>접수</th>
         <th>출고일</th>
         <th>차량번호</th>
@@ -44,7 +44,7 @@
         <th>공임매출</th>
     </tr>
     {% for incentive_form in incentive_formset %}
-    {% with incentive_form.instance as order%}
+    {% with incentive_form.instance as order %}
     <tr>
         <td data-incentive="{{order.get_incentive}}" data-turnover="{{order.get_wage_turnover}}" class="incentive_check incentive"><input type='checkbox' {% if order.incentive_paid %}checked{% endif%}></td>
         <td class="incentive_paid incentive">
@@ -52,9 +52,10 @@
             {{incentive_form.incentive_paid}}{{incentive_form.id}}
             {% else %}
             {{incentive_form.instance.get_incentive_paid_month_display}}
+            <div class="hidden">{{incentive_form.incentive_paid}}{{incentive_form.id}}</div>
             {% endif %}
         </td>
-        <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk%}">{{order.get_status_display}}</a></td>
+        {% comment %} <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk%}">{{order.get_status_display}}</a></td> {% endcomment %}
         <td>{{order.register.supporter}}</td>
         <td>{{order.register.RO_number}}</td>
         <td>{{order.formatted_real_day_came_out}}</td>

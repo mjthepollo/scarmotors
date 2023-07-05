@@ -358,10 +358,11 @@ def incentive(request):
     else:
         incentive_formset = incentive_form_factory(
             request.POST, queryset=orders, prefix="incentive")
-        orders = incentive_formset.save()
-        for order in orders:
-            order.incentive_paid_date = date.today()
-            order.save()
+        saved_orders = incentive_formset.save()
+        for saved_order in saved_orders:
+            saved_order.incentive_paid_date = date.today()
+            saved_order.save()
+    print([order.pk for order in orders])
     return render(request, "demand/incentive.html", context={
         "orders":  orders, "incentive_filter": incentive_filter,
         "supporter": supporter,

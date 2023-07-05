@@ -36,6 +36,11 @@
 .error {
   color: red;
 }
+
+.hidden {
+  display: none;
+}
+
 body {
   position: relative;
 
