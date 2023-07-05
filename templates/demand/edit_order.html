@@ -19,6 +19,6 @@
     <button id="complete" class="btn btn-dark">수정 완료</button>
 </form>
 {% endblock content %}
-{% block footer%}
-{% include "modules/footer.html" %}
-{% endblock footer%}
+{% block inline_javascript %}
+<script type="module" src="{% static 'js/order_edit.js' %}"></script>
+{% endblock inline_javascript %}

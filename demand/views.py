@@ -177,35 +177,38 @@ def edit_register(request, pk):
 @login_required
 def edit_order(request, pk):
     order = get_object_or_404(Order, pk=pk)
-    order_form = OrderForm(instance=order)
-    deposit_form = DepositForm(instance=order.deposit)
-    charge_form = ChargeForm(instance=order.charge, order=order)
-    payment_form = PaymentForm(instance=order.payment)
+    order_form = OrderForm(instance=order, prefix="order-0")
+    payment_form = PaymentForm(instance=order.payment, prefix="payment-0")
+    charge_form = ChargeForm(instance=order.charge,
+                             order=order, prefix="charge-0")
+    deposit_form = DepositForm(instance=order.deposit, prefix="deposit-0")
     if request.method == "GET":
         return render(request, "demand/edit_order.html", context={
             "order_form": order_form,
-            "deposit_form": deposit_form,
-            "charge_form": charge_form,
             "payment_form": payment_form,
+            "charge_form": charge_form,
+            "deposit_form": deposit_form,
         })
     else:
-        order_form = OrderForm(request.POST, instance=order)
-        deposit_form = DepositForm(request.POST, instance=order.deposit)
+        order_form = OrderForm(request.POST, instance=order, prefix="order-0")
+        payment_form = PaymentForm(
+            request.POST, instance=order.payment, prefix="payment-0")
         charge_form = ChargeForm(
-            request.POST, instance=order.charge, order=order)
-        payment_form = PaymentForm(request.POST, instance=order.payment)
-        if order_form.is_valid() and deposit_form.is_valid() and charge_form.is_valid() and payment_form.is_valid():
+            request.POST, instance=order.charge, order=order, prefix="charge-0")
+        deposit_form = DepositForm(
+            request.POST, instance=order.deposit, prefix="deposit-0")
+        if order_form.is_valid() and payment_form.is_valid() and charge_form.is_valid() and deposit_form.is_valid():
             order_form.save()
-            deposit_form.save()
-            charge_form.save()
             payment_form.save()
+            charge_form.save()
+            deposit_form.save()
             return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
         else:
             return render(request, "demand/edit_order.html", context={
                 "order_form": order_form,
-                "deposit_form": deposit_form,
-                "charge_form": charge_form,
                 "payment_form": payment_form,
+                "charge_form": charge_form,
+                "deposit_form": deposit_form,
             })
 
 
