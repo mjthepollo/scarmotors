@@ -1,10 +1,11 @@
 from datetime import date
 from random import choice, randint
 
+from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 
 from demand.key_models import Charge, Deposit, Payment
-from demand.sales_models import MockupCreated, Order
+from demand.sales_models import MockupCreated, Order, Register
 from demand.test_utility import (createRandomCharge, createRandomDeposit,
                                  createRandomOrdinaryOrder,
                                  createRandomPayment, createRandomRegister)
@@ -48,6 +49,29 @@ class DemandModelMethodTest(TestCase):
 
         self.depoist = createRandomDeposit()
         self.mockup_deposit = Deposit.create_mockup()
+
+    def test_RO_number(self):
+        Register.objects.all().delete()
+        last_month = (date.today() - relativedelta(months=1)).month
+        current_month = date.today().month
+        next_month = (date.today() + relativedelta(months=1)).month
+
+        last_month_registers = [createRandomRegister(f"{last_month}-1")]
+        new_last_month_register = createRandomRegister()
+        new_last_month_register.set_RO_number(month=last_month)
+        self.assertEqual(new_last_month_register.RO_number, f"{last_month}-2")
+
+        current_month_register = createRandomRegister()
+        current_month_register.set_RO_number()
+        self.assertEqual(current_month_register.RO_number,
+                         f"{current_month}-1")
+
+        next_month_registers = [createRandomRegister(
+            f"{next_month}-1"), createRandomRegister(f"{next_month}-5")]
+        next_month_register = createRandomRegister()
+        next_month_register.set_RO_number(month=next_month)
+        self.assertEqual(next_month_register.RO_number,
+                         f"{next_month}-3")
 
     def test_is_mockup(self):
         self.setUpMockup()

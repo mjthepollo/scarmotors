@@ -6,13 +6,13 @@ from demand.sales_models import ExtraSales, Order, Register
 from demand.utility import string_to_date
 
 
-def createRandomRegister():
+def createRandomRegister(RO_number=None):
     """
     테스트를 위해 Random한 Register를 만듭니다.
     """
     randint(1, 9)
     car_number = "RANDOM"
-    RO_number = f"TEST_RO"
+    RO_number = RO_number or f"TEST_RO"
     return Register.objects.create(
         RO_number=RO_number, car_number=car_number,
         day_came_in=string_to_date("2023-04-20"),

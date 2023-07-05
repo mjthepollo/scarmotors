@@ -90,12 +90,6 @@ class EditRegisterForm(forms.ModelForm):
         }
 
 
-class IncentiveForm(forms.ModelForm):
-    class Meta:
-        model = Order
-        fields = ["incentive_paid"]
-
-
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
@@ -114,11 +108,6 @@ class OrderForm(forms.ModelForm):
 
 
 class EditOrderForm(forms.ModelForm):
-    # Payment
-    indemnity_amount = forms.IntegerField()
-    discount_amount = forms.IntegerField()
-    refund_amount = forms.IntegerField()
-
     class Meta:
         model = Order
         fields = ["charge_type", "charged_company",
@@ -138,3 +127,9 @@ class EditOrderForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class IncentiveForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ["incentive_paid"]

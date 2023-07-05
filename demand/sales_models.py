@@ -439,19 +439,19 @@ class Register(TimeStampedModel):
         return self.number_of_exchange_works + self.number_of_repair_works
 
     @classmethod
-    def get_RO_number(cls):
-        current_month = datetime.now().month
+    def get_RO_number(cls, month=None, year=None):
+        current_year = year or datetime.now().year
+        current_month = month or datetime.now().month
         current_number = cls.objects.filter(
-            created__month=current_month).count()
+            RO_number__icontains=f"{current_month}-", created__year=current_year).count()+1
         return f"{current_month}-{current_number}"
 
-    def set_RO_number(self):
-        self.RO_number = Register.get_RO_number()
+    def set_RO_number(self, month=None, year=None):
+        self.RO_number = Register.get_RO_number(month, year)
         self.save()
 # endregion Register Utility Function
 
 # region Mockup Functions
-
     def get_mockups(self, KeyModel, key):
         """
         EditRegisterView에서 사용한다. modelformset을 활용하기 위해 mockup Object를 만들어준다.
