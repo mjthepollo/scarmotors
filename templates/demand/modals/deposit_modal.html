@@ -16,7 +16,7 @@
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">닫기</button>
         {% if order.deposit %}
-        <a type="button" href="{% url 'demand:delete_deposit' order.deposit.pk %}" class="btn btn-danger">삭제</a>
+        <button type="button" data-redirect_url="{% url 'demand:delete_deposit' order.deposit.pk %}" class="btn btn-danger delete_button">삭제</button>
         {% endif %}
         <button class="btn btn-success">입금</button>
     </div>

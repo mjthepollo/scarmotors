@@ -174,6 +174,7 @@ def edit_order(request, pk):
 @login_required
 def detail_register(request, pk):
     register = get_object_or_404(Register, pk=pk)
+    pass
 
 
 @ login_required

@@ -12,6 +12,13 @@ function closeModal(e) {
   modal.remove();
 }
 
+function handleDeleteButton(e) {
+  if (window.confirm("정말로 삭제하시겠습니까?")) {
+    const redirectUrl = e.currentTarget.dataset.redirect_url;
+    window.location.href = redirectUrl;
+  }
+}
+
 function modalFuctionFactory(preprocessFunction, postprocessFunction) {
   return function (e) {
     preprocessFunction(e);
@@ -32,6 +39,10 @@ function modalFuctionFactory(preprocessFunction, postprocessFunction) {
         const closeButtons = modal.querySelectorAll(".close_modal");
         for (let i = 0; i < closeButtons.length; i++) {
           closeButtons[i].addEventListener("click", closeModal);
+        }
+        const deleteButton = modal.querySelector(".delete_button");
+        if (deleteButton) {
+          deleteButton.addEventListener("click", handleDeleteButton);
         }
         postprocessFunction(e, modal);
       })
