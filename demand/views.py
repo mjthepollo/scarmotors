@@ -362,9 +362,8 @@ def incentive(request):
         for saved_order in saved_orders:
             saved_order.incentive_paid_date = date.today()
             saved_order.save()
-    print([order.pk for order in orders])
     return render(request, "demand/incentive.html", context={
-        "orders":  orders, "incentive_filter": incentive_filter,
+        "incentive_filter": incentive_filter,
         "supporter": supporter,
         "incentive_formset": incentive_formset,
     })
