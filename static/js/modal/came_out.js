@@ -1,5 +1,5 @@
 import {numberWithCommas} from "../utility.js";
-import {getIdOfField, getNumberOfForms, modalFuctionFactory} from "./modal.js";
+import {getIdOfField, modalFuctionFactory} from "./modal.js";
 
 const cameOutButtons = document.querySelectorAll(".came_out_button");
 const prefix = "payment";
@@ -15,7 +15,7 @@ function setSettlementAmountInfoFactory(e, settlementAmountInfo, indemnityAmount
 
 function cameOutModalPreprocess(e) {}
 function cameOutModalPostprocess(e, modal) {
-  const numberOfForms = getNumberOfForms(prefix, modal);
+  const numberOfForms = document.querySelectorAll(".payment_form").length;
   const settlementAmountInfos = modal.querySelectorAll(".settlement_amount_info");
   for (let i = 0; i < numberOfForms; i++) {
     const settlementAmountInfo = settlementAmountInfos[i];

@@ -7,7 +7,6 @@
         <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="닫기"></button>
     </div>
     <div class="modal-body">
-        {{payment_formset.management_form}}
         <p class="modal_sector_info">등록 정보</p>
         <div class="modal_inputs">
             <div>
@@ -18,8 +17,8 @@
             </div>
         </div>
         <p class="modal_sector_info">결제 정보</p>
-        {% for payment_form in payment_formset %}
-        <div class="modal_inputs">
+        {% for payment_form in payment_forms %}
+        <div class="modal_inputs payment_form">
             {{payment_form.as_div}}
         </div>
         {% if not forloop.last%}

@@ -64,7 +64,7 @@ class ChargeForm(forms.ModelForm):
         return_div = insert_tag(
             original_div, "component_amount", inserting_tag)
         VAT_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
-            부가세:</label><span class='modal_additional_info VAT_info'></span></div>"
+            부가세:</label><span class='modal_additional_info vat_info'></span></div>"
         chargable_amount_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>청구가능액:</label>\
                 <span class='modal_additional_info chargable_amount_info'></span></div>"
         charge_amount_tag = f"<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\

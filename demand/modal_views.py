@@ -24,19 +24,18 @@ def car_number_modal(request):
 @login_required
 def came_out_modal(request, pk):
     register = Register.objects.get(pk=pk)
-    payment_form_factory = modelformset_factory(
-        Payment, form=PaymentForm, extra=0)
     if request.method == "GET":
         real_day_came_out_form = RealDayCameOutForm(instance=register)
         special_register_form = SpecialRegisterForm(instance=register)
-        payment_formset = payment_form_factory(
-            queryset=register.get_mockups(Payment, "payment"), prefix="payment")
+        payment_forms = [PaymentForm(
+            instance=order.payment, prefix=f"payment-{i}")
+            for i, order in enumerate(register.all_orders)]
         return TemplateResponse(
             request, "demand/modals/came_out_modal.html",
             context={"register": register,
                      "real_day_came_out_form": real_day_came_out_form,
                      "special_register_form": special_register_form,
-                     "payment_formset": payment_formset})
+                     "payment_forms": payment_forms})
     else:
         register = get_object_or_404(Register, pk=pk)
         real_day_came_out_form = RealDayCameOutForm(
@@ -45,11 +44,19 @@ def came_out_modal(request, pk):
             request.POST, instance=register)
         real_day_came_out_form.save()
         special_register_form.save()
-        payment_formset = payment_form_factory(
-            request.POST, queryset=register.get_mockups(Payment, "payment"),
-            prefix="payment")
-        if payment_formset.is_valid():
-            payment_formset.save()
+        payment_forms = [PaymentForm(
+            request.POST, instance=order.payment, prefix=f"payment-{i}")
+            for i, order in enumerate(register.all_orders)]
+        payment_forms_are_valid = not (
+            False in [form.is_valid() for form in payment_forms])
+        if payment_forms_are_valid:
+            for i, order in enumerate(register.all_orders):
+                payment = payment_forms[i].save()
+                if payment.is_default():
+                    order.payment = None
+                    payment.delete()
+                else:
+                    order.payment = payment
         else:
             return JsonResponse({"error_message": "Payment Formset is not valid"})
         previous_url = request.META.get('HTTP_REFERER', None)
