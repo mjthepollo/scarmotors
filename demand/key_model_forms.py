@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 from core.utility import insert_tag
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
                                Payment, Supporter)
+from demand.utility import zero_if_none
 
 
 class SupporterForm(forms.ModelForm):
@@ -46,6 +47,9 @@ class PaymentForm(forms.ModelForm):
 
 
 class ChargeForm(forms.ModelForm):
+    """
+    init할 때 Order가 필요하다!
+    """
     class Meta:
         model = Charge
         fields = ["charge_date", 'wage_amount', "component_amount"]
@@ -61,16 +65,20 @@ class ChargeForm(forms.ModelForm):
             original_div, "component_amount", inserting_tag)
         VAT_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
             부가세:</label><span class='modal_additional_info VAT_info'></span></div>"
-        chargable_amount_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
-            청구가능액:</label><span class='modal_additional_info chargable_amount_info'></span></div>"
-        fault_ratio = self.order
-        try:
-            print(self.order, self.instance, "SEX")
-        except Exception as e:
-            print(e)
+        chargable_amount_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>청구가능액:</label>\
+                <span class='modal_additional_info chargable_amount_info'></span></div>"
         charge_amount_tag = f"<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
-            청구금액:</label><span class='modal_additional_info charge_amount_info'>{self.order}</span></div>"
-        return_div = return_div + VAT_tag + chargable_amount_tag + charge_amount_tag
+            청구금액:</label><span class='modal_additional_info charge_amount_info'></span></div>"
+        indemnity_amount = self.order.get_indemnity_amount() or ""
+        fault_ratio = self.order.fault_ratio or ""
+        refund_amount = zero_if_none(
+            self.order.payment.refund_amount if self.order.payment else 0)
+        indemnity_amount_data = f"data-indemnity_amount='{indemnity_amount}'"
+        fault_ratio_data = f"data-fault_ratio='{fault_ratio}'"
+        refund_amount_data = f"data-refund_amount='{refund_amount}'"
+        data_tag = f"<div class='hidden charge_data' {indemnity_amount_data} {fault_ratio_data} {refund_amount_data}></div>"
+        return_div = return_div + VAT_tag + \
+            chargable_amount_tag + charge_amount_tag + data_tag
         return mark_safe(return_div)
 
     def __init__(self, *args, **kwargs):

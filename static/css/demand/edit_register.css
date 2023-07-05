@@ -27,6 +27,10 @@
   width: 400px;
 }
 
+.order_edit_formset_entity > .delete_order {
+  display: none;
+}
+
 #register_form > div > label,
 .order_edit_formset_entity > div > label {
   display: flex;

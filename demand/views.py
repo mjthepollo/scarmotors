@@ -69,34 +69,31 @@ def new_register(request):
 def edit_register(request, pk):
     register = get_object_or_404(Register, pk=pk)
     order_form_factory = modelformset_factory(
-        Order, form=OrderForm, extra=0)
-    payment_form_factory = modelformset_factory(
-        Payment, form=PaymentForm, extra=0)
-    charge_form_factory = modelformset_factory(
-        Charge, form=ChargeForm, extra=0)
-    deposit_form_factory = modelformset_factory(
-        Deposit, form=DepositForm, extra=0)
+        Order, form=OrderForm, extra=0, can_delete=True)
     if request.method == "GET":
         register_form = EditRegisterForm(instance=register)
         edit_special_register_form = EditSpecialRegisterForm(instance=register)
         register_note_form = RegisterNoteForm(instance=register)
         order_formset = order_form_factory(
             queryset=register.all_orders, prefix="order")
-        payment_formset = payment_form_factory(
-            queryset=register.get_mockups(Payment, "payment"), prefix="payment")
-        charge_formset = charge_form_factory(
-            queryset=register.get_mockups(Charge, "charge"), prefix="charge")
-        deposit_formset = deposit_form_factory(
-            queryset=register.get_mockups(Deposit, "deposit"), prefix="deposit")
+        payment_forms = [PaymentForm(
+            instance=order.payment, prefix=f"payment-{i}")
+            for i, order in enumerate(register.all_orders)]
+        charge_forms = [ChargeForm(
+            instance=order.charge, prefix=f"charge-{i}", order=order)
+            for i, order in enumerate(register.all_orders)]
+        deposit_forms = [DepositForm(
+            instance=order.deposit, prefix=f"deposit-{i}")
+            for i, order in enumerate(register.all_orders)]
         return render(request, "demand/edit_register.html", context={
             "register": register,
             "register_form": register_form,
             'edit_special_register_form': edit_special_register_form,
             "register_note_form": register_note_form,
             "order_formset": order_formset,
-            "charge_formset": charge_formset,
-            "payment_formset": payment_formset,
-            "deposit_formset": deposit_formset,
+            "payment_forms": payment_forms,
+            "charge_forms": charge_forms,
+            "deposit_forms": deposit_forms,
         })
     else:
         register_form = EditRegisterForm(request.POST, instance=register)
@@ -104,39 +101,66 @@ def edit_register(request, pk):
             request.POST, instance=register)
         register_note_form = RegisterNoteForm(request.POST, instance=register)
         order_formset = order_form_factory(
-            request.POST, queryset=register.orders.all(), prefix="order")
-        payment_formset = payment_form_factory(
-            request.POST, queryset=register.get_mockups(Payment, "payment"),
-            prefix="payment")
-        charge_formset = charge_form_factory(
-            request.POST, queryset=register.get_mockups(Charge, "charge"),
-            prefix="charge")
-        deposit_formset = deposit_form_factory(
-            request.POST, queryset=register.get_mockups(Deposit, "deposit"),
-            prefix="deposit")
+            request.POST, queryset=register.all_orders, prefix="order")
+        payment_forms = [PaymentForm(
+            request.POST, instance=order.payment, prefix=f"payment-{i}")
+            for i, order in enumerate(register.all_orders)]
+        charge_forms = [ChargeForm(
+            request.POST, instance=order.charge, prefix=f"charge-{i}", order=order)
+            for i, order in enumerate(register.all_orders)]
+        deposit_forms = [DepositForm(
+            request.POST, instance=order.deposit, prefix=f"deposit-{i}")
+            for i, order in enumerate(register.all_orders)]
+        payment_forms_are_valid = not (
+            False in [form.is_valid() for form in payment_forms])
+        charge_forms_are_valid = not (
+            False in [form.is_valid() for form in charge_forms])
+        deposit_forms_are_valid = not (
+            False in [form.is_valid() for form in deposit_forms])
         if register_form.is_valid() and \
+                edit_special_register_form.is_valid() and \
+                register_note_form.is_valid() and \
                 order_formset.is_valid() and \
-                payment_formset.is_valid() and \
-                charge_formset.is_valid() and \
-                deposit_formset.is_valid():
+                payment_forms_are_valid and \
+                charge_forms_are_valid and \
+                deposit_forms_are_valid:
             register = register_form.save()
             edit_special_register_form.save()
             register_note_form.save()
-            payment_formset.save()
-            charge_formset.save()
-            deposit_formset.save()
-            orders = order_formset.save()
-            for order in orders:
-                order.register = register
+            for i, order in enumerate(register.all_orders):
+                payment = payment_forms[i].save()
+                deposit = deposit_forms[i].save()
+                charge = charge_forms[i].save()
+                if payment.is_default():
+                    order.payment = None
+                    payment.delete()
+                else:
+                    order.payment = payment
+                if deposit.is_default():
+                    order.deposit = None
+                    deposit.delete()
+                else:
+                    order.deposit = deposit
+                if charge.is_default():
+                    order.charge = None
+                    charge.delete()
+                else:
+                    order.charge = charge
                 order.save()
+            new_orders = order_formset.save()
+            for new_order in new_orders:
+                new_order.register = register
+                new_order.save()
             return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
         return render(request, "demand/edit_register.html", context={
             "register": register,
             "register_form": register_form,
+            'edit_special_register_form': edit_special_register_form,
+            "register_note_form": register_note_form,
             "order_formset": order_formset,
-            "charge_formset": charge_formset,
-            "payment_formset": payment_formset,
-            "deposit_formset": deposit_formset,
+            "payment_forms": payment_forms,
+            "charge_forms": charge_forms,
+            "deposit_forms": deposit_forms,
         })
 
 
@@ -145,7 +169,7 @@ def edit_order(request, pk):
     order = get_object_or_404(Order, pk=pk)
     order_form = OrderForm(instance=order)
     deposit_form = DepositForm(instance=order.deposit)
-    charge_form = ChargeForm(instance=order.charge)
+    charge_form = ChargeForm(instance=order.charge, order=order)
     payment_form = PaymentForm(instance=order.payment)
     if request.method == "GET":
         return render(request, "demand/edit_order.html", context={
@@ -157,7 +181,8 @@ def edit_order(request, pk):
     else:
         order_form = OrderForm(request.POST, instance=order)
         deposit_form = DepositForm(request.POST, instance=order.deposit)
-        charge_form = ChargeForm(request.POST, instance=order.charge)
+        charge_form = ChargeForm(
+            request.POST, instance=order.charge, order=order)
         payment_form = PaymentForm(request.POST, instance=order.payment)
         if order_form.is_valid() and deposit_form.is_valid() and charge_form.is_valid() and payment_form.is_valid():
             order_form.save()

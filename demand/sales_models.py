@@ -100,11 +100,23 @@ class Sales(TimeStampedModel):
 
 # region Sales Utility Functions
 
+    def get_chargable_amount(self):
+        """
+        청구 가능 금액을 반환한다. 청구객체가 없어서 반환이 불가능할시 None을 반환한다.
+        """
+        if self.charge:
+            if isinstance(self, Order):
+                if self.fault_ratio:
+                    return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
+            return round(self.charge.get_repair_amount()*1.1)
+        else:
+            return None
+
     def get_indemnity_amount(self):
         if self.payment:
-            if self.payment.indemnity_amount:
-                return self.payment.indemnity_amount
-        return 0
+            return zero_if_none(self.payment.indemnity_amount)
+        else:
+            return 0
 
     def get_charge_amount(self):
         """
@@ -113,7 +125,7 @@ class Sales(TimeStampedModel):
         if self.charge:
             refund_amount = zero_if_none(
                 self.payment.refund_amount if self.payment else 0)
-            charge_amount = self.get_chargable_amount() - self.charge.get_indemnity_amount() + \
+            charge_amount = self.get_chargable_amount() - self.get_indemnity_amount() + \
                 refund_amount
             if charge_amount > 0:
                 return charge_amount
@@ -167,18 +179,6 @@ class Sales(TimeStampedModel):
                     if self.deposit.deposit_amount:
                         return self.deposit.deposit_amount/charge_amount
                 return None
-
-    def get_chargable_amount(self):
-        """
-        청구 가능 금액을 반환한다. 청구객체가 없어서 반환이 불가능할시 None을 반환한다.
-        """
-        if self.charge:
-            if isinstance(self, Order):
-                if self.fault_ratio:
-                    return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
-            return round(self.charge.get_repair_amount()*1.1)
-        else:
-            return None
 
     def get_not_paid_amount(self):
         """

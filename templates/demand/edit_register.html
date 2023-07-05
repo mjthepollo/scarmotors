@@ -17,27 +17,24 @@
         {{register_form.as_div}}
     </div>
     {{order_formset.management_form}}
-    {{payment_formset.management_form}}
-    {{charge_formset.management_form}}
-    {{deposit_formset.management_form}}
     <h2>INFO</h2>
     <div data-formset-body id="order_edit_formset">
         {% for form in order_formset %}
         <h3>주문</h3>
         <div data-formset-form class="order_edit_formset_entity">
-            {{order_formset|index_form:forloop.counter0}}
+            {{form.render}}
         </div>
         <h3>결제 정보</h3>
         <div class='order_edit_formset_entity'>
-            {{payment_formset|index_form:forloop.counter0}}
+            {{payment_forms|index_form:forloop.counter0}}
         </div>
         <h3>청구</h3>
         <div class="order_edit_formset_entity">
-            {{charge_formset|index_form:forloop.counter0}}
+            {{charge_forms|index_form:forloop.counter0}}
         </div>
         <h3>입금</h3>
         <div class="order_edit_formset_entity">
-            {{deposit_formset|index_form:forloop.counter0}}
+            {{deposit_forms|index_form:forloop.counter0}}
         </div>
         {% if not forloop.last%}
         <hr>
@@ -48,7 +45,7 @@
     <script type="form-template" data-formset-empty-form>
         {% escapescript %}
         <div data-formset-form class="new_order">
-            {{order_formset.empty_form.as_div}}
+            {{order_formset.empty_form.render}}
         </div>
         {% endescapescript %}
     </script>
