@@ -63,6 +63,9 @@ class KeyModel(TimeStampedModel):
         obj.save()
         return obj
 
+    def is_stable(self):
+        raise NotImplementedError
+
     def is_mockup(self):
         result = True
         for field in self._meta.model._meta.fields:
@@ -100,6 +103,14 @@ class Payment(KeyModel):
     payment_date = models.DateField(blank=True, null=True, verbose_name="결제일")
     refund_date = models.DateField(blank=True, null=True, verbose_name="환불일")
 
+    def is_stable(self):
+        return bool(self.payment_date)
+
+    def get_settlement_amount(self):
+        indemnity_amount = self.indemnity_amount if self.indemnity_amount else 0
+        discount_amount = self.discount_amount if self.discount_amount else 0
+        return indemnity_amount - discount_amount
+
     def __str__(self):
         if hasattr(self, "order"):
             order = self.order
@@ -112,11 +123,6 @@ class Payment(KeyModel):
                 return f"기타매출({self.extra_sales.pk}) 결제"
             else:
                 return f"주문없음({self.pk})"
-
-    def get_settlement_amount(self):
-        indemnity_amount = self.indemnity_amount if self.indemnity_amount else 0
-        discount_amount = self.discount_amount if self.discount_amount else 0
-        return indemnity_amount - discount_amount
 
 
 class Charge(KeyModel):
@@ -143,23 +149,8 @@ class Charge(KeyModel):
     def get_repair_amount(self):
         return self.wage_amount+self.component_amount
 
-    def get_charge_amount(self):
-        if hasattr(self, "order"):
-            sales = self.order
-            refund_amount = self.order.payment.refund_amount if self.order.payment else 0
-            refund_amount = refund_amount if refund_amount else 0
-        elif hasattr(self, "extra_sales"):
-            sales = self.extra_sales
-            refund_amount = self.extra_sales.payment.refund_amount if self.extra_sales.payment else 0
-        if not sales:
-            raise Exception("Charge에 order나 extra_sales가 없습니다.")
-        refund_amount = refund_amount if refund_amount else 0
-        charge_amount = sales.get_chargable_amount() - self.get_indemnity_amount() + \
-            refund_amount
-        if charge_amount > 0:
-            return charge_amount
-        else:
-            return 0
+    def is_stable(self):
+        return bool(self.charge_date)
 
     def __str__(self):
         if hasattr(self, "order"):
@@ -187,6 +178,9 @@ class Deposit(KeyModel):
     deposit_date = models.DateField(verbose_name="입금일", blank=True, null=True)
     deposit_note = models.TextField(
         verbose_name="입금 정보", blank=True, null=True)
+
+    def is_stable(self):
+        return self.deposit_amount and self.deposit_date
 
     def __str__(self):
         if hasattr(self, "order"):

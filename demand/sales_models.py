@@ -11,6 +11,7 @@ from demand.excel_line_info import (dictionary_to_line,
                                     order_to_excel_dictionary)
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
                                Payment, RequestDepartment, Supporter)
+from demand.utility import zero_if_none
 
 STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금", "NO_CAME_OUT": "미출고",
                "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요",
@@ -40,18 +41,7 @@ class Sales(TimeStampedModel):
         verbose_name_plural = "매출(들)"
         abstract = True
 
-    def get_indemnity_amount(self):
-        if self.payment:
-            if self.payment.indemnity_amount:
-                return self.payment.indemnity_amount
-        return 0
-
-    def get_charge_amount(self):
-        if self.charge:
-            return self.charge.get_charge_amount()
-        else:
-            return None
-
+# region Formatting Functions
     def formatted_day_came_in(self):
         if isinstance(self, Order):
             day_came_in = self.register.day_came_in if self.register else None
@@ -106,34 +96,61 @@ class Sales(TimeStampedModel):
         else:
             return "-"
 
+# endregion Formatted Functions
+
+# region Sales Utility Functions
+
+    def get_indemnity_amount(self):
+        if self.payment:
+            if self.payment.indemnity_amount:
+                return self.payment.indemnity_amount
+        return 0
+
+    def get_charge_amount(self):
+        """
+        청구금을 반환한다. 청구객체가 없어서 반환이 불가능할시 None을 반환한다.
+        """
+        if self.charge:
+            refund_amount = zero_if_none(
+                self.payment.refund_amount if self.payment else 0)
+            charge_amount = self.get_chargable_amount() - self.charge.get_indemnity_amount() + \
+                refund_amount
+            if charge_amount > 0:
+                return charge_amount
+            else:
+                return 0
+        else:
+            return None
+
     def get_payment_rate_for_input(self):
         """
         EXCEL에서 사용하는 지급율
         """
-        charge_amount = self.get_charge_amount()
-        if not charge_amount:
-            return None
-        else:
+        if self.charge:
+            charge_amount = self.get_charge_amount()
             if charge_amount != 0:
-                if self.deposit:
+                if self.deposit and self.deposit.deposit_amount:
                     return self.deposit.deposit_amount/charge_amount
                 else:
                     return None
             else:
                 return None
+        else:
+            return None
 
     def get_net_payment(self):
         if self.payment:
-            refund_amount = self.payment.refund_amount if self.payment.refund_amount else 0
-            discount_amount = self.payment.discount_amount if self.payment.discount_amount else 0
-            indemnity_amount = self.payment.indemnity_amount if self.payment.indemnity_amount else 0
+            refund_amount = zero_if_none(self.payment.refund_amount)
+            discount_amount = zero_if_none(self.payment.discount_amount)
+            indemnity_amount = zero_if_none(self.payment.indemnity_amount)
+            return indemnity_amount-discount_amount-refund_amount
         else:
-            refund_amount = 0
-            discount_amount = 0
-            indemnity_amount = 0
-        return indemnity_amount-discount_amount-refund_amount
+            return 0
 
     def get_payment_rate(self):
+        """
+        지급율을 계산한다. 지급율이 계산이 불가능할시 None을 반환한다.
+        """
         if not self.charge:
             return 0
         else:
@@ -144,8 +161,6 @@ class Sales(TimeStampedModel):
             if isinstance(self, ExtraSales) or self.charge_type[:2] == "일반":
                 if self.payment:
                     return self.get_net_payment()/chargable_amount
-                else:
-                    return 0
             else:  # 보험
                 charge_amount = self.get_charge_amount()
                 if self.deposit and charge_amount:
@@ -154,15 +169,21 @@ class Sales(TimeStampedModel):
                 return None
 
     def get_chargable_amount(self):
+        """
+        청구 가능 금액을 반환한다. 청구객체가 없어서 반환이 불가능할시 None을 반환한다.
+        """
         if self.charge:
             if isinstance(self, Order):
                 if self.fault_ratio:
                     return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
             return round(self.charge.get_repair_amount()*1.1)
         else:
-            None
+            return None
 
     def get_not_paid_amount(self):
+        """
+        미수액을 계산한다. 계산이 불가능할시에도 0을 반환한다.
+        """
         charge_amount = self.get_charge_amount()
         if not self.deposit:
             return charge_amount if charge_amount else 0
@@ -277,6 +298,9 @@ class Sales(TimeStampedModel):
                 print_colored(str(e), "magenta")
             return STATUS_DICT["ERROR"]
 
+# endregion Sales Utility Functions
+
+# region Manually Complete
     def make_manually_complete(self):
         self.status = STATUS_DICT["MANUALLY_COMPLETE"]
         self.save()
@@ -301,8 +325,9 @@ class Sales(TimeStampedModel):
         if not self.manually_completed():
             self.status = self.get_status()
         super().save(*args, **kwargs)
+# endregion Manually Complete
 
-# --------------- HTML FUNCTION -----------------#
+# region HTML FUNCTIONS
     def get_status_class(self):
         status_key = next(
             (k for k, v in STATUS_DICT.items() if v == self.status), None)
@@ -324,7 +349,7 @@ class Sales(TimeStampedModel):
 
     def get_charge_class(self):
         if self.charge:
-            if self.charge.charge_date:
+            if self.charge.is_stable():
                 status_class = STATUS_CLASS[COMPLETE]
             else:
                 status_class = STATUS_CLASS[WARNING]
@@ -334,7 +359,7 @@ class Sales(TimeStampedModel):
 
     def get_deposit_class(self):
         if self.deposit:
-            if self.deposit.deposit_date:
+            if self.deposit.is_stable():
                 status_class = STATUS_CLASS[COMPLETE]
             else:
                 status_class = STATUS_CLASS[WARNING]
@@ -344,7 +369,7 @@ class Sales(TimeStampedModel):
 
     def get_description(self):
         raise NotImplementedError
-
+# endregion HTML FUNCTIONS
 # --------------- EXCEL FUNCTION -----------------#
 
     def to_excel_line(self):
@@ -399,6 +424,11 @@ class Register(TimeStampedModel):
     first_center_repaired = models.BooleanField(
         default=False, verbose_name="1센터 수리건")
 
+# region Register Utility Function
+    @property
+    def all_orders(self):
+        return self.orders.all().order_by("created")
+
     def get_work_days(self):
         if self.real_day_came_out and self.day_came_in:
             return (self.real_day_came_out - self.day_came_in).days
@@ -418,7 +448,9 @@ class Register(TimeStampedModel):
     def set_RO_number(self):
         self.RO_number = Register.get_RO_number()
         self.save()
-# --------------- FORMSET FUNCTION -----------------#
+# endregion Register Utility Function
+
+# region Mockup Functions
 
     def get_mockups(self, KeyModel, key):
         """
@@ -457,13 +489,9 @@ class Register(TimeStampedModel):
         self.remove_mockups(Payment, "payment")
         self.remove_mockups(Deposit, "deposit")
         self.remove_mockups(Charge, "charge")
+# endregion Mockup Functions
 
-# --------------- HTML FUNCTION -----------------#
-
-    @property
-    def all_orders(self):
-        return self.orders.all().order_by("created")
-
+# region FOR HTML FUNCTIONS
     def get_status(self):
         orders = self.orders.all()
         all_completed = True
@@ -523,8 +551,7 @@ class Register(TimeStampedModel):
             return f"입고:{day_came_in}/출고:{day_came_out}/차종:{self.car_model}/판수:{self.get_number_of_works()}/입고지원:{supporter}/고객명:{client_name}/담당자:{insurance_agent}/전화번호:{self.phone_number}/렌트:{rentcar}"
         except Exception as e:
             return str(e)
-
-# --------------- PRINT FUNCTION -----------------#
+# endregion FOR HTML FUNCTIONS
 
     def __str__(self):
         return f"[{self.RO_number}]{self.car_number}({self.day_came_in.year}/{self.day_came_in.month}/{self.day_came_in.day})"
