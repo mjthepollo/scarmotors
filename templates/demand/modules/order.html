@@ -21,11 +21,9 @@
     <td>{{order.formatted_charge_amount}}</td>
     <td>{{order.formatted_deposit_amount}}</td>
     <td>{{order.formatted_payment_rate}}</td>
-    {% if forloop.counter0 == 0 %}
-    <td class="order {{order.get_came_out_class}}" rowspan="{{order.register.orders.count}}">
-        <div class="came_out_button" data-modal_url="{% url 'demand:came_out_modal' order.register.pk%}">출고</div>
+    <td class="order {{order.get_came_out_class}}">
+        <div class="came_out_button" data-modal_url="{% url 'demand:came_out_modal' order.pk%}">출고</div>
     </td>
-    {% endif %}
     <td class="order {{order.get_charge_class}}">
         <div class="charge_button" data-modal_url="{% url 'demand:charge_modal' order.pk%}">청구</div>
     </td>

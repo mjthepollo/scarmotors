@@ -24,7 +24,13 @@ WARNING = 4
 MANUALLY_COMPLETE = 5
 STATUS_CLASS = ["not_complete", "progress",
                 "complete", "need_check", "warning", "manually_complete"]
-REGISTER_STAUTS = ["청구 필요", "진행중", "완료", "확인 필요", "완료(수동)"]
+
+REGISTER_NEED_CHARGE = 0
+REGISTER_PROGRESS = 1
+REGISTER_COMPLETE = 2
+REGISTER_NEED_CHECK = 3
+REGISTER_MANUALLY_COMPLETE = 4
+REGISTER_STATUS = ["청구 필요", "진행중", "완료", "확인 필요", "완료(수동)"]
 
 
 def make_to_class_name(name):
@@ -324,6 +330,7 @@ class Sales(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.manually_completed():
             self.status = self.get_status()
+            print("SAVE!", self, self.status, self.get_status())
         super().save(*args, **kwargs)
 # endregion Manually Complete
 
@@ -343,6 +350,8 @@ class Sales(TimeStampedModel):
             real_day_came_out = self.real_day_came_out
         if real_day_came_out:
             status_class = STATUS_CLASS[COMPLETE]
+        elif self.payment:
+            status_class = STATUS_CLASS[WARNING]
         else:
             status_class = STATUS_CLASS[NOT_COMPLETE]
         return make_to_class_name(status_class)
@@ -493,44 +502,39 @@ class Register(TimeStampedModel):
 
 # region FOR HTML FUNCTIONS
     def get_status(self):
-        orders = self.orders.all()
+        orders = self.all_orders
         all_completed = True
         for order in orders:
             if not order.completed():
                 all_completed = False
         if all_completed:
-            return REGISTER_STAUTS[COMPLETE]
+            return REGISTER_STATUS[REGISTER_COMPLETE]
         for order in orders:
             if order.get_status() in [STATUS_DICT["ERROR"], STATUS_DICT["NEED_CHECK"]]:
-                return REGISTER_STAUTS[NEED_CHECK]
+                print(order, order.get_status(), order.status)
+                return REGISTER_STATUS[REGISTER_NEED_CHECK]
         for order in orders:
             if order.get_status() == STATUS_DICT["NO_CHARGE"]:
-                return REGISTER_STAUTS[NOT_COMPLETE]
+                return REGISTER_STATUS[REGISTER_NEED_CHARGE]
         for order in orders:
             if order.get_status() != STATUS_DICT["COMPLETE"]:
-                return REGISTER_STAUTS[PROGRESS]
-        return REGISTER_STAUTS[COMPLETE]
+                return REGISTER_STATUS[REGISTER_PROGRESS]
+        return REGISTER_STATUS[COMPLETE]
 
     def get_status_class(self):
         status = self.get_status()
         status_class = ""
-        if status == REGISTER_STAUTS[NEED_CHECK]:
-            status_class = "need_check"
-        elif status == REGISTER_STAUTS[NOT_COMPLETE]:
-            status_class = "not_complete"
-        elif status == REGISTER_STAUTS[PROGRESS]:
-            status_class = "progress"
-        elif status == REGISTER_STAUTS[COMPLETE]:
-            status_class = "complete"
+        if status == REGISTER_STATUS[REGISTER_NEED_CHECK]:
+            status_class = STATUS_CLASS[NEED_CHECK]
+        elif status == REGISTER_STATUS[REGISTER_NEED_CHARGE]:
+            status_class = STATUS_CLASS[NOT_COMPLETE]
+        elif status == REGISTER_STATUS[REGISTER_PROGRESS]:
+            status_class = STATUS_CLASS[PROGRESS]
+        elif status == REGISTER_STATUS[REGISTER_COMPLETE]:
+            status_class = STATUS_CLASS[COMPLETE]
         else:
             raise ValueError(f"status:{status} is not valid")
         return make_to_class_name(status_class)
-
-    def get_came_out_class(self):
-        if self.real_day_came_out:
-            return STATUS_CLASS[COMPLETE]
-        else:
-            return STATUS_CLASS[NOT_COMPLETE]
 
     def get_description(self):
         try:

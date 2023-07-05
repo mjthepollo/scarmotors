@@ -17,17 +17,15 @@
             </div>
         </div>
         <p class="modal_sector_info">결제 정보</p>
-        {% for payment_form in payment_forms %}
         <div class="modal_inputs payment_form">
             {{payment_form.as_div}}
         </div>
-        {% if not forloop.last%}
-        <hr>
-        {% endif %}
-        {% endfor %}
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">닫기</button>
+        {% if order.payment %}
+        <button type="button" data-redirect_url="{% url 'demand:delete_payment' order.payment.pk %}" class="btn btn-danger delete_button">삭제</button>
+        {% endif %}
         <button class="btn btn-success">출고</button>
     </div>
 </form>
