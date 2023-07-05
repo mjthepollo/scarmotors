@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import Case, When
 
 from core.models import TimeStampedModel
-from core.utility import list_to_queryset, print_colored
+from core.utility import key_from_dict, print_colored
 from demand.excel_line_info import (dictionary_to_line,
                                     order_to_excel_dictionary)
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
@@ -330,14 +330,12 @@ class Sales(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.manually_completed():
             self.status = self.get_status()
-            print("SAVE!", self, self.status, self.get_status())
         super().save(*args, **kwargs)
 # endregion Manually Complete
 
 # region HTML FUNCTIONS
     def get_status_class(self):
-        status_key = next(
-            (k for k, v in STATUS_DICT.items() if v == self.status), None)
+        status_key = key_from_dict(self.status, STATUS_DICT)
         if status_key == None:
             raise ValueError(f"status_key is None. status:{self.status}")
         else:

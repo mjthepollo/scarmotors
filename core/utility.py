@@ -46,3 +46,8 @@ def insert_tag(original_div, field_name, inserting_tag):
         div_finish_tag, discount_amount_index) + len(div_finish_tag)
     return original_div[:discount_amount_finish_index] + \
         inserting_tag + original_div[discount_amount_finish_index:]
+
+
+def key_from_dict(value, dict):
+    key = next((k for k, v in dict.items() if v == value), None)
+    return key
