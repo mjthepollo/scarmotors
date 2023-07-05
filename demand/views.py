@@ -24,7 +24,7 @@ from demand.sales_models import ExtraSales, Order, Register
 @login_required
 def new_register(request):
     order_form_factory = modelformset_factory(
-        Order, form=OrderForm, extra=1)
+        Order, form=OrderForm, extra=1, can_delete=True)
     if request.method == "GET":
         register_form = NewRegisterForm(initial={'day_came_in': date.today()})
         register_note_form = RegisterNoteForm()

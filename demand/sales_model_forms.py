@@ -91,6 +91,8 @@ class EditRegisterForm(forms.ModelForm):
 
 
 class OrderForm(forms.ModelForm):
+    template_name = "demand/forms/deletable_order_form.html"
+
     class Meta:
         model = Order
         fields = ["charge_type", "charged_company",

@@ -16,16 +16,12 @@
     <h2>주문 정보</h2>
     <div data-formset-body id="order_formset">
         {% for form in order_formset %}
-        <div data-formset-form class="new_order">
-            {{form.as_div}}
-        </div>
+        <div data-formset-form class="new_order">{{form.render}}</div>
         {% endfor %}
     </div>
     <script type="form-template" data-formset-empty-form>
         {% escapescript %}
-        <div data-formset-form class="new_order">
-            {{order_formset.empty_form.as_div}}
-        </div>
+        <div data-formset-form class="new_order">{{order_formset.empty_form.render}}</div>
         {% endescapescript %}
     </script>
     <input id="add_button" type="button" class="btn btn-success" value="주문 추가하기" data-formset-add>
