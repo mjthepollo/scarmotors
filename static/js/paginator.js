@@ -23,3 +23,7 @@ function handlePageNumberCancelButtonClick(e) {
 pageNumberButton.addEventListener("click", handlePageNumberButtonClick);
 pageNumberMoveButton.addEventListener("click", handlePageNumberMoveButtonClick);
 pageNumberCancelButton.addEventListener("click", handlePageNumberCancelButtonClick);
+
+function test() {
+  alert("Enter Key 입력 감지 \n함수 실행.");
+}
