@@ -349,44 +349,44 @@ class DemandModelTest(TestCase):
 
     def test_get_order_status(self):
         self.setUpOrderStatusTestCase()
-        self.assertEqual(self.no_charge_order1.get_status(),
+        self.assertEqual(self.no_charge_order1.status,
                          STATUS_DICT["NO_CHARGE"])
-        self.assertEqual(self.no_charge_order2.get_status(),
+        self.assertEqual(self.no_charge_order2.status,
                          STATUS_DICT["NO_CHARGE"])
-        self.assertEqual(self.not_paid_order1.get_status(),
+        self.assertEqual(self.not_paid_order1.status,
                          STATUS_DICT["NOT_PAID"])
-        self.assertEqual(self.not_paid_order2.get_status(),
+        self.assertEqual(self.not_paid_order2.status,
                          STATUS_DICT["NOT_PAID"])
-        self.assertEqual(self.no_came_out_order.get_status(),
+        self.assertEqual(self.no_came_out_order.status,
                          STATUS_DICT["NO_CAME_OUT"])
-        self.assertEqual(self.over_deposit_order.get_status(),
+        self.assertEqual(self.over_deposit_order.status,
                          STATUS_DICT["OVER_DEPOSIT"])
-        self.assertEqual(self.complete_order1.get_status(),
+        self.assertEqual(self.complete_order1.status,
                          STATUS_DICT["COMPLETE"])
-        self.assertEqual(self.complete_order2.get_status(),
+        self.assertEqual(self.complete_order2.status,
                          STATUS_DICT["COMPLETE"])
-        self.assertEqual(self.need_check_order1.get_status(),
+        self.assertEqual(self.need_check_order1.status,
                          STATUS_DICT["NEED_CHECK"])
-        self.assertEqual(self.need_check_order2.get_status(),
+        self.assertEqual(self.need_check_order2.status,
                          STATUS_DICT["NEED_CHECK"])
-        self.assertEqual(self.no_charge_date_order.get_status(),
+        self.assertEqual(self.no_charge_date_order.status,
                          STATUS_DICT["NO_CHARGE"])
 
     def test_get_extra_sales_status(self):
         self.setUpExtraSalesStatusTestCase()
-        self.assertEqual(self.no_charge_extra_sales1.get_status(),
+        self.assertEqual(self.no_charge_extra_sales1.status,
                          STATUS_DICT["NO_CHARGE"])
-        self.assertEqual(self.no_charge_extra_sales2.get_status(),
+        self.assertEqual(self.no_charge_extra_sales2.status,
                          STATUS_DICT["NO_CHARGE"])
-        self.assertEqual(self.not_paid_extra_sales.get_status(),
+        self.assertEqual(self.not_paid_extra_sales.status,
                          STATUS_DICT["NOT_PAID"])
-        self.assertEqual(self.no_came_out_extra_sales.get_status(),
+        self.assertEqual(self.no_came_out_extra_sales.status,
                          STATUS_DICT["NO_CAME_OUT"])
         self.assertEqual(
-            self.over_deposit_extra_sales.get_status(), STATUS_DICT["OVER_DEPOSIT"])
-        self.assertEqual(self.complete_extra_sales.get_status(),
+            self.over_deposit_extra_sales.status, STATUS_DICT["OVER_DEPOSIT"])
+        self.assertEqual(self.complete_extra_sales.status,
                          STATUS_DICT["COMPLETE"])
-        self.assertEqual(self.need_check_extra_sales.get_status(),
+        self.assertEqual(self.need_check_extra_sales.status,
                          STATUS_DICT["NEED_CHECK"])
-        self.assertEqual(self.no_charge_date_extrasales.get_status(),
+        self.assertEqual(self.no_charge_date_extrasales.status,
                          STATUS_DICT["NO_CHARGE"])

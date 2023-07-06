@@ -229,7 +229,7 @@ def order_to_excel_dictionary(order):
     integrated_turnover = int(order.get_integrated_turnover())
     wage_turnover = int(order.get_wage_turnover())
     component_turnover = int(order.get_component_turnover())
-    status = order.get_status()
+    status = order.status
     return {
         "RO_number": RO_number,
         "day_came_in": day_came_in,
@@ -347,7 +347,7 @@ def extra_sales_to_excel_dictionary(extra_sales):
     integrated_turnover = extra_sales.get_integrated_turnover()
     wage_turnover = extra_sales.get_wage_turnover()
     component_turnover = extra_sales.get_component_turnover()
-    status = extra_sales.get_status()
+    status = extra_sales.status
     return {
         "RO_number": RO_number,
         "day_came_in": day_came_in,

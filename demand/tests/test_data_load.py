@@ -115,36 +115,3 @@ class DataLoadTest(TestCase):
         check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,
                                self.line_numbers_for_extra_sales,
                                WAGE_TURNOVER, "get_wage_turnover")
-
-    # def test_monthly_sales(self):
-    #     from datetime import datetime
-    #     current_month = datetime.now().month
-
-    #     call_command('clean_models')
-    #     make_models_from_effective_df(self.df)
-    #     for month in range(1, current_month+1):
-    #         print(f"Month : {month}")
-    #         print("보험 : ", get_sales_of_month_and_type(month, "보험"))
-    #         print("렌트일반 : ", get_sales_of_month_and_type(month, "렌트일반"))
-    #         print("렌트판도 : ", get_sales_of_month_and_type(month, "렌트판도"))
-    #         print("일반판도 : ", get_sales_of_month_and_type(month, "일반판도"))
-    #         print("일반경정비 : ", get_sales_of_month_and_type(month, "일반경정비"))
-    #         print("--------------")
-
-        # call_command('clean_models')
-        # not_charged_df = get_effective_data_frame(
-        #     "src/basic.xlsx", "22년 12월 미청구")
-        # make_models_from_effective_df(not_charged_df)
-        # for month in range(1, current_month+1):
-        #     print(f"Month : {month}")
-        #     print("보험 : ", get_sales_of_month_and_type(month, "보험"))
-        #     print("렌트일반 : ", get_sales_of_month_and_type(month, "렌트일반"))
-        #     print("렌트판도 : ", get_sales_of_month_and_type(month, "렌트판도"))
-        #     print("일반판도 : ", get_sales_of_month_and_type(month, "일반판도"))
-        #     print("일반경정비 : ", get_sales_of_month_and_type(month, "일반경정비"))
-        #     print("--------------")
-
-    # def test_status(self):
-    #     check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,
-    #                            self.line_numbers_for_extra_sales,
-    #                            STATUS, "get_status")

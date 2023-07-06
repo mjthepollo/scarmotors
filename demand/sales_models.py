@@ -470,14 +470,13 @@ class Register(TimeStampedModel):
         if all_completed:
             return REGISTER_STATUS[REGISTER_COMPLETE]
         for order in orders:
-            if order.get_status() in [STATUS_DICT["ERROR"], STATUS_DICT["NEED_CHECK"]]:
-                print(order, order.get_status(), order.status)
+            if order.status in [STATUS_DICT["ERROR"], STATUS_DICT["NEED_CHECK"]]:
                 return REGISTER_STATUS[REGISTER_NEED_CHECK]
         for order in orders:
-            if order.get_status() == STATUS_DICT["NO_CHARGE"]:
+            if order.status == STATUS_DICT["NO_CHARGE"]:
                 return REGISTER_STATUS[REGISTER_NEED_CHARGE]
         for order in orders:
-            if order.get_status() != STATUS_DICT["COMPLETE"]:
+            if order.status != STATUS_DICT["COMPLETE"]:
                 return REGISTER_STATUS[REGISTER_PROGRESS]
         return REGISTER_STATUS[COMPLETE]
 
