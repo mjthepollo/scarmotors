@@ -1,50 +1,24 @@
 @import url("./new_register.css");
 @import url("../forms/edit_order_form.css");
 
-.order_edit_formset_entity {
-  display: flex;
-
-  width: 100%;
-  margin-bottom: 30px;
-
-  flex-wrap: wrap;
-}
-.order_edit_formset_entity > h3 {
-  width: 80%;
-  margin-top: 10px;
-  margin-left: 30px;
-}
-.order_edit_formset_entity > div {
-  display: flex;
-  justify-content: center;
-
-  width: 50%;
-  margin-bottom: 5px;
-}
-
-.order_edit_formset_entity > div > div {
-  display: flex;
-  justify-content: space-between;
-
-  width: 400px;
-}
-
-.order_edit_formset_entity > .delete_order {
-  display: none;
-}
-
-#register_form > div > label,
-.order_edit_formset_entity > div > label {
+#formset > div > label {
   display: flex;
 
   width: 110px;
 }
 
-#edit_special_register_form {
-  display: flex;
-  justify-content: space-between;
+h3 {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
 
-  width: 600px;
+h2#edit_order_formset_title {
+  margin-bottom: 0px;
+}
+
+#edit_special_register_form {
+  justify-content: center !important;
+
   margin-bottom: 30px;
 }
 
@@ -65,9 +39,9 @@ textarea.deposit_note {
   padding: 5px;
 }
 
-hr {
+hr.edit_order_hr {
   width: 100%;
-  height: 2px;
+  margin-top: 50px;
 
   background-color: #000000;
 }

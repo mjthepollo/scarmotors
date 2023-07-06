@@ -1,42 +1,15 @@
+@import url("./edit_common.css");
 @import url("../modules/input.css");
 @import url("./modals/car_number_modal.css");
 
-input,
-select {
-  border-radius: 0px;
-  width: 200px;
-  height: 30px;
-
-  text-align: center;
-
-  border: 1px solid black;
+#register_form > #car_number_button_box {
+  justify-content: flex-start;
 }
 
-input[type="checkbox"] {
-  width: 200px;
-}
-
-#formset {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-h2 {
-  margin-top: 30px;
-  margin-bottom: 30px;
-}
-
-#register_form,
-#order_formset,
-#order_edit_formset {
-  display: flex;
-  justify-content: space-between;
-
-  width: var(--normal_width);
-
-  flex-wrap: wrap;
+#car_number_button {
+  position: relative;
+  left: 40px;
+  bottom: 5px;
 }
 
 .new_order {
@@ -45,7 +18,7 @@ h2 {
   margin-bottom: 30px;
 }
 
-.new_order .delete_order {
+.new_order button.delete_order {
   position: absolute;
   top: 0px;
   right: 0px;
@@ -58,43 +31,4 @@ h2 {
 
   width: 400px;
   margin-top: 5px;
-}
-
-#register_form > #car_number_button_box {
-  justify-content: flex-start;
-}
-
-#car_number_button {
-  position: relative;
-  bottom: 5px;
-}
-
-#register_form > div > label,
-.new_order > div > label {
-  display: flex;
-
-  width: 110px;
-}
-
-#add_button {
-  width: var(--normal_width);
-  height: 40px;
-  margin-top: 30px;
-}
-
-button#complete {
-  width: var(--normal_width);
-  margin-top: 30px;
-  margin-bottom: 50px;
-}
-
-#register_note_form {
-  display: flex;
-  justify-content: center;
-
-  width: 600px;
-}
-
-#register_note_form textarea {
-  width: 100%;
 }

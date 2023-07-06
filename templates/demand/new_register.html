@@ -14,7 +14,7 @@
     </div>
     {{order_formset.management_form}}
     <h2>주문 정보</h2>
-    <div data-formset-body id="order_formset">
+    <div data-formset-body id="extra_order_formset">
         {% for form in order_formset %}
         <div data-formset-form class="new_order">{{form.render}}</div>
         {% endfor %}

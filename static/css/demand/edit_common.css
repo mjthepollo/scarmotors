@@ -1,0 +1,65 @@
+main.container {
+  display: flex;
+  justify-content: center;
+}
+
+h2 {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+h3 {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+form#formset {
+  width: var(--normal_width);
+}
+
+form#formset > div {
+  display: flex;
+  justify-content: space-between;
+
+  width: 100%;
+
+  flex-wrap: wrap;
+}
+
+#register_form > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 50%;
+  margin-top: 5px;
+}
+
+form#formset label {
+  display: flex;
+
+  width: 110px;
+}
+
+button#complete {
+  width: var(--normal_width);
+  height: 40px;
+  margin-top: 30px;
+  margin-bottom: 50px;
+}
+
+input#add_button {
+  width: var(--normal_width);
+  height: 40px;
+  margin-top: 30px;
+}
+
+#register_note_form {
+  display: flex;
+  justify-content: center !important;
+}
+
+#register_note_form textarea {
+  width: 700px;
+}

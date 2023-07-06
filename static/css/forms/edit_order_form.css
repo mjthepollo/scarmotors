@@ -1,0 +1,26 @@
+.edit_order_form {
+  display: flex;
+
+  width: 100%;
+
+  flex-wrap: wrap;
+}
+
+.edit_order_form > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 50%;
+  margin-top: 5px;
+}
+
+.edit_order_form span.modal_additional_info {
+  width: 200px;
+}
+
+.edit_order_form > div > textarea {
+  width: 200px;
+  height: 60px;
+  padding: 5px;
+}

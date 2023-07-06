@@ -6,11 +6,13 @@
 <link rel="stylesheet" href="{% static 'css/demand/edit_order.css' %}">
 {% endblock css %}
 {% block content %}
-<form id="edit_order_form" method="POST">
+<form id="formset" method="POST">
     {% csrf_token %}
+    <div id="edit_order_formset">
     {% with order_form.as_div as order_form_div and payment_form.as_div as payment_form_div and charge_form.as_div as charge_form_div and deposit_form.as_div as deposit_form_div%}
     {% include "demand/forms/edit_order_form.html" %}
     {% endwith %}
+    </div>
     <button id="complete" class="btn btn-dark">수정 완료</button>
 </form>
 {% endblock content %}
