@@ -1,10 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.forms import modelformset_factory
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
+from core.utility import go_to_previous_url_or_search_register
 from demand.key_model_forms import ChargeForm, DepositForm, PaymentForm
 from demand.key_models import Charge, Deposit, Payment
 from demand.sales_model_forms import (FirstCenterRegisterForm,
@@ -57,11 +57,7 @@ def came_out_modal(request, pk):
             order.save()
         else:
             return JsonResponse({"error_message": "Payment Formset is not valid"})
-        previous_url = request.META.get('HTTP_REFERER', None)
-        if previous_url:
-            return redirect(previous_url)
-        else:
-            return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
+        return go_to_previous_url_or_search_register(request, register)
 
 
 @login_required
@@ -87,11 +83,7 @@ def charge_modal(request, pk):
             order.save()
         else:
             return JsonResponse({"error_message": "Charge Form is not valid"})
-        previous_url = request.META.get('HTTP_REFERER', None)
-        if previous_url:
-            return redirect(previous_url)
-        else:
-            return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+        return go_to_previous_url_or_search_register(request, order.register)
 
 
 @login_required
@@ -109,11 +101,7 @@ def deposit_modal(request, pk):
             order.save()
         else:
             return JsonResponse({"error_message": "Deposit Form is not valid"})
-        previous_url = request.META.get('HTTP_REFERER', None)
-        if previous_url:
-            return redirect(previous_url)
-        else:
-            return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+        return go_to_previous_url_or_search_register(request, order.register)
 
 
 @login_required
@@ -121,11 +109,7 @@ def delete_payment(request, pk):
     payment = Payment.objects.get(pk=pk)
     order = payment.order
     payment.delete()
-    previous_url = request.META.get('HTTP_REFERER', None)
-    if previous_url:
-        return redirect(previous_url)
-    else:
-        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+    return go_to_previous_url_or_search_register(request, order.register)
 
 
 @login_required
@@ -133,11 +117,7 @@ def delete_charge(request, pk):
     charge = Charge.objects.get(pk=pk)
     order = charge.order
     charge.delete()
-    previous_url = request.META.get('HTTP_REFERER', None)
-    if previous_url:
-        return redirect(previous_url)
-    else:
-        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+    return go_to_previous_url_or_search_register(request, order.register)
 
 
 @login_required
@@ -145,8 +125,4 @@ def delete_deposit(request, pk):
     deposit = Deposit.objects.get(pk=pk)
     order = deposit.order
     deposit.delete()
-    previous_url = request.META.get('HTTP_REFERER', None)
-    if previous_url:
-        return redirect(previous_url)
-    else:
-        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+    return go_to_previous_url_or_search_register(request, order.register)

@@ -9,6 +9,7 @@ from django.http import FileResponse  # Create your views here.
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from core.utility import go_to_previous_url_or_search_register
 from demand.excel_line_info import INDEXES
 from demand.filter_forms import (IncentiveFilter, OrderFilter, RegisterFilter,
                                  RegisterFilterForOrderFilter)
@@ -363,22 +364,14 @@ def order_deposit(request, pk):
 def make_manually_complete(request, pk):
     order = get_object_or_404(Order, pk=pk)
     order.make_manually_complete()
-    previous_url = request.META.get('HTTP_REFERER', None)
-    if previous_url:
-        return redirect(previous_url)
-    else:
-        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+    return go_to_previous_url_or_search_register(request, order.register)
 
 
 @login_required
 def cancel_manually_complete(request, pk):
     order = get_object_or_404(Order, pk=pk)
     order.cancel_manually_complete()
-    previous_url = request.META.get('HTTP_REFERER', None)
-    if previous_url:
-        return redirect(previous_url)
-    else:
-        return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
+    return go_to_previous_url_or_search_register(request, order.register)
 
 
 @login_required

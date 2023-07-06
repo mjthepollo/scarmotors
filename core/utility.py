@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 
 
 def get_time(time):
@@ -51,3 +53,11 @@ def insert_tag(original_div, field_name, inserting_tag):
 def key_from_dict(value, dict):
     key = next((k for k, v in dict.items() if v == value), None)
     return key
+
+
+def go_to_previous_or_search_registers(request, register):
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
