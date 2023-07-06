@@ -31,6 +31,10 @@ class PaymentForm(forms.ModelForm):
         fields = ["indemnity_amount", "discount_amount", "refund_amount",
                   "payment_type", 'payment_info', "payment_date", "refund_date"]
         widgets = {
+            "indemnity_amount": forms.NumberInput(attrs={'placeholder': '면책금'}),
+            "discount_amount": forms.NumberInput(attrs={'placeholder': '할인금'}),
+            "refund_amount": forms.NumberInput(attrs={'placeholder': '환불액'}),
+            "payment_info": forms.TextInput(attrs={'placeholder': '은행/카드'}),
             'payment_date': forms.DateInput(attrs={'type': 'date'}),
             'refund_date': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -41,7 +45,7 @@ class PaymentForm(forms.ModelForm):
     def as_div(self, *args, **kwags):
         original_div = super(PaymentForm, self).as_div()
         inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
-            결제금액:</label><span class='modal_additional_info settlement_amount_info'></span></div>"
+            결제금액:</label><span class='modal_additional_info orange settlement_amount_info'></span></div>"
         return_div = insert_tag(original_div, "discount_amount", inserting_tag)
         return mark_safe(return_div)
 
@@ -54,6 +58,8 @@ class ChargeForm(forms.ModelForm):
         model = Charge
         fields = ["charge_date", 'wage_amount', "component_amount"]
         widgets = {
+            "component_amount": forms.NumberInput(attrs={'placeholder': '기입 필요'}),
+            "wage_amount": forms.NumberInput(attrs={'placeholder': '기입 필요', }),
             'charge_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
@@ -66,9 +72,9 @@ class ChargeForm(forms.ModelForm):
         VAT_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
             부가세:</label><span class='modal_additional_info vat_info'></span></div>"
         chargable_amount_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>청구가능액:</label>\
-                <span class='modal_additional_info chargable_amount_info'></span></div>"
+                <span class='modal_additional_info orange chargable_amount_info'></span></div>"
         charge_amount_tag = f"<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
-            청구금액:</label><span class='modal_additional_info charge_amount_info'></span></div>"
+            청구금액:</label><span class='modal_additional_info blue charge_amount_info'></span></div>"
         indemnity_amount = self.order.get_indemnity_amount() or ""
         fault_ratio = self.order.fault_ratio or ""
         refund_amount = zero_if_none(
@@ -95,16 +101,17 @@ class DepositForm(forms.ModelForm):
         widgets = {
             'deposit_date': forms.DateInput(attrs={'type': 'date'}),
             'deposit_note': forms.Textarea(attrs={'class': 'deposit_note'}),
+            "deposit_amount": forms.NumberInput(attrs={'placeholder': '입금액'}),
         }
 
     def as_div(self, *args, **kwags):
         original_div = super(DepositForm, self).as_div()
         inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
-            지급율:</label><span class='modal_additional_info payment_rate_info'></span></div>"
+            지급율:</label><span class='modal_additional_info orange payment_rate_info'></span></div>"
         inserted_div = insert_tag(
             original_div, "deposit_date", inserting_tag)
         inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
-            삭감율:</label><span class='modal_additional_info cut_rate_info'></span></div>"
+            삭감율:</label><span class='modal_additional_info blue cut_rate_info'></span></div>"
         inserted_div = insert_tag(
             inserted_div, "deposit_amount", inserting_tag)
         data_tag = f"<div class='hidden charge_amount_data' data-charge_amount='{self.order.get_charge_amount()}'></div>"

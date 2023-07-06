@@ -17,10 +17,10 @@
         {{register_form.as_div}}
     </div>
     {{order_formset.management_form}}
-    <h2 id='edit_order_formset_title'>INFO</h2>
+    <hr class="edit_order_hr">
     <div id="edit_order_formset">
     {% for order_form in order_forms %}
-    {% with order_form.as_div as order_form_div and payment_forms|index_form:forloop.counter0 as payment_form_div and charge_forms|index_form:forloop.counter0 as charge_form_div and deposit_forms|index_form:forloop.counter0 as deposit_form_div%}
+    {% with order_form.instance as order and order_form.as_div as order_form_div and payment_forms|index_form:forloop.counter0 as payment_form_div and charge_forms|index_form:forloop.counter0 as charge_form_div and deposit_forms|index_form:forloop.counter0 as deposit_form_div%}
     {% include "demand/forms/edit_order_form.html" %}
     {% endwith %}
     {% if not forloop.last%}

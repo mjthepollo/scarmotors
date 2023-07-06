@@ -128,5 +128,12 @@ p.modal_sector_info {
   font-weight: 600;
   text-align: center;
 
+  color: gray;
+}
+
+.modal_additional_info.orange {
   color: var(--orange);
+}
+.modal_additional_info.blue {
+  color: var(--blue);
 }

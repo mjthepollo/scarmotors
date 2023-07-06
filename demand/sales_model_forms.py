@@ -100,35 +100,13 @@ class OrderForm(forms.ModelForm):
         widgets = {
             "charge_type": forms.Select(attrs={'required': 'required'}),
             "charged_company": forms.Select(attrs={'required': 'required'}),
-            'receipt_number': forms.TextInput(),
-            'fault_ratio': forms.NumberInput(),
+            'receipt_number': forms.TextInput(attrs={"placeholder": "12-3456"}),
+            'fault_ratio': forms.NumberInput(attrs={"placeholder": "100"}),
         }
 
         labels = {
             "fault_ratio": "과실분(%)"
         }
-
-
-class EditOrderForm(forms.ModelForm):
-    class Meta:
-        model = Order
-        fields = ["charge_type", "charged_company",
-                  "order_type", "receipt_number", "fault_ratio"]
-        widgets = {
-            'receipt_number': forms.TextInput(),
-            'fault_ratio': forms.NumberInput(),
-        }
-
-        labels = {
-            "fault_ratio": "과실분(%)"
-        }
-
-    def save(self, commit=True):
-        instance = super(EditOrderForm, self).save(commit=False)
-        instance.flag1 = 'flag1' in self.cleaned_data['multi_choice']  # etc
-        if commit:
-            instance.save()
-        return instance
 
 
 class IncentiveForm(forms.ModelForm):
