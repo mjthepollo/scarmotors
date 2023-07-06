@@ -16,6 +16,13 @@ class NullBooleanWidget(BooleanWidget):
                         ("true", "X"))
 
 
+class OXBooleanWidget(BooleanWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.choices = (("", "-"), ("true", "O"),
+                        ("false", "X"))
+
+
 class RegisterFilter(django_filters.FilterSet):
     RO_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
@@ -41,6 +48,10 @@ class RegisterFilter(django_filters.FilterSet):
     client_name = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='client_name', lookup_expr='icontains', label="고객명")
+    first_center_repaired = django_filters.BooleanFilter(
+        field_name='first_center_repaired', label="1센터수리",
+        widget=OXBooleanWidget())
+
     note = django_filters.BooleanFilter(
         field_name='note', label="비고여부", lookup_expr="isnull",
         widget=NullBooleanWidget())
@@ -103,13 +114,6 @@ INCENTIVE_FILTER_CHOICES = (
     (date.today()+relativedelta(months=-6), "6개월"),
     (date.today()+relativedelta(months=-12), "1년"),
 )
-
-
-class OXBooleanWidget(BooleanWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.choices = (("", "-"), ("true", "O"),
-                        ("false", "X"))
 
 
 class IncentiveFilter(django_filters.FilterSet):

@@ -62,6 +62,16 @@
   background-color: orange;
 }
 
+.order.wasted_class {
+  color: white;
+  background-color: darkslategray;
+}
+
+.order.unrepaired_class {
+  color: white;
+  background-color: darkred;
+}
+
 .order_function.complete_class {
   color: white;
   background-color: green;

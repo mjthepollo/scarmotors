@@ -15,7 +15,8 @@ from demand.utility import zero_if_none
 
 STATUS_DICT = {"NO_CHARGE": "미청구", "NOT_PAID": "미입금", "NO_CAME_OUT": "미출고",
                "OVER_DEPOSIT": "과입금", "COMPLETE": "완료", "NEED_CHECK": "확인필요",
-               "ERROR": "오류", "MANUALLY_COMPLETE": "완료(수동)"}
+               "WASTED": "폐차", "UNREPAIRED": "미/출", "ERROR": "오류",
+               "MANUALLY_COMPLETE": "완료(수동)"}
 NOT_COMPLETE = 0
 PROGRESS = 1
 COMPLETE = 2
@@ -252,6 +253,12 @@ class Sales(TimeStampedModel):
         7. 입금이 됐고 위의 두 조건이 아니면 확인필요
         """
         try:
+            if isinstance(self, Order):
+                if self.register.wasted:
+                    return STATUS_DICT["WASTED"]
+                if self.register.unrepaired:
+                    return STATUS_DICT["UNREPAIRED"]
+
             if self.check_no_came_out():
                 return STATUS_DICT["NO_CAME_OUT"]
             if not self.charge:
@@ -275,8 +282,6 @@ class Sales(TimeStampedModel):
                     return STATUS_DICT["NOT_PAID"]
 
             if isinstance(self, Order):  # 일반 주문의 경우
-                if self.register.wasted or self.register.unrepaired:
-                    return STATUS_DICT["COMPLETE"]
                 if self.deposit:
                     payment_rate = self.get_payment_rate()
                     if payment_rate > 1.01:
@@ -322,7 +327,8 @@ class Sales(TimeStampedModel):
             return False
 
     def completed(self):
-        if self.status == STATUS_DICT["COMPLETE"] or self.status == STATUS_DICT["MANUALLY_COMPLETE"]:
+        if self.status == STATUS_DICT["COMPLETE"] or self.status == STATUS_DICT["MANUALLY_COMPLETE"]\
+                or self.status == STATUS_DICT["UNREPAIRED"] or self.status == STATUS_DICT["WASTED"]:
             return True
         else:
             return False
@@ -460,6 +466,7 @@ class Register(TimeStampedModel):
 
 
 # region FOR HTML FUNCTIONS
+
 
     def get_status(self):
         orders = self.all_orders

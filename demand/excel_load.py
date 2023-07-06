@@ -418,6 +418,21 @@ def make_order_payment_charge_and_deposit_with_line(line, register):
     return order
 
 
+def set_created_to_day_came_in(register):
+    day_came_in = register.day_came_in
+    for order in register.all_orders:
+        if order.deposit:
+            order.deposit.created = day_came_in
+        if order.charge:
+            order.charge.created = day_came_in
+        if order.payment:
+            order.payment.created = day_came_in
+        order.created = day_came_in
+        order.save()
+    register.created = register.day_came_in
+    register.save()
+
+
 def make_complete_register_for_line_numbers(df, line_numbers):
     first_line = df.iloc[line_numbers[0], :].values.tolist()
     register = make_register_from_first_line(first_line)
@@ -426,6 +441,8 @@ def make_complete_register_for_line_numbers(df, line_numbers):
             for line_number in line_numbers:
                 line = df.iloc[line_number, :].values.tolist()
                 make_order_payment_charge_and_deposit_with_line(line, register)
+            register.created = register.day_came_in
+            # set_created_to_day_came_in(register)
         except Exception as e:
             print_fields(register)
             raise e
