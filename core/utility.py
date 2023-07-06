@@ -55,7 +55,7 @@ def key_from_dict(value, dict):
     return key
 
 
-def go_to_previous_or_search_registers(request, register):
+def go_to_previous_url_or_search_register(request, register):
     previous_url = request.META.get('HTTP_REFERER', None)
     if previous_url:
         return redirect(previous_url)
