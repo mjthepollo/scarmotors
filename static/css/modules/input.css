@@ -8,6 +8,13 @@ select {
 
   border: 1px solid black;
 }
+
+input[type="number"]::-webkit-inner-spin-button {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+
 input[type="checkbox"] {
   border-radius: 0px;
   height: 20px;
@@ -23,6 +30,6 @@ input[type="radio"] {
   border: 1px solid black;
 }
 textarea {
-  padding: 20px;
   height: 150px;
+  padding: 20px;
 }
