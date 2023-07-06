@@ -86,7 +86,7 @@ def edit_register(request, pk):
             instance=order.charge, prefix=f"charge-{i}", order=order)
             for i, order in enumerate(register.all_orders)]
         deposit_forms = [DepositForm(
-            instance=order.deposit, prefix=f"deposit-{i}")
+            instance=order.deposit, prefix=f"deposit-{i}", order=order)
             for i, order in enumerate(register.all_orders)]
         return render(request, "demand/edit_register.html", context={
             "register": register,
@@ -115,7 +115,7 @@ def edit_register(request, pk):
             request.POST, instance=order.charge, prefix=f"charge-{i}", order=order)
             for i, order in enumerate(register.all_orders)]
         deposit_forms = [DepositForm(
-            request.POST, instance=order.deposit, prefix=f"deposit-{i}")
+            request.POST, instance=order.deposit, prefix=f"deposit-{i}", order=order)
             for i, order in enumerate(register.all_orders)]
         order_forms_are_valid = not (
             False in [form.is_valid() for form in order_forms])
@@ -182,7 +182,8 @@ def edit_order(request, pk):
     payment_form = PaymentForm(instance=order.payment, prefix="payment-0")
     charge_form = ChargeForm(instance=order.charge,
                              order=order, prefix="charge-0")
-    deposit_form = DepositForm(instance=order.deposit, prefix="deposit-0")
+    deposit_form = DepositForm(
+        instance=order.deposit, prefix="deposit-0", order=order)
     if request.method == "GET":
         return render(request, "demand/edit_order.html", context={
             "order_form": order_form,
@@ -197,7 +198,7 @@ def edit_order(request, pk):
         charge_form = ChargeForm(
             request.POST, instance=order.charge, order=order, prefix="charge-0")
         deposit_form = DepositForm(
-            request.POST, instance=order.deposit, prefix="deposit-0")
+            request.POST, instance=order.deposit, prefix="deposit-0", order=order)
         if order_form.is_valid() and payment_form.is_valid() and charge_form.is_valid() and deposit_form.is_valid():
             order_form.save()
             payment_form.save()
@@ -344,13 +345,14 @@ def order_charge(request, pk):
 @login_required
 def order_deposit(request, pk):
     order = get_object_or_404(Order, pk=pk)
-    deposit_form = DepositForm(instance=order.deposit)
+    deposit_form = DepositForm(instance=order.deposit, order=order)
     if request.method == "GET":
         return render(request, "demand/order_deposit.html", context={
             "deposit_form": deposit_form,
         })
     else:
-        deposit_form = DepositForm(request.POST, instance=order.deposit)
+        deposit_form = DepositForm(
+            request.POST, instance=order.deposit, order=order)
         if deposit_form.is_valid():
             deposit_form.save()
             return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)

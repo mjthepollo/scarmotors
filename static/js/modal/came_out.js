@@ -4,8 +4,8 @@ import {getIdOfField, modalFuctionFactory} from "./modal.js";
 const cameOutButtons = document.querySelectorAll(".came_out_button");
 const prefix = "payment";
 
-function setSettlementAmountInfoFactory(e, settlementAmountInfo, indemnityAmountInput, discountAmountInput) {
-  return function (e) {
+function setSettlementAmountInfoFactory(settlementAmountInfo, indemnityAmountInput, discountAmountInput) {
+  return function () {
     const indemnityAmount = parseInt(indemnityAmountInput.value);
     const discountAmount = isNaN(parseInt(discountAmountInput.value)) ? 0 : parseInt(discountAmountInput.value);
     const settlementAmount = indemnityAmount - discountAmount;
@@ -22,7 +22,7 @@ function cameOutModalPostprocess(e, modal) {
     const indemnityAmountInput = modal.querySelector(`#${getIdOfField(prefix, "indemnity_amount", i)}`);
     const discountAmountInput = modal.querySelector(`#${getIdOfField(prefix, "discount_amount", i)}`);
 
-    const setSettlementAmount = setSettlementAmountInfoFactory(e, settlementAmountInfo, indemnityAmountInput, discountAmountInput);
+    const setSettlementAmount = setSettlementAmountInfoFactory(settlementAmountInfo, indemnityAmountInput, discountAmountInput);
     indemnityAmountInput.addEventListener("input", setSettlementAmount);
     discountAmountInput.addEventListener("input", setSettlementAmount);
     setSettlementAmount();
@@ -34,3 +34,5 @@ const cameOutButtonHandler = modalFuctionFactory(cameOutModalPreprocess, cameOut
 for (let i = 0; i < cameOutButtons.length; i++) {
   cameOutButtons[i].addEventListener("click", cameOutButtonHandler);
 }
+
+export {setSettlementAmountInfoFactory};

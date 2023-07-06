@@ -105,6 +105,14 @@ class DepositForm(forms.ModelForm):
             original_div, "deposit_date", inserting_tag)
         inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
             삭감율:</label><span class='modal_additional_info cut_rate_info'></span></div>"
-        return_div = insert_tag(
+        inserted_div = insert_tag(
             inserted_div, "deposit_amount", inserting_tag)
+        data_tag = f"<div class='hidden charge_amount_data' data-charge_amount='{self.order.get_charge_amount()}'></div>"
+        return_div = inserted_div+data_tag
         return mark_safe(return_div)
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('order', None):
+            self.order = kwargs["order"]
+        kwargs.pop('order', None)
+        super(DepositForm, self).__init__(*args, **kwargs)

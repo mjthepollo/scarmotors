@@ -2,8 +2,8 @@ import {modalFuctionFactory} from "./modal.js";
 
 const depositButtons = document.querySelectorAll(".deposit_button");
 
-function setRateInfoFactory(e, chargeAmount, depositAmountInput, paymentRateInfo, curRateInfo) {
-  return function (e) {
+function setRateInfoFactory(chargeAmount, depositAmountInput, paymentRateInfo, curRateInfo) {
+  return function () {
     const depositAmout = isNaN(depositAmountInput.value) ? 0 : parseInt(depositAmountInput.value);
     const paymentRate = parseInt((depositAmout / chargeAmount) * 100);
     paymentRateInfo.innerHTML = isNaN(paymentRate) ? "-" : paymentRate.toString() + "%";
@@ -13,12 +13,12 @@ function setRateInfoFactory(e, chargeAmount, depositAmountInput, paymentRateInfo
 
 function depositModalPreprocess(e) {}
 function depositModalPostprocess(e, modal) {
-  let chargeAmount = parseInt(modal.querySelector("#charge_amount").value);
+  let chargeAmount = parseInt(modal.querySelector(".charge_amount_data").dataset.charge_amount);
   chargeAmount = isNaN(chargeAmount) ? 0 : chargeAmount;
   const depositAmountInput = modal.querySelector("#id_deposit_amount");
   const paymentRateInfo = modal.querySelector(".payment_rate_info");
   const curRateInfo = modal.querySelector(".cut_rate_info");
-  const setRateInfo = setRateInfoFactory(e, chargeAmount, depositAmountInput, paymentRateInfo, curRateInfo);
+  const setRateInfo = setRateInfoFactory(chargeAmount, depositAmountInput, paymentRateInfo, curRateInfo);
   depositAmountInput.addEventListener("input", setRateInfo);
   setRateInfo();
 }
@@ -28,3 +28,5 @@ const depositButtonHandler = modalFuctionFactory(depositModalPreprocess, deposit
 for (let i = 0; i < depositButtons.length; i++) {
   depositButtons[i].addEventListener("click", depositButtonHandler);
 }
+
+export {setRateInfoFactory};

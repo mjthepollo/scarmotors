@@ -7,7 +7,6 @@ function carNumberModalPreprocess(e) {
   const carNumber = carNumberInput.value;
   const defaultUrl = e.currentTarget.dataset.modal_default_url;
   const modalUrl = defaultUrl + carNumber;
-  console.log(modalUrl);
   e.currentTarget.dataset.modal_url = modalUrl;
 }
 function carNumberModalPostprocess(e, modal) {}

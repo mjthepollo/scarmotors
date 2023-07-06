@@ -5,8 +5,6 @@ const pageNumberCancelButton = document.querySelector("#page_number_cancel_butto
 const pageNumberInput = document.querySelector("input#page_number_input");
 const urlWithoutPage = pageNumberInputBox.dataset.url_without_page;
 
-console.log(urlWithoutPage);
-
 function handlePageNumberButtonClick(e) {
   pageNumberInputBox.classList.remove("inactive");
   pageNumberInput.focus();

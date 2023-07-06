@@ -90,11 +90,12 @@ def charge_modal(request, pk):
 def deposit_modal(request, pk):
     order = Order.objects.get(pk=pk)
     if request.method == "GET":
-        deposit_form = DepositForm(instance=order.deposit)
+        deposit_form = DepositForm(instance=order.deposit, order=order)
         return TemplateResponse(request, "demand/modals/deposit_modal.html",
                                 context={"order": order, "deposit_form": deposit_form})
     else:
-        deposit_form = DepositForm(request.POST, instance=order.deposit)
+        deposit_form = DepositForm(
+            request.POST, instance=order.deposit, order=order)
         if deposit_form.is_valid():
             deposit = deposit_form.save()
             order.deposit = deposit

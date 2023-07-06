@@ -10,7 +10,6 @@ function hideHoverNotes(e) {
   hoverNote.classList.add("hidden");
 }
 
-console.log(hoverNotes);
 for (let i = 0; i < hoverNotes.length; i++) {
   hoverNotes[i].parentElement.addEventListener("mouseover", showHoverNotes);
   hoverNotes[i].parentElement.addEventListener("mouseout", hideHoverNotes);
