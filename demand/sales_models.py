@@ -458,47 +458,9 @@ class Register(TimeStampedModel):
         self.save()
 # endregion Register Utility Function
 
-# region Mockup Functions
-    def get_mockups(self, KeyModel, key):
-        """
-        EditRegisterView에서 사용한다. modelformset을 활용하기 위해 mockup Object를 만들어준다.
-        KeyModel은 모델이고 key는 해당하는 모델의 attribute 이름이다.
-        """
-        mockup_keys = []
-        key_pk_list = []
-        for order in self.all_orders:
-            mockup_key = getattr(order, key)
-            if not mockup_key:
-                mockup_key = KeyModel.create_mockup()
-                setattr(order, key, mockup_key)
-                order.save()
-            mockup_keys.append(mockup_key)
-            key_pk_list.append(mockup_key.pk)
-        preserved = Case(*[When(pk=pk, then=pos)
-                         for pos, pk in enumerate(key_pk_list)])
-        queryset = KeyModel.objects.filter(
-            pk__in=key_pk_list).order_by(preserved)
-        MockupCreated.objects.create(register=self)
-        return queryset
-
-    def remove_mockups(self, KeyModel, key):
-        """
-        EditRegisterView에서 사용한다. modelformset을 활용하기 위해 만들어진 mockup들을 지워준다.
-        KeyModel은 모델이고 key는 해당하는 모델의 attribute 이름이다.
-        """
-        for order in self.orders.all():
-            key_model = getattr(order, key)
-            if key_model:
-                if key_model.is_mockup():
-                    key_model.delete()
-
-    def remove_all_mockups(self):
-        self.remove_mockups(Payment, "payment")
-        self.remove_mockups(Deposit, "deposit")
-        self.remove_mockups(Charge, "charge")
-# endregion Mockup Functions
 
 # region FOR HTML FUNCTIONS
+
     def get_status(self):
         orders = self.all_orders
         all_completed = True
@@ -675,23 +637,6 @@ class ExtraSales(Sales):
 
     def get_description(self):
         return f"기타매출({self.pk})"
-
-    def remove_mockups(self, KeyModel, key):
-        """
-        EditRegisterView에서 사용한다. modelformset을 활용하기 위해 만들어진 mockup들을 지워준다.
-        KeyModel은 모델이고 key는 해당하는 모델의 attribute 이름이다.
-        """
-        for order in self.orders.all():
-            key_model = getattr(order, key)
-            if key_model:
-                if key_model.is_mockup():
-                    print(key_model)
-                    key_model.delete()
-
-    def remove_all_mockups(self):
-        self.remove_mockups(Payment, "payment")
-        self.remove_mockups(Deposit, "deposit")
-        self.remove_mockups(Charge, "charge")
 
     def to_excel_line(self):
         pass

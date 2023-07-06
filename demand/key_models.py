@@ -53,29 +53,11 @@ class KeyModel(TimeStampedModel):
         ordering = ["-created"]
         abstract = True
 
-    @classmethod
-    def create_mockup(cls):
-        obj = cls.objects.create()
-        for field in cls._meta.fields:
-            if field.name != "id" and\
-                    not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
-                setattr(obj, field.name, None)
-        obj.save()
-        return obj
-
     def is_stable(self):
         raise NotImplementedError
 
     def is_default(self):
         raise NotImplementedError
-
-    def is_mockup(self):
-        result = True
-        for field in self._meta.model._meta.fields:
-            if field.name != "id" and\
-                    not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields]:
-                result = result and getattr(self, field.name) == None
-        return result
 
     def save(self, *args, **kwargs):
         """
