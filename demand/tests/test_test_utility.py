@@ -8,11 +8,4 @@ from demand.test_utility import (createRandomCharge, createRandomDeposit,
 class TestUtilityTest(TestCase):
 
     def setUp(self):
-        self.payment = createRandomPayment()
-        self.mockup_payment = Payment.create_mockup()
-
-        self.charge = createRandomCharge()
-        self.mockup_charge = Charge.create_mockup()
-
-        self.depoist = createRandomDeposit()
-        self.mockup_deposit = Deposit.create_mockup()
+        pass

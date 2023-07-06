@@ -559,18 +559,6 @@ class Register(TimeStampedModel):
         return f"[{self.RO_number}]{self.car_number}({self.day_came_in.year}/{self.day_came_in.month}/{self.day_came_in.day})"
 
 
-class MockupCreated(TimeStampedModel):
-    """
-    demand.middleware의 remove_mockups middleware에서 사용된다.
-    """
-    register = models.ForeignKey(
-        Register, on_delete=models.CASCADE, verbose_name="등록")
-
-    def remove_mockups(self):
-        self.register.remove_all_mockups()
-        self.delete()
-
-
 class Order(Sales):
     """
     charge_type 수정시에 SalesInfo Model도 바꾸어야 한다.

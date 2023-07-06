@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 
 from demand.key_models import Charge, Deposit, Payment
-from demand.sales_models import MockupCreated, Order, Register
+from demand.sales_models import Register
 from demand.test_utility import (createRandomCharge, createRandomDeposit,
                                  createRandomOrdinaryOrder,
                                  createRandomPayment, createRandomRegister)
@@ -39,16 +39,6 @@ class DemandModelMethodTest(TestCase):
                                                           self.not_full_charges[i],
                                                           self.not_full_deposits[i]
                                                           ) for i in range(3)]
-
-    def setUpMockup(self):
-        self.payment = createRandomPayment()
-        self.mockup_payment = Payment.create_mockup()
-
-        self.charge = createRandomCharge()
-        self.mockup_charge = Charge.create_mockup()
-
-        self.depoist = createRandomDeposit()
-        self.mockup_deposit = Deposit.create_mockup()
 
     def test_RO_number(self):
         Register.objects.all().delete()
