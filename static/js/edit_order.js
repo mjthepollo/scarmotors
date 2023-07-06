@@ -6,7 +6,12 @@ import {getIdOfField} from "./modal/modal.js";
 const totalNumberOfEditOrderForms = document.querySelectorAll(".edit_order_form").length;
 const totlaNumberOfEditOrderSet = totalNumberOfEditOrderForms / 4;
 
-setRateInfoFactory;
+function setChargeAmountDataFactory(paymentData, wageAmountInput, componentAmountInput) {
+  return function () {};
+}
+function setPyamentDataFactory(paymentData, wageAmountInput, componentAmountInput) {
+  return function () {};
+}
 
 for (let i = 0; i < totlaNumberOfEditOrderSet; i++) {
   const faultRatioInput = document.querySelector(`#${getIdOfField("order", "fault_ratio", i)}`);
@@ -15,11 +20,12 @@ for (let i = 0; i < totlaNumberOfEditOrderSet; i++) {
   const settlementAmountInfo = document.querySelectorAll(".settlement_amount_info")[i];
   const wageAmountInput = document.querySelector(`#${getIdOfField("charge", "wage_amount", i)}`);
   const componentAmountInput = document.querySelector(`#${getIdOfField("charge", "component_amount", i)}`);
-  const chargeData = document.querySelectorAll(".charge_data")[i];
+  const paymentData = document.querySelectorAll(".payment_data")[i];
   const repairAmountInfo = document.querySelectorAll(".repair_amount_info")[i];
   const vatInfo = document.querySelectorAll(".vat_info")[i];
   const chargableAmountInfo = document.querySelectorAll(".chargable_amount_info")[i];
   const chargeAmountInfo = document.querySelectorAll(".charge_amount_info")[i];
+  const chargeAmountData = document.querySelectorAll(".charge_amount_data")[i];
   const depositAmountInput = document.querySelector(`#${getIdOfField("deposit", "deposit_amount", i)}`);
   const paymentRateInfo = document.querySelectorAll(".payment_rate_info")[i];
   const curRateInfo = document.querySelectorAll(".cut_rate_info")[i];
@@ -32,7 +38,7 @@ for (let i = 0; i < totlaNumberOfEditOrderSet; i++) {
   const setChargeInfo = setChargeInfoFactory(
     wageAmountInput,
     componentAmountInput,
-    chargeData,
+    paymentData,
     repairAmountInfo,
     vatInfo,
     chargableAmountInfo,
@@ -41,4 +47,8 @@ for (let i = 0; i < totlaNumberOfEditOrderSet; i++) {
   wageAmountInput.addEventListener("input", setChargeInfo);
   componentAmountInput.addEventListener("input", setChargeInfo);
   setChargeInfo();
+
+  const setRateInfo = setRateInfoFactory(chargeAmountData, depositAmountInput, paymentRateInfo, curRateInfo);
+  depositAmountInput.addEventListener("input", setRateInfo);
+  setRateInfo();
 }

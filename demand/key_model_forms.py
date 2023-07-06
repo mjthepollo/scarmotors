@@ -76,7 +76,7 @@ class ChargeForm(forms.ModelForm):
         indemnity_amount_data = f"data-indemnity_amount='{indemnity_amount}'"
         fault_ratio_data = f"data-fault_ratio='{fault_ratio}'"
         refund_amount_data = f"data-refund_amount='{refund_amount}'"
-        data_tag = f"<div class='hidden charge_data' {indemnity_amount_data} {fault_ratio_data} {refund_amount_data}></div>"
+        data_tag = f"<div class='hidden payment_data' {indemnity_amount_data} {fault_ratio_data} {refund_amount_data}></div>"
         return_div = return_div + VAT_tag + \
             chargable_amount_tag + charge_amount_tag + data_tag
         return mark_safe(return_div)
