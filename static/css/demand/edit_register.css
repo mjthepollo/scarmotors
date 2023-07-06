@@ -32,6 +32,10 @@ h2#edit_order_formset_title {
 #edit_special_register_form input[type="checkbox"] {
   width: 50px;
 }
+#edit_special_register_form label {
+  display: flex;
+  justify-content: flex-end;
+}
 
 textarea.deposit_note {
   width: 200px;
