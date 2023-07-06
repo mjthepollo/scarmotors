@@ -8,17 +8,12 @@
 {% block content %}
 <form id="edit_order_form" method="POST">
     {% csrf_token %}
-    <h3>주문</h3>
-    <div>{{order_form.as_div}}</div>
-    <h3>결제 정보</h3>
-    <div>{{payment_form.as_div}}</div>
-    <h3>청구</h3>
-    <div>{{charge_form.as_div}}</div>
-    <h3>입금</h3>
-    <div>{{deposit_form.as_div}}</div>
+    {% with order_form.as_div as order_form_div and payment_form.as_div as payment_form_div and charge_form.as_div as charge_form_div and deposit_form.as_div as deposit_form_div%}
+    {% include "demand/forms/edit_order_form.html" %}
+    {% endwith %}
     <button id="complete" class="btn btn-dark">수정 완료</button>
 </form>
 {% endblock content %}
 {% block inline_javascript %}
-<script type="module" src="{% static 'js/order_edit.js' %}"></script>
+<script type="module" src="{% static 'js/edit_order.js' %}"></script>
 {% endblock inline_javascript %}

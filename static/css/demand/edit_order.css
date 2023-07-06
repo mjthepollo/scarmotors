@@ -1,4 +1,5 @@
 @import url("../modules/input.css");
+@import url("../forms/edit_order_form.css");
 
 main.container {
   display: flex;

@@ -18,29 +18,18 @@
     </div>
     {{order_formset.management_form}}
     <h2>INFO</h2>
-    <div data-formset-body id="order_edit_formset">
+    <div id="edit_order_formset">
         {% for order_form in order_forms %}
-        <h3>주문</h3>
-        <div data-formset-form class="order_edit_formset_entity">
-            {{order_form.render}}
-        </div>
-        <h3>결제 정보</h3>
-        <div class='order_edit_formset_entity'>
-            {{payment_forms|index_form:forloop.counter0}}
-        </div>
-        <h3>청구</h3>
-        <div class="order_edit_formset_entity">
-            {{charge_forms|index_form:forloop.counter0}}
-        </div>
-        <h3>입금</h3>
-        <div class="order_edit_formset_entity">
-            {{deposit_forms|index_form:forloop.counter0}}
-        </div>
+        {% with order_form.as_div as order_form_div and payment_forms|index_form:forloop.counter0 as payment_form_div and charge_forms|index_form:forloop.counter0 as charge_form_div and deposit_forms|index_form:forloop.counter0 as deposit_form_div%}
+        {% include "demand/forms/edit_order_form.html" %}
+        {% endwith %}
         {% if not forloop.last%}
         <hr>
         {% endif %}
         {% endfor %}
-        <h2 id="additional_order">추가주문</h2>
+    </div>
+    <h2>추가주문</h2>
+    <div data-formset-body id="extra_order_formset">
     </div>
     <script type="form-template" data-formset-empty-form>
         {% escapescript %}
@@ -64,5 +53,5 @@
 </form>
 {% endblock content %}
 {% block inline_javascript %}
-<script type="module" src="{% static 'js/order_edit.js' %}"></script>
+<script type="module" src="{% static 'js/edit_order.js' %}"></script>
 {% endblock inline_javascript %}

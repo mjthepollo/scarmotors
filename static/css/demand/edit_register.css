@@ -1,4 +1,6 @@
 @import url("./new_register.css");
+@import url("../forms/edit_order_form.css");
+
 .order_edit_formset_entity {
   display: flex;
 
