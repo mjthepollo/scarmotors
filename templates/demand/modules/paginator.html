@@ -7,12 +7,11 @@
       <a style="color:#a0a0a0"><<</a>
       <a style="color:#a0a0a0"><</a>
     {% endif %}
-    <div id="page_number_input_box" class="inactive" data-url_without_page="?{{ params_without_page }}&page=">
-      <input type="number" id="page_number_input" value="{{ page.number }}" min="1" max="{{ page.paginator.num_pages }}" onkeyup="if(window.event.keyCode==13){handlePageNumberMoveButtonClick()}" />
-      <button id="page_number_move_button" class='btn btn-warning'>이동</button>
-      <button id="page_number_cancel_button" class='btn btn-danger'>취소</button>
-    </div>
-    <span class="current">[<div id="page_number_button">{{ page.number }}</div><div id="page_slash">/</div><div id="number_of_pages">{{ page.paginator.num_pages }}</div>]</span>
+    <span class="current">
+      [<input type="number" id="page_number_input" value="{{page.number}}"min="1" max="{{ page.paginator.num_pages }}"
+      onkeyup="if(window.event.keyCode==13){goToPage()}" data-url_without_page="?{{ params_without_page }}&page=">
+      <div id="page_slash">/</div><div id="number_of_pages">{{ page.paginator.num_pages }}</div>]
+    </span>
     {% if page.has_next %}
       <a href="?{{ params_without_page }}&page={{page.next_page_number}}">></a>
       <a class="end_page" href="?{{ params_without_page }}&page={{page.paginator.num_pages}}">>></a>

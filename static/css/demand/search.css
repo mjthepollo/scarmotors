@@ -82,14 +82,24 @@ input[type="submit"] {
 
 .paginator span.current {
   display: flex;
+  align-items: center;
 }
 input#page_number_input {
-  width: 80px;
-  margin-left: 15px;
+  width: 60px;
+  padding: 0px;
 
   outline: none;
   border: none;
 }
+input#page_number_input:focus {
+  color: #198754;
+}
+
+#number_of_pages {
+  width: 33px;
+  margin: 0px 10px;
+}
+
 .paginator #page_number_input_box {
   position: absolute;
   left: calc(50% - 125px);
@@ -123,12 +133,6 @@ span.current > div {
 
 span.current #page_number_button {
   cursor: pointer;
-}
-
-span.current #page_slash {
-}
-
-span.current #number_of_pages {
 }
 
 #search_results {
