@@ -1,0 +1,34 @@
+table {
+  margin-bottom: 10px;
+}
+
+table.period_sales th,
+table.period_sales td,
+table.insurance th,
+table.insurance td,
+table.payment th,
+table.payment td {
+  width: 100px;
+
+  font-weight: 700;
+  text-align: center;
+
+  border: 1px solid black;
+
+  vertical-align: middle;
+}
+
+table.period_sales th {
+  background-color: yellow;
+}
+
+table.insurance th {
+  background-color: green;
+}
+table.payment th {
+  background-color: var(--blue);
+}
+
+table.payment th.double {
+  width: 200px;
+}
