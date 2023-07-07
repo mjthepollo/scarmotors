@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from core.utility import insert_tag
-from demand.sales_models import Order, Register
+from demand.sales_models import ExtraSales, Order, Register
 
 
 class RealDayCameOutForm(forms.ModelForm):
@@ -113,3 +113,21 @@ class IncentiveForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ["incentive_paid"]
+
+
+class ExtraSalesForm(forms.ModelForm):
+    class Meta:
+        model = ExtraSales
+        fields = ["day_came_in", "expected_day_came_out", "real_day_came_out",
+                  "car_number", "car_model", "sort", "abroad_type", "supporter",
+                  "insurance_agent", "client_name", "phone_number", "note"]
+        widgets = {
+            'day_came_in': forms.DateInput(attrs={'type': 'date'}),
+            'expected_day_came_out': forms.DateInput(attrs={'type': 'date'}),
+            'real_day_came_out': forms.DateInput(attrs={'type': 'date'}),
+            'car_number': forms.TextInput(attrs={'placeholder': '12가1234'}),
+            'car_model': forms.TextInput(attrs={'placeholder': '아반떼'}),
+            'client_name': forms.TextInput(attrs={'placeholder': '홍길동'}),
+            'phone_number': forms.TextInput(attrs={'placeholder': '01012345678'}),
+            'note': forms.Textarea(attrs={'placeholder': '메모, 특이사항 등'}),
+        }

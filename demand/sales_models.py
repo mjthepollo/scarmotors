@@ -612,14 +612,14 @@ class ExtraSales(Sales):
         ("세차", "세차"), ("기타", "기타")),
         max_length=20, verbose_name="구분")
 
-    car_number = models.CharField(
-        verbose_name="차량번호", blank=True, null=True, max_length=20)
     day_came_in = models.DateField(verbose_name="입고일", blank=True, null=True)
     expected_day_came_out = models.DateField(
         blank=True, null=True, verbose_name="출고예정일")
     # 나중에 출고시에 추가함
     real_day_came_out = models.DateField(
         blank=True, null=True, verbose_name="실제출고일")
+    car_number = models.CharField(
+        verbose_name="차량번호", blank=True, null=True, max_length=20)
     car_model = models.CharField(
         blank=True, null=True, max_length=90, verbose_name="차종")
     abroad_type = models.CharField(
@@ -648,7 +648,7 @@ class ExtraSales(Sales):
         pass
 
     def __str__(self):
-        return f"({self.day_came_in})입고: {self.note}"
+        return f"[{self.sort}]{self.car_number}"
 
 
 class RecognizedSales(TimeStampedModel):

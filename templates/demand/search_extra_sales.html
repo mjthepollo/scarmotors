@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/demand/search.css' %}">
+{% endblock css %} {% block content %}
+
+<div id="search_form"><div id="special_functions">
+        <a class="btn btn-success special_function" href="{% url 'demand:new_extra_sales' %}">기타 매출 등록</a>
+</div></div>
+<form id="search_form" method="GET">
+<table id="search_results" border="1">
+  <tr>
+    <th>종류</th>
+    <th>입고일</th>
+    <th>차량번호</th>
+    <th>차종</th>
+    <th>국산/수입</th>
+    <th>입고지원</th>
+    <th>담당자</th>
+    <th>청구가능금액</th>
+    <th>면책금</th>
+    <th>지급율</th>
+    <th>출고</th>
+    <th>청구</th>
+    <th>상태</th>
+  </tr>
+{% for extra_sales in all_extra_sales %}
+{% include "demand/modules/extra_sales.html" %}
+{% endfor %}
+</table>
+{% endblock content %}
+{% block inline_javascript %}
+<script type="module" src="{% static 'js/modal/came_out.js' %}"></script>
+<script type="module" src="{% static 'js/modal/charge.js' %}"></script>
+<script type="module" src="{% static 'js/modal/deposit.js' %}"></script>
+<script type="module" src="{% static 'js/hover_note.js' %}"></script>
+<script src="{% static 'js/paginator.js' %}"></script>
+{% endblock inline_javascript %}

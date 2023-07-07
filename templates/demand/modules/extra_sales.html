@@ -1,0 +1,28 @@
+{% load custom_filters %}
+{% load humanize %}
+<tr>
+    <td>{{extra_sales.sort}}</td>
+    <td>{{extra_sales.formatted_day_came_in}}</td>
+    <td class="car_number">
+        {{extra_sales.car_number}}
+        {% if extra_sales.note %}
+        <div class="hover_note hidden">{{extra_sales.note}}</div>
+        {% else %}
+        <div class="hover_note hidden hover_blurred_note">비고 없음</div>
+        {% endif %}
+    </td>
+    <td>{{extra_sales.car_model}}</td>
+    <td>{{extra_sales.get_abroad_type_display}}</td>
+    <td>{{extra_sales.supporter.name}}</td>
+    <td>{{extra_sales.insurance_agent.name}}</td>
+    <td>{{extra_sales.get_chargable_amount|intcomma}}</td>
+    <td>{{extra_sales.get_indemnity_amount|intcomma}}</td>
+    <td>{{extra_sales.formatted_payment_rate}}</td>
+    <td class="extra_sales {{extra_sales.get_came_out_class}}">
+        <div class="came_out_button" data-modal_url="{% url 'demand:extra_sales_came_out_modal' extra_sales.pk%}">출고</div>
+    </td>
+    <td class="extra_sales {{extra_sales.get_charge_class}}">
+        <div class="charge_button" data-modal_url="{% url 'demand:extra_sales_charge_modal' extra_sales.pk%}">청구</div>
+    </td>
+    <td class="extra_sales bold {{extra_sales.get_status_class}}"><a href="{% url 'demand:edit_extra_sales' extra_sales.pk %}">{{extra_sales.get_status_display}}</td>
+</tr>

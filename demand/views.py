@@ -9,17 +9,18 @@ from django.http import FileResponse  # Create your views here.
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from core.utility import go_to_previous_url_or_search_register
+from core.utility import go_to_previous_url_or_search_register, print_colored
 from demand.excel_line_info import INDEXES
 from demand.filter_forms import (IncentiveFilter, OrderFilter, RegisterFilter,
                                  RegisterFilterForOrderFilter)
 from demand.key_model_forms import ChargeForm, DepositForm, PaymentForm
 from demand.key_models import Charge, Deposit, Payment
 from demand.sales_model_forms import (EditRegisterForm,
-                                      EditSpecialRegisterForm, IncentiveForm,
-                                      NewRegisterForm, OrderForm,
-                                      RegisterNoteForm)
+                                      EditSpecialRegisterForm, ExtraSalesForm,
+                                      IncentiveForm, NewRegisterForm,
+                                      OrderForm, RegisterNoteForm)
 from demand.sales_models import ExtraSales, Order, Register
+from demand.utility import print_fields
 
 
 @login_required
@@ -407,8 +408,52 @@ def incentive(request):
 
 
 @login_required
-def extra_sales(request):
-    return render(request, "demand/extra_sales.html", context={"extra_sales_queryset": ExtraSales.objects.all()})
+def search_extra_sales(request):
+    all_extra_sales = ExtraSales.objects.all()
+    for extra_sales in all_extra_sales:
+        print_fields(extra_sales)
+        print_fields(extra_sales.payment)
+        print_fields(extra_sales.charge)
+        print(extra_sales.get_charge_amount())
+    return render(request, "demand/search_extra_sales.html", context={"all_extra_sales": all_extra_sales})
+
+
+@login_required
+def new_extra_sales(request):
+    if request.method == "GET":
+        extra_sales_form = ExtraSalesForm()
+        return render(request, "demand/new_extra_sales.html", context={
+            "extra_sales_form": extra_sales_form,
+        })
+    else:
+        extra_sales_form = ExtraSalesForm(request.POST)
+        if extra_sales_form.is_valid():
+            extra_sales = extra_sales_form.save()
+            return redirect(reverse("demand:search_extra_sales"))
+        else:
+            return render(request, "demand/new_extra_sales.html", context={
+                "extra_sales_form": extra_sales_form,
+            })
+
+
+@login_required
+def edit_extra_sales(request, pk):
+    extra_sales = ExtraSales.objects.get(pk=pk)
+    if request.method == "GET":
+        extra_sales_form = ExtraSalesForm(instance=extra_sales)
+        return render(request, "demand/edit_extra_sales.html", context={
+            "extra_sales_form": extra_sales_form,
+        })
+    else:
+        extra_sales_form = ExtraSalesForm(request.POST, instance=extra_sales)
+        if extra_sales_form.is_valid():
+            extra_sales = extra_sales_form.save()
+            return redirect(reverse("demand:search_extra_sales"))
+        else:
+            return render(request, "demand/edit_extra_sales.html", context={
+                "extra_sales_form": extra_sales_form,
+            })
+
 
 # 차량번호 검색
 # RO 번호 검색

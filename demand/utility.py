@@ -7,6 +7,9 @@ from demand.excel_line_info import *
 
 
 def print_fields(obj):
+    if obj is None:
+        print("THIS IS NONE")
+        return
     except_fields = ["updated", "created", "id"]
     foreign_fields = []
     for key in obj.__dict__:

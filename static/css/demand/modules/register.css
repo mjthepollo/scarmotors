@@ -4,6 +4,7 @@
 
 .register a,
 .order a,
+.extra_sales a,
 .order_function a {
   font-weight: inherit;
 
@@ -26,6 +27,7 @@
 }
 
 .register.complete_class,
+.extra_sales.complete_class,
 .order.complete_class,
 .order.manually_complete_class {
   color: white;
@@ -37,11 +39,13 @@
   background-color: black;
 }
 
+.extra_sales.not_complete_class,
 .order.not_complete_class {
   color: white;
   background-color: pink;
 }
 
+.extra_sales.warning_class,
 .order.warning_class {
   color: white;
   background-color: magenta;

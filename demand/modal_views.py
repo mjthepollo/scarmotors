@@ -127,3 +127,46 @@ def delete_deposit(request, pk):
     order = deposit.order
     deposit.delete()
     return go_to_previous_url_or_search_register(request, order.register)
+
+
+@login_required
+def extra_sales_came_out_modal(request, pk):
+    pass
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_extra_sales"))
+
+
+@login_required
+def extra_sales_charge_modal(request, pk):
+    pass
+
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_extra_sales"))
+
+
+@login_required
+def extra_sales_delete_payment(request, pk):
+    payment = Payment.objects.get(pk=pk)
+    payment.delete()
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_extra_sales"))
+
+
+@login_required
+def extra_sales_delete_charge(request, pk):
+    charge = Charge.objects.get(pk=pk)
+    charge.delete()
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:search_extra_sales"))

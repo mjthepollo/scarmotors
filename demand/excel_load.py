@@ -51,13 +51,22 @@ def get_effective_data_frame(file_name, sheet_name):
     return original_df.iloc[:line_numbers, :END].replace({pd.NaT: None, np.nan: None}, inplace=False)
 
 
-def check_wash_line(df, line_number):
+def check_wash_line_with_df_and_line_number(df, line_number):
     """
     effective DataFrame의 line number에 해당하는 line이 세차를 가리키는 line인지 확인한다.
     """
     client_name_and_insurance_agent = df.iloc[line_number,
                                               CLIENT_NAME_AND_INSURANCE_AGENT]
     supporter_name = df.iloc[line_number, SUPPORTER]
+    return "세차" in client_name_and_insurance_agent or "세차" in supporter_name
+
+
+def check_wash_line(line):
+    """
+    line이 세차를 가리키는 line인지 확인한다.
+    """
+    client_name_and_insurance_agent = line[CLIENT_NAME_AND_INSURANCE_AGENT]
+    supporter_name = line[SUPPORTER]
     return "세차" in client_name_and_insurance_agent or "세차" in supporter_name
 
 
@@ -94,7 +103,7 @@ def get_line_numbers_for_extra_sales(effective_df):
     for i, RO_number in enumerate(RO_numbers):
         if not RO_number:
             # 현재는 세차만 고려한다. 현재까지 유일하게 존재하는 extra sales는 세차다.
-            if check_wash_line(effective_df, i):
+            if check_wash_line_with_df_and_line_number(effective_df, i):
                 line_numbers_for_extra_sales.append(i)
     return line_numbers_for_extra_sales
 
@@ -343,8 +352,10 @@ def make_extra_sales_from_line(line):
             name=insurance_agent_name)
     else:
         insurance_agent = None
+    sort = "세차" if check_wash_line(line) else "기타"
 
     extra_sales = ExtraSales.objects.create(
+        sort=sort,
         car_number=line[CAR_NUMBER],
         day_came_in=input_to_date(line[DAY_CAME_IN]),
         expected_day_came_out=input_to_date(line[EXPECTED_DAY_CAME_OUT]),
