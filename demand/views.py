@@ -428,7 +428,7 @@ def new_extra_sales(request):
     else:
         extra_sales_form = ExtraSalesForm(request.POST)
         if extra_sales_form.is_valid():
-            extra_sales = extra_sales_form.save()
+            extra_sales_form.save()
             return redirect(reverse("demand:search_extra_sales"))
         else:
             return render(request, "demand/new_extra_sales.html", context={

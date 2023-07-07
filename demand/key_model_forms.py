@@ -123,3 +123,30 @@ class DepositForm(forms.ModelForm):
             self.order = kwargs["order"]
         kwargs.pop('order', None)
         super(DepositForm, self).__init__(*args, **kwargs)
+
+
+class ChargeFormForExtraSales(forms.ModelForm):
+    """
+    init할 때 Order가 필요하다!
+    """
+    class Meta:
+        model = Charge
+        fields = ["charge_date", 'wage_amount', "component_amount"]
+        widgets = {
+            "component_amount": forms.NumberInput(attrs={'placeholder': '기입 필요'}),
+            "wage_amount": forms.NumberInput(attrs={'placeholder': '기입 필요', }),
+            'charge_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+    def as_div(self, *args, **kwargs):
+        original_div = super(ChargeFormForExtraSales, self).as_div()
+        inserting_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+            수리금액:</label><span class='modal_additional_info repair_amount_info'></span></div>"
+        return_div = insert_tag(
+            original_div, "component_amount", inserting_tag)
+        VAT_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>\
+            부가세:</label><span class='modal_additional_info vat_info'></span></div>"
+        chargable_amount_tag = "<div class='modal_additional_info_box'><label class='modal_additional_info_label'>청구가능액:</label>\
+                <span class='modal_additional_info orange chargable_amount_info'></span></div>"
+        return_div += VAT_tag + chargable_amount_tag
+        return mark_safe(return_div)

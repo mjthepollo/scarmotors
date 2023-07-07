@@ -12,12 +12,6 @@
     <div>{{extra_sales_form.as_div}}</div>
     <button id="complete" class="btn btn-dark">수정 완료</button>
 </form>
-<div id="change_key_models">
-    <div class="came_out_button" data-modal_url="{% url 'demand:extra_sales_came_out_modal' extra_sales_form.instance.pk %}">출고</div>
-    <div class="charge_button" data-modal_url="{% url 'demand:extra_sales_charge_modal' extra_sales_form.instance.pk %}">청구</div>
-</div>
 {% endblock content %}
 {% block inline_javascript %}
-<script type="module" src="{% static 'js/modal/came_out.js' %}"></script>
-<script type="module" src="{% static 'js/modal/charge.js' %}"></script>
 {% endblock inline_javascript %}

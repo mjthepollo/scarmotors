@@ -1,0 +1,23 @@
+{% extends "modules/custom_modal.html"%}
+{% block modal_content %}
+<form class="modal-content" method="POST" action="{% url 'demand:extra_sales_charge_modal' extra_sales.pk %}">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h5 class="modal-title">{{extra_sales}} {% if extra_sales.charge %}정보 수정{% else %}청구 처리{% endif %}</h5>
+        <button type="button" class="btn-close close_modal" data-bs-dismiss="modal" aria-label="닫기"></button>
+    </div>
+    <div class="modal-body">
+        <p class="modal_sector_info">청구</p>
+        <div class="modal_inputs">
+            {{charge_form.as_div}}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">닫기</button>
+        {% if extra_sales.charge %}
+        <button type="button" data-redirect_url="{% url 'demand:extra_sales_delete_charge' extra_sales.charge.pk %}" class="btn btn-danger delete_button">삭제</button>
+        {% endif %}
+        <button class="btn btn-success">청구</button>
+    </div>
+</form>
+{% endblock modal_content %}

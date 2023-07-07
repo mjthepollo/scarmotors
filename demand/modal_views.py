@@ -5,11 +5,13 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from core.utility import go_to_previous_url_or_search_register
-from demand.key_model_forms import ChargeForm, DepositForm, PaymentForm
+from demand.key_model_forms import (ChargeForm, ChargeFormForExtraSales,
+                                    DepositForm, PaymentForm)
 from demand.key_models import Charge, Deposit, Payment
-from demand.sales_model_forms import (FirstCenterRegisterForm,
+from demand.sales_model_forms import (ExtraSalesRealDayCameOutForm,
+                                      FirstCenterRegisterForm,
                                       RealDayCameOutForm, SpecialRegisterForm)
-from demand.sales_models import Order, Register
+from demand.sales_models import ExtraSales, Order, Register
 
 
 @login_required
@@ -131,42 +133,66 @@ def delete_deposit(request, pk):
 
 @login_required
 def extra_sales_came_out_modal(request, pk):
-    pass
-    previous_url = request.META.get('HTTP_REFERER', None)
-    if previous_url:
-        return redirect(previous_url)
+    extra_sales = ExtraSales.objects.get(pk=pk)
+    payment_prefix = "payment-0"
+    if request.method == "GET":
+        real_day_came_out_form = ExtraSalesRealDayCameOutForm(
+            instance=extra_sales)
+        payment_form = PaymentForm(
+            instance=extra_sales.payment, prefix=payment_prefix)
+        return TemplateResponse(
+            request, "demand/modals/extra_sales_came_out_modal.html",
+            context={"extra_sales": extra_sales,
+                     "real_day_came_out_form": real_day_came_out_form,
+                     "payment_form": payment_form})
     else:
+        real_day_came_out_form = ExtraSalesRealDayCameOutForm(
+            request.POST, instance=extra_sales)
+        real_day_came_out_form.save()
+        payment_form = PaymentForm(
+            request.POST, instance=extra_sales.payment, prefix=payment_prefix)
+        if payment_form.is_valid():
+            payment = payment_form.save()
+            if payment.is_default():
+                extra_sales.payment = None
+                payment.delete()
+            else:
+                extra_sales.payment = payment
+            extra_sales.save()
+        else:
+            return JsonResponse({"error_message": "Payment Formset is not valid"})
         return redirect(reverse("demand:search_extra_sales"))
 
 
 @login_required
 def extra_sales_charge_modal(request, pk):
-    pass
-
-    previous_url = request.META.get('HTTP_REFERER', None)
-    if previous_url:
-        return redirect(previous_url)
+    extra_sales = ExtraSales.objects.get(pk=pk)
+    if request.method == "GET":
+        charge_form = ChargeFormForExtraSales(instance=extra_sales.charge)
+        return TemplateResponse(request, "demand/modals/extra_sales_charge_modal.html",
+                                context={"extra_sales": extra_sales,
+                                         "charge_form": charge_form})
     else:
-        return redirect(reverse("demand:search_extra_sales"))
+        charge_form = ChargeFormForExtraSales(
+            request.POST, instance=extra_sales.charge)
+        if charge_form.is_valid():
+            charge = charge_form.save()
+            extra_sales.charge = charge
+            extra_sales.save()
+        else:
+            return JsonResponse({"error_message": "Charge Form is not valid"})
+    return redirect(reverse("demand:search_extra_sales"))
 
 
 @login_required
 def extra_sales_delete_payment(request, pk):
     payment = Payment.objects.get(pk=pk)
     payment.delete()
-    previous_url = request.META.get('HTTP_REFERER', None)
-    if previous_url:
-        return redirect(previous_url)
-    else:
-        return redirect(reverse("demand:search_extra_sales"))
+    return redirect(reverse("demand:search_extra_sales"))
 
 
 @login_required
 def extra_sales_delete_charge(request, pk):
     charge = Charge.objects.get(pk=pk)
     charge.delete()
-    previous_url = request.META.get('HTTP_REFERER', None)
-    if previous_url:
-        return redirect(previous_url)
-    else:
-        return redirect(reverse("demand:search_extra_sales"))
+    return redirect(reverse("demand:search_extra_sales"))

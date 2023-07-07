@@ -131,3 +131,12 @@ class ExtraSalesForm(forms.ModelForm):
             'phone_number': forms.TextInput(attrs={'placeholder': '01012345678'}),
             'note': forms.Textarea(attrs={'placeholder': '메모, 특이사항 등'}),
         }
+
+
+class ExtraSalesRealDayCameOutForm(forms.ModelForm):
+    class Meta:
+        model = ExtraSales
+        fields = ["real_day_came_out"]
+        widgets = {
+            'real_day_came_out': forms.DateInput(attrs={'type': 'date'}),
+        }
