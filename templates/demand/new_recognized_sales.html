@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load formset_tags %}
+{% load static %}
+{% block css %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'css/demand/recognized_sales_form.css' %}">
+{% endblock css %}
+{% block content %}
+<form id="formset" method="POST">
+    <h2>기타 매출 등록</h2>
+    {% csrf_token %}
+    <div>{{recognized_sales_form.as_div}}</div>
+    <button id="complete" class="btn btn-dark">수정 완료</button>
+</form>
+{% endblock content %}
+{% block inline_javascript %}
+<script type="module" src="{% static 'js/edit_order.js' %}"></script>
+{% endblock inline_javascript %}

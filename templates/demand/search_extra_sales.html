@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
 <link rel="stylesheet" href="{% static 'css/demand/search.css' %}">
+<link rel="stylesheet" href="{% static 'css/demand/search_special_functions.css' %}">
 {% endblock css %} {% block content %}
 
-<div id="search_form"><div id="special_functions">
+<div id="special_functions">
         <a class="btn btn-success special_function" href="{% url 'demand:new_extra_sales' %}">기타 매출 등록</a>
-</div></div>
+</div>
 <form id="search_form" method="GET">
 <table id="search_results" border="1">
   <tr>

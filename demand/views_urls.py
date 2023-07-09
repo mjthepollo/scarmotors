@@ -31,4 +31,10 @@ views_urlpatterns = [
          views.new_extra_sales, name="new_extra_sales"),
     path("edit_extra_sales/<int:pk>/",
          views.edit_extra_sales, name="edit_extra_sales"),
+    path("search_recognized_sales/", views.search_recognized_sales,
+         name="search_recognized_sales"),
+    path("new_recognized_sales/",
+         views.new_recognized_sales, name="new_recognized_sales"),
+    path("edit_recognized_sales/<int:pk>/",
+         views.edit_recognized_sales, name="edit_recognized_sales"),
 ]

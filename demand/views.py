@@ -14,12 +14,12 @@ from demand.excel_line_info import INDEXES
 from demand.filter_forms import (IncentiveFilter, OrderFilter, RegisterFilter,
                                  RegisterFilterForOrderFilter)
 from demand.key_model_forms import ChargeForm, DepositForm, PaymentForm
-from demand.key_models import Charge, Deposit, Payment
 from demand.sales_model_forms import (EditRegisterForm,
                                       EditSpecialRegisterForm, ExtraSalesForm,
                                       IncentiveForm, NewRegisterForm,
-                                      OrderForm, RegisterNoteForm)
-from demand.sales_models import ExtraSales, Order, Register
+                                      OrderForm, RecognizedSalesForm,
+                                      RegisterNoteForm)
+from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
 from demand.utility import print_fields
 
 
@@ -455,6 +455,46 @@ def edit_extra_sales(request, pk):
             })
 
 
-# 차량번호 검색
-# RO 번호 검색
-#
+@login_required
+def search_recognized_sales(request):
+    all_recognized_sales = RecognizedSales.objects.all()
+    print(all_recognized_sales)
+    return render(request, "demand/search_recognized_sales.html", context={"all_recognized_sales": all_recognized_sales})
+
+
+@login_required
+def new_recognized_sales(request):
+    if request.method == "GET":
+        recognized_sales_form = RecognizedSalesForm()
+        return render(request, "demand/new_recognized_sales.html", context={
+            "recognized_sales_form": recognized_sales_form,
+        })
+    else:
+        recognized_sales_form = RecognizedSalesForm(request.POST)
+        if recognized_sales_form.is_valid():
+            recognized_sales_form.save()
+            return redirect(reverse("demand:search_recognized_sales"))
+        else:
+            return render(request, "demand/new_recognized_sales.html", context={
+                "recognized_sales_form": recognized_sales_form,
+            })
+
+
+@login_required
+def edit_recognized_sales(request, pk):
+    recognized_sales = RecognizedSales.objects.get(pk=pk)
+    if request.method == "GET":
+        recognized_sales_form = RecognizedSalesForm(instance=recognized_sales)
+        return render(request, "demand/edit_recognized_sales.html", context={
+            "recognized_sales_form": recognized_sales_form,
+        })
+    else:
+        recognized_sales_form = RecognizedSalesForm(
+            request.POST, instance=recognized_sales)
+        if recognized_sales_form.is_valid():
+            recognized_sales = recognized_sales_form.save()
+            return redirect(reverse("demand:search_recognized_sales"))
+        else:
+            return render(request, "demand/edit_recognized_sales.html", context={
+                "recognized_sales_form": recognized_sales_form,
+            })

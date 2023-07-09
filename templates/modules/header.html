@@ -13,6 +13,8 @@
             <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:incentive'%}">입고 인센</a>
             {% url 'demand:search_extra_sales' as url %}
             <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_extra_sales'%}">기타 매출</a>
+            {% url 'demand:search_recognized_sales' as url %}
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_recognized_sales'%}">인정 매출</a>
         </div>
         <div id="inner_header_right">
             <a class="header_link" href="{% url 'logout'%}">로그아웃</a>

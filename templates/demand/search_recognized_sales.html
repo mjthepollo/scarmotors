@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/demand/search.css' %}">
+<link rel="stylesheet" href="{% static 'css/demand/search_special_functions.css' %}">
+{% endblock css %} {% block content %}
+
+<div id="special_functions">
+        <a class="btn btn-success special_function" href="{% url 'demand:new_recognized_sales' %}">인정 매출 등록</a>
+</div>
+<form id="search_form" method="GET">
+    <table id="search_results" border="1">
+    <tr>
+        <th>입고일</th>
+        <th>출고일</th>
+        <th>차량번호</th>
+        <th>요청부서</th>
+        <th>공임</th>
+        <th>부품</th>
+        <th>수리금액</th>
+        <th>공장매출</th>
+    </tr>
+    {% for recognized_sales in all_recognized_sales %}
+    {% include "demand/modules/recognized_sales.html" %}
+    {% endfor %}
+    </table>
+</form>
+{% endblock content %}
+{% block inline_javascript %}
+<script type="module" src="{% static 'js/hover_note.js' %}"></script>
+<script src="{% static 'js/paginator.js' %}"></script>
+{% endblock inline_javascript %}

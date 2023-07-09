@@ -1,12 +1,20 @@
 from django.core.management.base import BaseCommand
 
-from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
-                               Payment, Supporter)
-from demand.sales_models import ExtraSales, Order, Register
+from demand.sales_models import RecognizedSales
+
+
+def load_data_for_recognized_sales(file_name, sheet_name):
+    """
+    엑셀 파일을 불러와 DataFrame으로 변환한다.
+    """
+    df = pd.read_excel(
+        file_name, sheet_name=sheet_name, engine="openpyxl", header=HEADER
+    )
+    return df
 
 
 class Command(BaseCommand):
-    help = 'Load exsiting datas from excel file with sheet name and file name'
+    help = 'Create Recognized Sales using excel sheet'
 
     def handle(self, *args, **options):
         for supporter in Supporter.objects.all():
@@ -19,7 +27,7 @@ class Command(BaseCommand):
             payment.delete()
         for charge in Charge.objects.all():
             charge.delete()
-        for insurance in Insurance.objects.all():
+        for deposit in Deposit.objects.all():
             insurance.delete()
         for order in Order.objects.all():
             order.delete()

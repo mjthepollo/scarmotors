@@ -1,0 +1,19 @@
+{% load custom_filters %}
+{% load humanize %}
+<tr>
+    <td>{{recognized_sales.formatted_day_came_in}}</td>
+    <td>{{recognized_sales.formatted_real_day_came_out}}</td>
+    <td class="car_number">
+        {{recognized_sales.car_number}}
+        {% if recognized_sales.note %}
+        <div class="hover_note hidden">{{recognized_sales.note}}</div>
+        {% else %}
+        <div class="hover_note hidden hover_blurred_note">비고 없음</div>
+        {% endif %}
+    </td>
+    <td>{{recognized_sales.request_department}}</td>
+    <td>{{recognized_sales.wage_amount|intcomma}}</td>
+    <td>{{recognized_sales.component_amount|intcomma}}</td>
+    <td>{{recognized_sales.get_repair_amount|intcomma}}</td>
+    <td>{{recognized_sales.get_not_paid_turnover|intcomma}}</td>
+</tr>

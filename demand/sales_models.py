@@ -661,9 +661,30 @@ class RecognizedSales(TimeStampedModel):
         blank=True, null=True, verbose_name="출고일")
     car_number = models.CharField(
         verbose_name="차량번호", blank=True, null=True, max_length=20)
+    request_department = models.ForeignKey(
+        RequestDepartment, on_delete=models.SET_NULL, null=True, verbose_name="요청부서")
     wage_amount = models.IntegerField(default=0, verbose_name="공임비")
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
-    request_department = models.ForeignKey(
-        RequestDepartment, on_delete=models.SET_NULL, null=True)
     note = models.TextField(default="부가세 별도", blank=True,
                             null=True, verbose_name="비고")
+
+    def get_repair_amount(self):
+        if self.wage_amount and self.component_amount:
+            return self.wage_amount + self.component_amount
+        else:
+            None
+
+    def formatted_day_came_in(self):
+        if self.day_came_in:
+            return self.day_came_in.strftime("%m/%d")
+        else:
+            return "-"
+
+    def formatted_real_day_came_out(self):
+        if self.real_day_came_out:
+            return self.real_day_came_out.strftime("%m/%d")
+        else:
+            return "-"
+
+    def get_not_paid_turnover(self):
+        return self.get_repair_amount() if self.get_repair_amount() else 0
