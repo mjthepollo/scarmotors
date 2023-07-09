@@ -141,6 +141,24 @@ class Sales(TimeStampedModel):
         else:
             return None
 
+    def get_deposit_amount(self):
+        """
+        입금액을 반환한다.
+        """
+        if self.deposit:
+            return zero_if_none(self.deposit.deposit_amount)
+        else:
+            return 0
+
+    def get_attempted_amount(self):
+        """
+        미수액을 반환한다. 미수액이란 청구는 됐으나 입금이 되지 않은 경우의 청구금액을 의미한다.
+        """
+        if not self.deposit:
+            return self.get_charge_amount()
+        else:
+            return 0
+
     def get_payment_rate_for_input(self):
         """
         EXCEL에서 사용하는 지급율
@@ -165,6 +183,12 @@ class Sales(TimeStampedModel):
             return indemnity_amount-discount_amount-refund_amount
         else:
             return 0
+
+    def get_net_payment_sales(self):
+        """
+        Preiod Sales
+        """
+        return int(self.get_net_payment()/1.1)
 
     def get_payment_rate(self):
         """

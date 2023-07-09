@@ -10,6 +10,8 @@ from core import core_views
 
 urlpatterns = [
     path("", core_views.home, name="home"),
+    path("update_priod_sales", core_views.update_period_sales,
+         name="update_period_sales"),
     path("login/", core_views.login, name="login"),
     path("logout/", core_views.logout, name="logout"),
     path("demand/", include("demand.urls", namespace="demand")),

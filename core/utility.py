@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
@@ -61,3 +63,30 @@ def go_to_previous_url_or_search_register(request, register):
         return redirect(previous_url)
     else:
         return redirect(reverse("demand:search_registers")+"?RO_number="+register.RO_number)
+
+
+def get_current_half():
+    """
+    현재 상반기인지 하반기인지 내놓는다.
+    """
+    if date.today().month < 7:
+        return "first"
+    else:
+        return "second"
+
+
+def get_start_and_end_dates_of_half(year, half):
+    """
+    상반기/하반기의 시작일과 종료일을 내놓는다. 튜플형태로 리턴
+    """
+    if half == "first":
+        start_date = date(year, 1, 1)
+        end_date = date(year, 6, 30)
+    elif half == "second":
+        start_date = date(year, 7, 1)
+        end_date = date(year, 12, 31)
+    else:
+        raise ValueError(
+            "half must be 'first' or 'second'"
+        )
+    return (start_date, end_date)

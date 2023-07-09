@@ -5,7 +5,7 @@ from django.db import models
 
 from core.models import TimeStampedModel
 from core.utility import print_colored
-from demand.sales_models import ExtraSales, Order, Register
+from demand.sales_models import ExtraSales, Order, RecognizedSales
 from demand.utility import print_fields
 
 
@@ -41,6 +41,8 @@ class PeriodSales(TimeStampedModel):
         default=0, verbose_name="[미입금]렌트일반")
     not_paid_rent_pando = models.IntegerField(
         default=0, verbose_name="[미입금]렌트판도")
+    not_paid_recognized_sales = models.IntegerField(
+        default=0, verbose_name="[미입금]인정매출")
 
     wage_turnover = models.IntegerField(default=0, verbose_name="공임매출")
     component_turnover = models.IntegerField(default=0, verbose_name="부품매출")
@@ -49,7 +51,7 @@ class PeriodSales(TimeStampedModel):
     # Order의 get_net_payment에서 1.1을 나눠준 값이다.
     net_payment_amount = models.IntegerField(default=0, verbose_name="면책금")
 
-    def get_kwargs(orders):
+    def get_kwargs(orders, all_extra_sales, all_recognized_sales):
         paid_insurance_sales = 0
         paid_general_expense = 0
         paid_general_pando = 0
@@ -60,6 +62,14 @@ class PeriodSales(TimeStampedModel):
         not_paid_general_pando = 0
         not_paid_general_rent = 0
         not_paid_rent_pando = 0
+        not_paid_recognized_sales = 0
+        wage_turnover = 0
+        component_turnover = 0
+        charge_amount = 0
+        deposit_amount = 0
+        attemted_amount = 0
+        net_payment_sales = 0
+
         for order in orders:
             if order.charge_type == "보험":
                 paid_insurance_sales += order.get_paid_turnover()
@@ -79,6 +89,25 @@ class PeriodSales(TimeStampedModel):
             else:
                 print_colored("잘못된 Charge Type입니다.", "magenta")
                 print_fields(order)
+            wage_turnover += order.get_wage_turnover()
+            component_turnover += order.get_component_turnover()
+            charge_amount += order.get_charge_amount()
+            deposit_amount += order.get_deposit_amount()
+            attemted_amount += order.get_attemted_amount()
+            net_payment_sales += order.get_net_payment_sales()
+
+        for extra_sales in all_extra_sales:
+            paid_general_expense += extra_sales.get_paid_turnover()
+            not_paid_general_expense += extra_sales.get_not_paid_turnover()
+            wage_turnover += extra_sales.get_wage_turnover()
+            component_turnover += extra_sales.get_component_turnover()
+            charge_amount += extra_sales.get_charge_amount()
+            deposit_amount += extra_sales.get_deposit_amount()
+            attemted_amount += extra_sales.get_attemted_amount()
+            net_payment_sales += extra_sales.get_net_payment_sales()
+
+        for recognized_sales in all_recognized_sales:
+            not_paid_recognized_sales += recognized_sales.get_not_paid_turnover()
 
         return {
             "paid_insurance_sales": paid_insurance_sales,
@@ -91,6 +120,13 @@ class PeriodSales(TimeStampedModel):
             "not_paid_general_pando": not_paid_general_pando,
             "not_paid_general_rent": not_paid_general_rent,
             "not_paid_rent_pando": not_paid_rent_pando,
+            "not_paid_recognized_sales": not_paid_recognized_sales,
+            "wage_turnover": wage_turnover,
+            "component_turnover": component_turnover,
+            "charge_amount": charge_amount,
+            "deposit_amount": deposit_amount,
+            "attempted_amount": attemted_amount,
+            "net_payment_sales": net_payment_sales,
         }
 
     @property
@@ -114,7 +150,12 @@ class PeriodSales(TimeStampedModel):
             return exist_sales
         orders = Order.objects.filter(
             charge__charge_date__range=(start_date, end_date))
-        kwargs = cls.get_kwargs(orders)
+        all_extra_sales = ExtraSales.objects.filter(
+            charge__charge_date__range=(start_date, end_date))
+        all_recognized_sales = RecognizedSales.objects.filter(
+            real_day_came_out__range=(start_date, end_date)
+        )
+        kwargs = cls.get_kwargs(orders, all_extra_sales, all_recognized_sales)
         kwargs["start_date"] = start_date
         kwargs["end_date"] = end_date
         return cls.objects.create(**kwargs)
