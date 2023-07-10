@@ -5,8 +5,13 @@ from django.db import models
 
 from core.models import TimeStampedModel
 from core.utility import print_colored
+from demand.key_models import ChargedCompany
 from demand.sales_models import ExtraSales, Order, RecognizedSales
 from demand.utility import print_fields
+
+SAMSUNG = ChargedCompany.objects.get(name="삼성")
+DONGBU = ChargedCompany.objects.get(name="DB")
+MERITZ = ChargedCompany.objects.get(name="메리츠")
 
 
 class PeriodSales(TimeStampedModel):
@@ -46,10 +51,34 @@ class PeriodSales(TimeStampedModel):
 
     wage_turnover = models.IntegerField(default=0, verbose_name="공임매출")
     component_turnover = models.IntegerField(default=0, verbose_name="부품매출")
+
+    number_of_domestic_samsung_insurances = models.IntegerField(
+        default=0, verbose_name="삼성보험(국산)")
+    number_of_domestic_dongbu_insurances = models.IntegerField(
+        default=0, verbose_name="동부보험(국산)")
+    number_of_domestic_meritz_insurances = models.IntegerField(
+        default=0, verbose_name="메리츠보험(국산)")
+    number_of_domestic_etc_insurances = models.IntegerField(
+        default=0, verbose_name="기타보험(국산)")
+    number_of_domestic_rent = models.IntegerField(
+        default=0, verbose_name="렌트(국산)")
+
+    number_of_abroad_samsung_insurances = models.IntegerField(
+        default=0, verbose_name="삼성보험(수입)")
+    number_of_abroad_dongbu_insurances = models.IntegerField(
+        default=0, verbose_name="동부보험(수입)")
+    number_of_abroad_meritz_insurances = models.IntegerField(
+        default=0, verbose_name="메리츠보험(수입)")
+    number_of_abroad_etc_insurances = models.IntegerField(
+        default=0, verbose_name="기타보험(수입)")
+    number_of_abroad_rent = models.IntegerField(
+        default=0, verbose_name="렌트(수입)")
+
     charge_amount = models.IntegerField(default=0, verbose_name="청구금")
     deposit_amount = models.IntegerField(default=0, verbose_name="입금액")
+    attempted_amount = models.IntegerField(default=0, verbose_name="미수금")
     # Order의 get_net_payment에서 1.1을 나눠준 값이다.
-    net_payment_amount = models.IntegerField(default=0, verbose_name="면책금")
+    net_payment_sales = models.IntegerField(default=0, verbose_name="면책금")
 
     def get_kwargs(orders, all_extra_sales, all_recognized_sales):
         paid_insurance_sales = 0
@@ -57,23 +86,58 @@ class PeriodSales(TimeStampedModel):
         paid_general_pando = 0
         paid_general_rent = 0
         paid_rent_pando = 0
+
         not_paid_insurance_sales = 0
         not_paid_general_expense = 0
         not_paid_general_pando = 0
         not_paid_general_rent = 0
         not_paid_rent_pando = 0
         not_paid_recognized_sales = 0
+
         wage_turnover = 0
         component_turnover = 0
+
+        number_of_domestic_samsung_insurances = 0
+        number_of_domestic_dongbu_insurances = 0
+        number_of_domestic_meritz_insurances = 0
+        number_of_domestic_etc_insurances = 0
+        number_of_domestic_rent = 0
+
+        number_of_abroad_samsung_insurances = 0
+        number_of_abroad_dongbu_insurances = 0
+        number_of_abroad_meritz_insurances = 0
+        number_of_abroad_etc_insurances = 0
+        number_of_abroad_rent = 0
+
         charge_amount = 0
         deposit_amount = 0
-        attemted_amount = 0
-        net_payment_sales = 0
+        attempted_amount = 0  # 미수금
+        net_payment_sales = 0  # 면책금 매출
 
         for order in orders:
             if order.charge_type == "보험":
                 paid_insurance_sales += order.get_paid_turnover()
                 not_paid_insurance_sales += order.get_not_paid_turnover()
+                if order.register.abroad_type == "국산":
+                    if order.charged_company == SAMSUNG:
+                        number_of_domestic_samsung_insurances += 1
+                    elif order.charged_company == DONGBU:
+                        number_of_domestic_dongbu_insurances += 1
+                    elif order.charged_company == MERITZ:
+                        number_of_domestic_meritz_insurances += 1
+                    else:
+                        number_of_domestic_etc_insurances += 1
+                elif order.register.abroad_type == "수입":
+                    if order.charged_company == SAMSUNG:
+                        number_of_abroad_samsung_insurances += 1
+                    elif order.charged_company == DONGBU:
+                        number_of_abroad_dongbu_insurances += 1
+                    elif order.charged_company == MERITZ:
+                        number_of_abroad_meritz_insurances += 1
+                    else:
+                        number_of_abroad_etc_insurances += 1
+                else:
+                    raise ValueError("잘못된 Abroad Type입니다. (보험)")
             elif order.charge_type == "일반경정비":
                 paid_general_expense += order.get_paid_turnover()
                 not_paid_general_expense += order.get_not_paid_turnover()
@@ -86,6 +150,12 @@ class PeriodSales(TimeStampedModel):
             elif order.charge_type == "렌트판도":
                 paid_rent_pando += order.get_paid_turnover()
                 not_paid_rent_pando += order.get_not_paid_turnover()
+                if order.register.abroad_type == "국산":
+                    number_of_domestic_rent += 1
+                elif order.register.abroad_type == "수입":
+                    number_of_abroad_rent += 1
+                else:
+                    raise ValueError("잘못된 Abroad Type입니다. (렌트)")
             else:
                 print_colored("잘못된 Charge Type입니다.", "magenta")
                 print_fields(order)
@@ -93,7 +163,7 @@ class PeriodSales(TimeStampedModel):
             component_turnover += order.get_component_turnover()
             charge_amount += order.get_charge_amount()
             deposit_amount += order.get_deposit_amount()
-            attemted_amount += order.get_attemted_amount()
+            attempted_amount += order.get_attempted_amount()
             net_payment_sales += order.get_net_payment_sales()
 
         for extra_sales in all_extra_sales:
@@ -103,7 +173,7 @@ class PeriodSales(TimeStampedModel):
             component_turnover += extra_sales.get_component_turnover()
             charge_amount += extra_sales.get_charge_amount()
             deposit_amount += extra_sales.get_deposit_amount()
-            attemted_amount += extra_sales.get_attemted_amount()
+            attempted_amount += extra_sales.get_attempted_amount()
             net_payment_sales += extra_sales.get_net_payment_sales()
 
         for recognized_sales in all_recognized_sales:
@@ -123,11 +193,28 @@ class PeriodSales(TimeStampedModel):
             "not_paid_recognized_sales": not_paid_recognized_sales,
             "wage_turnover": wage_turnover,
             "component_turnover": component_turnover,
+
+            "number_of_domestic_samsung_insurances": number_of_domestic_samsung_insurances,
+            "number_of_domestic_dongbu_insurances": number_of_domestic_dongbu_insurances,
+            "number_of_domestic_meritz_insurances": number_of_domestic_meritz_insurances,
+            "number_of_domestic_etc_insurances": number_of_domestic_etc_insurances,
+            "number_of_domestic_rent": number_of_domestic_rent,
+
+            "number_of_abroad_samsung_insurances": number_of_abroad_samsung_insurances,
+            "number_of_abroad_dongbu_insurances": number_of_abroad_dongbu_insurances,
+            "number_of_abroad_meritz_insurances": number_of_abroad_meritz_insurances,
+            "number_of_abroad_etc_insurances": number_of_abroad_etc_insurances,
+            "number_of_abroad_rent": number_of_abroad_rent,
+
             "charge_amount": charge_amount,
             "deposit_amount": deposit_amount,
-            "attempted_amount": attemted_amount,
+            "attempted_amount": attempted_amount,
             "net_payment_sales": net_payment_sales,
         }
+
+    @property
+    def rate_of_attempt(self):
+        return int(self.attempted_amount / self.whole_turnover * 100)
 
     @property
     def whole_turnover(self):
@@ -163,7 +250,12 @@ class PeriodSales(TimeStampedModel):
     def update(self):
         orders = Order.objects.filter(
             charge__charge_date__range=(self.start_date, self.end_date))
-        kwargs = self.get_kwargs(orders)
+        all_extra_sales = ExtraSales.objects.filter(
+            charge__charge_date__range=(self.start_date, self.end_date))
+        all_recognized_sales = RecognizedSales.objects.filter(
+            real_day_came_out__range=(self.start_date, self.end_date)
+        )
+        kwargs = self.get_kwargs(orders, all_extra_sales, all_recognized_sales)
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.save()
@@ -187,6 +279,21 @@ class MonthlySales(PeriodSales):
 
     def __str__(self):
         return f"[{self.start_date.year}년{self.start_date.month}월] 매출"
+
+
+def get_net_information(all_monthly_sales):
+    return_dict = {}
+    except_fields = ["id", "created", "updated", "start_date", "end_date"]
+    for field in MonthlySales._meta.fields:
+        if field.name not in except_fields:
+            return_dict[field.name] = 0
+            for monthly_sales in all_monthly_sales:
+                return_dict[field.name] += getattr(monthly_sales, field.name)
+    print(return_dict)
+    return return_dict
+
+
+get_net_information(MonthlySales.objects.all())
 
 
 class StatisticSales(PeriodSales):

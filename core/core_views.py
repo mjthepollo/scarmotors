@@ -41,6 +41,8 @@ def home(request):
     start_date, end_date = get_start_and_end_dates_of_half(year, half)
     monthly_sales = MonthlySales.objects.all(
         start_date__gte=start_date, end_date__lte=end_date)
+
+    # net_paid_insurance_sales =
     return render(request, "home.html", {"monthly_sales": monthly_sales})
 
 
