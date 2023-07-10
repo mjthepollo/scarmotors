@@ -28,3 +28,18 @@ def index_form(sequence, position):
         return sequence[position].as_div()
     else:
         return mark_safe("")
+
+
+@register.filter
+def per_thousand(value):
+    return int(value/1000)
+
+
+@register.filter
+def thousnad_format(value):
+    return format(int(value/1000), ',')
+
+
+@register.filter
+def get_percent(value, dividor):
+    return f"{int(value/dividor*100)}%"

@@ -9,137 +9,24 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock javascript %}
 {% block content %}
-<div>
-    <canvas id="myChart1"></canvas>
-    <canvas id="myChart2"></canvas>
+<form class="period_filter" method="GET">
+  {{period_filter_form.year}}
+  {{period_filter_form.half}}
+  <button class="btn btn-info">검색</button>
+  <a class="btn btn-success" href="{% url 'update_period_sales' %}?half={{period_filter_form.half.value}}&year={{period_filter_form.year.value}}">업데이트</a>
+</form>
+<div class="top_summary">
+  {% include 'modules/whole_sale_graph.html' %}
+  {% include 'modules/wage_sale_graph.html' %}
+  {% include 'modules/total_sum_table.html' %}
 </div>
-<script>
-    const ctx1 = document.getElementById('myChart1');
-    const ctx2 = document.getElementById('myChart2');
-    new Chart(ctx1, {
-      type: 'bar',
-      data: {
-        labels: [{% for monthly_sale in monthly_sales %}"{{monthly_sale.month}}월",{% endfor %}],
-        datasets: [{
-          label: 'Whole Sales',
-          data: [{% for monthly_sale in monthly_sales %}{{monthly_sale.whole_turnover}},{% endfor %}],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive:false,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-    new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: [{% for monthly_sale in monthly_sales %}"{{monthly_sale.month}}월",{% endfor %}],
-        datasets: [{
-          label: 'Whole Sales',
-          data: [{% for monthly_sale in monthly_sales %}{{monthly_sale.whole_turnover}},{% endfor %}],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive:false,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-</script>
-<table class="period_sales" border="1">
-  <tr>
-    <th colspan="2" rowspan="2">구분 (단위 : 1,000)</th>
-    <th colspan="3">1월</th>
-    <th colspan="3">2월</th>
-    <th colspan="3">3월</th>
-  </tr>
-  <tr>
-    {% for x in "XXX" %}<th>입금</th><th>미입금</th><th>계</th>{% endfor %}
-  </tr>
-  <tr>
-    <th rowspan="7">매출</th>
-    <th>보험</th>
-  </tr>
-  <tr>
-    <th>렌트일반</th>
-  </tr>
-  <tr>
-    <th>렌트판도</th>
-  </tr>
-  <tr>
-    <th>일반판도</th>
-  </tr>
-  <tr>
-    <th>일반경정비</th>
-  </tr>
-  <tr>
-    <th>인정매출</th>
-  </tr>
-  <tr>
-    <th>계</th>
-  </tr>
-  <tr>
-    <th colspan="2">공임매출</th>
-  </tr>
-  <tr>
-    <th colspan="2">부품매출</th>
-  </tr>
-</table>
-<table class="insurance" border="1">
-  <tr>
-    <th colspan="2">입고대수</th>
-    {% for x in "xxx" %}<th>수입</th><th>국산</th><th>계</th>{% endfor %}
-  </tr>
-  <tr>
-    <th rowspan="5">보험</th>
-    <th>삼성</th>
-  </tr>
-  <tr>
-    <th>동부</th>
-  </tr>
-  <tr>
-    <th>메리츠</th>
-  </tr>
-  <tr>
-    <th>기타</th>
-  </tr>
-  <tr>
-    <th>계</th>
-  </tr>
-  <tr>
-    <th colspan="2">렌트</th>
-  </tr>
-  <tr>
-    <th colspan="2">총계</th>
-  </tr>
-</table>
-
-<table class="payment" border="1">
-  <tr>
-    <th class="double" colspan="2">청구/입금 (단위 : 1,000)</th>
-    {% for x in "xxx" %}<th>청구</th><th>입금</th><th>미수</th>{% endfor %}
-  </tr>
-  <tr>
-    <th class="double" colspan="2">금액</th>
-    <td></td>
-  </tr>
-  <tr>
-    <th class="double" colspan="2">면책금</th>
-    <td></td>
-  </tr>
-</table>
-
-
-
+<div class="chunks">
+{% for chunk in chunks %}
+{% include 'modules/period_sales_table.html' %}
+{% include 'modules/insurance_table.html' %}
+{% include 'modules/payment_table.html' %}
+{% endfor%}
+</div>
 {% endblock content %}
 
 {% block inline_javascript %}

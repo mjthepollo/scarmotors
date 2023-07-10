@@ -1,0 +1,133 @@
+{% load humanize%}
+{% load custom_filters %}
+<div>
+    <table class="period_sales" border="1">
+    <tr>
+      <th colspan="1" rowspan="2">구분</th>
+      <th colspan="3">계</th>
+    </tr>
+    <tr>
+      <th>입금</th><th>미입금</th><th>계</th>
+    </tr>
+    <tr>
+      <th>보험</th>
+      <td>{{net_paid_insurance_sales|intcomma}}</td>
+      <td>{{net_not_paid_insurance_sales|intcomma}}</td>
+      <td>{{net_paid_insurance_sales|add:net_not_paid_insurance_sales|intcomma}}</td>
+    </tr>
+    <tr>
+      <th>렌트일반</th>
+      <td>{{net_paid_general_rent|intcomma}}</td>
+      <td>{{net_not_paid_general_rent|intcomma}}</td>
+      <td>{{net_paid_general_rent|add:net_not_paid_general_rent|intcomma}}</td>
+    </tr>
+    <tr>
+      <th>렌트판도</th>
+      <td>{{net_paid_rent_pando|intcomma}}</td>
+      <td>{{net_not_paid_rent_pando|intcomma}}</td>
+      <td>{{net_paid_rent_pando|add:net_not_paid_rent_pando|intcomma}}</td>
+    </tr>
+    <tr>
+      <th>일반판도</th>
+      <td>{{net_paid_general_pando|intcomma}}</td>
+      <td>{{net_not_paid_general_pando|intcomma}}</td>
+      <td>{{net_paid_general_pando|add:net_not_paid_general_pando|intcomma}}</td>
+    </tr>
+    <tr>
+      <th>일반경정비</th>
+      <td>{{net_paid_general_expense|intcomma}}</td>
+      <td>{{net_not_paid_general_expense|intcomma}}</td>
+      <td>{{net_paid_general_expense|add:net_not_paid_general_expense|intcomma}}</td>
+    </tr>
+    <tr>
+      <th>인정매출</th>
+      <td class="disable"></td>
+      <td>{{net_not_paid_recognized_sales|intcomma}}</td>
+      <td>{{net_not_paid_recognized_sales|intcomma}}</td>
+    </tr>
+    <tr>
+      <th>계</th>
+      <td>{{net_paid_insurance_sales|add:net_paid_general_rent|add:net_paid_rent_pando|add:net_paid_general_pando|add:net_paid_general_expense|intcomma}}</td>
+      <td>{{net_not_paid_insurance_sales|add:net_not_paid_general_rent|add:net_not_paid_rent_pando|add:net_not_paid_general_pando|add:net_not_paid_general_expense|add:net_not_paid_recognized_sales|intcomma}}</td>
+      <td>{{net_paid_insurance_sales|add:net_paid_general_rent|add:net_paid_rent_pando|add:net_paid_general_pando|add:net_paid_general_expense|add:net_not_paid_insurance_sales|add:net_not_paid_general_rent|add:net_not_paid_rent_pando|add:net_not_paid_general_pando|add:net_not_paid_general_expense|add:net_not_paid_recognized_sales|intcomma}}</td>
+    </tr>
+    <tr>
+      <th>공임매출</th>
+      <td class="disable"></td>
+      <td class="disable"></td>
+      <td>{{net_wage_turnover|intcomma}}</td>
+    </tr>
+    <tr>
+      <th>부품매출</th>
+      <td class="disable"></td>
+      <td class="disable"></td>
+      <td>{{net_component_turnover|intcomma}}</td>
+    </tr>
+  </table>
+  <table class="insurance" border="1">
+    <tr>
+      <th>입고대수</th>
+      <th>수입</th><th>국산</th><th>계</th>
+    </tr>
+    <tr>
+      <th>삼성</th>
+      <td>{{net_number_of_abroad_samsung_insurances}}</td>
+      <td>{{net_number_of_domestic_samsung_insurances}}</td>
+      <td>{{net_number_of_abroad_samsung_insurances|add:net_number_of_domestic_samsung_insurances}}</td>
+    </tr>
+    <tr>
+      <th>동부</th>
+      <td>{{net_number_of_abroad_dongbu_insurances}}</td>
+      <td>{{net_number_of_domestic_dongbu_insurances}}</td>
+      <td>{{net_number_of_abroad_dongbu_insurances|add:net_number_of_domestic_dongbu_insurances}}</td>
+    </tr>
+    <tr>
+      <th>메리츠</th>
+      <td>{{net_number_of_abroad_meritz_insurances}}</td>
+      <td>{{net_number_of_domestic_meritz_insurances}}</td>
+      <td>{{net_number_of_abroad_meritz_insurances|add:net_number_of_domestic_meritz_insurances}}</td>
+    </tr>
+    <tr>
+      <th>기타</th>
+      <td>{{net_number_of_abroad_etc_insurances}}</td>
+      <td>{{net_number_of_domestic_etc_insurances}}</td>
+      <td>{{net_number_of_abroad_etc_insurances|add:net_number_of_domestic_etc_insurances}}</td>
+    </tr>
+    <tr>
+        <th>계</th>
+        <td>{{net_number_of_abroad_samsung_insurances|add:net_number_of_abroad_dongbu_insurances|add:net_number_of_abroad_meritz_insurances|add:net_number_of_abroad_etc_insurances}}</td>
+        <td>{{net_number_of_domestic_samsung_insurances|add:net_number_of_domestic_dongbu_insurances|add:net_number_of_domestic_meritz_insurances|add:net_number_of_domestic_etc_insurances}}</td>
+        <td>{{net_number_of_abroad_samsung_insurances|add:net_number_of_abroad_dongbu_insurances|add:net_number_of_abroad_meritz_insurances|add:net_number_of_abroad_etc_insurances|add:net_number_of_domestic_samsung_insurances|add:net_number_of_domestic_dongbu_insurances|add:net_number_of_domestic_meritz_insurances|add:net_number_of_domestic_etc_insurances}}</td>
+    </tr>
+    <tr>
+      <th>렌트</th>
+      <td>{{net_number_of_abroad_rent}}</td>
+      <td>{{net_number_of_domestic_rent}}</td>
+      <td>{{net_number_of_domestic_rent|add:net_number_of_abroad_rent}}</td>
+    </tr>
+    <tr>
+      <th>총계</th>
+      <td>{{net_number_of_abroad_samsung_insurances|add:net_number_of_abroad_dongbu_insurances|add:net_number_of_abroad_meritz_insurances|add:net_number_of_abroad_etc_insurances|add:net_number_of_abroad_rent}}</td>
+      <td>{{net_number_of_domestic_samsung_insurances|add:net_number_of_domestic_dongbu_insurances|add:net_number_of_domestic_meritz_insurances|add:net_number_of_domestic_etc_insurances|add:net_number_of_domestic_rent}}</td>
+      <td>{{net_number_of_abroad_samsung_insurances|add:net_number_of_abroad_dongbu_insurances|add:net_number_of_abroad_meritz_insurances|add:net_number_of_abroad_etc_insurances|add:net_number_of_domestic_rent|add:net_number_of_domestic_samsung_insurances|add:net_number_of_domestic_dongbu_insurances|add:net_number_of_domestic_meritz_insurances|add:net_number_of_domestic_etc_insurances|add:net_number_of_domestic_rent}}</td>
+    </tr>
+  </table>
+  <table class="payment" border="1">
+    <tr>
+      <th>청구/입금</th>
+      <th>청구</th><th>입금</th><th>미수</th>
+    </tr>
+    <tr>
+      <th>금액</th>
+      <td>{{net_charge_amount|intcomma}}</td>
+      <td>{{net_deposit_amount|intcomma}}</td>
+      <td>{{net_attempted_amount|intcomma}}</td>
+    </tr>
+    <tr>
+      <th>면책금</th>
+      <td>{{net_deposit_amount|intcomma}}</td>
+      <th>미수율</th>
+      <td>{{net_attempted_amount|get_percent:net_charge_amount}}</td>
+    </tr>
+  </table>
+</div>

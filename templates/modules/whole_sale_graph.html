@@ -1,0 +1,26 @@
+<canvas id="whole_sale_graph" style="width:400px;height:550px;"></canvas>
+<script>
+const whoelSaleGraph = document.getElementById('whole_sale_graph');
+new Chart(whoelSaleGraph, {
+    type: 'bar',
+    data: {
+      labels: [{% for monthly_sale in monthly_sales %}"{{monthly_sale.month}}월",{% endfor %}],
+      datasets: [{
+        label: '전체 매출',
+        data: [{% for monthly_sale in monthly_sales %}{{monthly_sale.whole_turnover}},{% endfor %}],
+        backgroundColor: "#009CFF",
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive:false,
+      maintainAspectRatio: false,
+      
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>

@@ -32,3 +32,7 @@ table.payment th {
 table.payment th.double {
   width: 200px;
 }
+
+table td.disable {
+  background-color: #ccc;
+}

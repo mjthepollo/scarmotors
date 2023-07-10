@@ -1,9 +1,40 @@
 @import url("period_sales/table.css");
 
 main.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
   min-height: calc(var(--vh) * 100);
 }
 
-canvas {
-  width: 300px;
+.period_filter {
+  display: flex;
+  justify-content: space-between;
+
+  width: 400px;
+  margin-top: 30px;
+}
+
+.period_filter select {
+  width: 100px;
+}
+
+.top_summary {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 100%;
+}
+
+.chunks {
+  width: 100%;
+  margin-bottom: 100px;
+}
+
+.chunks table {
+  width: 100%;
 }

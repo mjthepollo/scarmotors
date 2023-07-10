@@ -80,7 +80,7 @@ class PeriodSales(TimeStampedModel):
     # Order의 get_net_payment에서 1.1을 나눠준 값이다.
     net_payment_sales = models.IntegerField(default=0, verbose_name="면책금")
 
-    def get_kwargs(orders, all_extra_sales, all_recognized_sales):
+    def get_kwargs(self, orders, all_extra_sales, all_recognized_sales):
         paid_insurance_sales = 0
         paid_general_expense = 0
         paid_general_pando = 0
@@ -180,19 +180,19 @@ class PeriodSales(TimeStampedModel):
             not_paid_recognized_sales += recognized_sales.get_not_paid_turnover()
 
         return {
-            "paid_insurance_sales": paid_insurance_sales,
-            "paid_general_expense": paid_general_expense,
-            "paid_general_pando": paid_general_pando,
-            "paid_general_rent": paid_general_rent,
-            "paid_rent_pando": paid_rent_pando,
-            "not_paid_insurance_sales": not_paid_insurance_sales,
-            "not_paid_general_expense": not_paid_general_expense,
-            "not_paid_general_pando": not_paid_general_pando,
-            "not_paid_general_rent": not_paid_general_rent,
-            "not_paid_rent_pando": not_paid_rent_pando,
-            "not_paid_recognized_sales": not_paid_recognized_sales,
-            "wage_turnover": wage_turnover,
-            "component_turnover": component_turnover,
+            "paid_insurance_sales": int(paid_insurance_sales/1000),
+            "paid_general_expense": int(paid_general_expense/1000),
+            "paid_general_pando": int(paid_general_pando/1000),
+            "paid_general_rent": int(paid_general_rent/1000),
+            "paid_rent_pando": int(paid_rent_pando/1000),
+            "not_paid_insurance_sales": int(not_paid_insurance_sales/1000),
+            "not_paid_general_expense": int(not_paid_general_expense/1000),
+            "not_paid_general_pando": int(not_paid_general_pando/1000),
+            "not_paid_general_rent": int(not_paid_general_rent/1000),
+            "not_paid_rent_pando": int(not_paid_rent_pando/1000),
+            "not_paid_recognized_sales": int(not_paid_recognized_sales/1000),
+            "wage_turnover": int(wage_turnover/1000),
+            "component_turnover": int(component_turnover/1000),
 
             "number_of_domestic_samsung_insurances": number_of_domestic_samsung_insurances,
             "number_of_domestic_dongbu_insurances": number_of_domestic_dongbu_insurances,
@@ -206,10 +206,10 @@ class PeriodSales(TimeStampedModel):
             "number_of_abroad_etc_insurances": number_of_abroad_etc_insurances,
             "number_of_abroad_rent": number_of_abroad_rent,
 
-            "charge_amount": charge_amount,
-            "deposit_amount": deposit_amount,
-            "attempted_amount": attempted_amount,
-            "net_payment_sales": net_payment_sales,
+            "charge_amount": int(charge_amount/1000),
+            "deposit_amount": int(deposit_amount/1000),
+            "attempted_amount": int(attempted_amount/1000),
+            "net_payment_sales": int(net_payment_sales/1000),
         }
 
     @property
@@ -286,14 +286,13 @@ def get_net_information(all_monthly_sales):
     except_fields = ["id", "created", "updated", "start_date", "end_date"]
     for field in MonthlySales._meta.fields:
         if field.name not in except_fields:
-            return_dict[field.name] = 0
+            net_field_name = f"net_{field.name}"
+            return_dict[net_field_name] = 0
             for monthly_sales in all_monthly_sales:
-                return_dict[field.name] += getattr(monthly_sales, field.name)
+                return_dict[net_field_name] += getattr(
+                    monthly_sales, field.name)
     print(return_dict)
     return return_dict
-
-
-get_net_information(MonthlySales.objects.all())
 
 
 class StatisticSales(PeriodSales):
