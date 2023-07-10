@@ -42,4 +42,7 @@ def thousnad_format(value):
 
 @register.filter
 def get_percent(value, dividor):
-    return f"{int(value/dividor*100)}%"
+    try:
+        return f"{int(value/dividor*100)}%"
+    except ZeroDivisionError:
+        return "-%"

@@ -80,7 +80,8 @@ class PeriodSales(TimeStampedModel):
     # Order의 get_net_payment에서 1.1을 나눠준 값이다.
     net_payment_sales = models.IntegerField(default=0, verbose_name="면책금")
 
-    def get_kwargs(self, orders, all_extra_sales, all_recognized_sales):
+    @classmethod
+    def get_kwargs(cls, orders, all_extra_sales, all_recognized_sales):
         paid_insurance_sales = 0
         paid_general_expense = 0
         paid_general_pando = 0
@@ -255,7 +256,8 @@ class PeriodSales(TimeStampedModel):
         all_recognized_sales = RecognizedSales.objects.filter(
             real_day_came_out__range=(self.start_date, self.end_date)
         )
-        kwargs = self.get_kwargs(orders, all_extra_sales, all_recognized_sales)
+        kwargs = PeriodSales.get_kwargs(
+            orders, all_extra_sales, all_recognized_sales)
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.save()
