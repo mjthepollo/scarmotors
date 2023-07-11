@@ -1,4 +1,5 @@
-
+{% load humanize%}
+{% load custom_filters %}
 <table class="payment" border="1">
     <tr>
       <th style="border-right:none; text-align:end;">청구/입금</th>
@@ -7,10 +8,18 @@
     </tr>
     <tr>
       <th colspan="2">금액</th>
-      <td></td>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.charge_amount|intcomma}}</td>
+      <td>{{monthly_sales.deposit_amount|intcomma}}</td>
+      <td>{{monthly_sales.attempted_amount|intcomma}}</td>
+    {% endfor %}
     </tr>
     <tr>
       <th colspan="2">면책금</th>
-      <td></td>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.deposit_amount|intcomma}}</td>
+      <th>미수율</th>
+      <td>{{monthly_sales.attempted_amount|get_percent:monthly_sales.charge_amount}}</td>
+    {% endfor %}
     </tr>
   </table>

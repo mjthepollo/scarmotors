@@ -1,3 +1,4 @@
+{% load humanize%}
 <table class="insurance" border="1">
     <tr>
       <th colspan="2">입고대수</th>
@@ -6,23 +7,58 @@
     <tr>
       <th rowspan="5">보험</th>
       <th>삼성</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.number_of_abroad_samsung_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_domestic_samsung_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_abroad_samsung_insurances|add:monthly_sales.number_of_domestic_samsung_insurances|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th>동부</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.number_of_abroad_dongbu_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_domestic_dongbu_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_abroad_dongbu_insurances|add:monthly_sales.number_of_domestic_dongbu_insurances|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th>메리츠</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.number_of_abroad_meritz_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_domestic_meritz_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_abroad_meritz_insurances|add:monthly_sales.number_of_domestic_meritz_insurances|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th>기타</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.number_of_abroad_etc_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_domestic_etc_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_abroad_etc_insurances|add:monthly_sales.number_of_domestic_etc_insurances|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th>계</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.number_of_abroad_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_domestic_insurances|intcomma}}</td>
+      <td>{{monthly_sales.number_of_abroad_insurances|add:monthly_sales.number_of_domestic_insurances|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th colspan="2">렌트</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.number_of_abroad_rent|intcomma}}</td>
+      <td>{{monthly_sales.number_of_domestic_rent|intcomma}}</td>
+      <td>{{monthly_sales.number_of_abroad_rent|add:monthly_sales.number_of_domestic_rent|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th colspan="2">총계</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.number_of_abroad_insurances|add:monthly_sales.number_of_abroad_rent|intcomma}}</td>
+      <td>{{monthly_sales.number_of_domestic_insurances|add:monthly_sales.number_of_domestic_rent|intcomma}}</td>
+      <td>{{monthly_sales.number_of_abroad_insurances|add:monthly_sales.number_of_domestic_insurances|add:monthly_sales.number_of_abroad_rent|add:monthly_sales.number_of_domestic_rent|intcomma}}</td>
+      {% endfor %}
     </tr>
   </table>

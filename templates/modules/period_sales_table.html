@@ -1,9 +1,10 @@
+{% load humanize%}
 <table class="period_sales" border="1">
     <tr>
       <th colspan="2" rowspan="2">구분 (단위 : 1,000)</th>
-      <th colspan="3">1월</th>
-      <th colspan="3">2월</th>
-      <th colspan="3">3월</th>
+      {% for monthly_sales in chunk %}
+        <th colspan="3">{{monthly_sales.month}}월</th>
+      {% endfor %}
     </tr>
     <tr>
       {% for x in "XXX" %}<th>입금</th><th>미입금</th><th>계</th>{% endfor %}
@@ -11,29 +12,74 @@
     <tr>
       <th rowspan="7">매출</th>
       <th>보험</th>
+      {% for monthly_sales in chunk %}
+        <td>{{monthly_sales.paid_insurance_sales|intcomma}}</td>
+        <td>{{monthly_sales.not_paid_insurance_sales|intcomma}}</td>
+        <td>{{monthly_sales.paid_insurance_sales|add:monthly_sales.not_paid_insurance_sales|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th>렌트일반</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.paid_general_rent|intcomma}}</td>
+      <td>{{monthly_sales.not_paid_general_rent|intcomma}}</td>
+      <td>{{monthly_sales.paid_general_rent|add:monthly_sales.not_paid_general_rent|intcomma}}</td>
+    {% endfor %}
     </tr>
     <tr>
       <th>렌트판도</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.paid_rent_pando|intcomma}}</td>
+      <td>{{monthly_sales.not_paid_rent_pando|intcomma}}</td>
+      <td>{{monthly_sales.paid_rent_pando|add:monthly_sales.not_paid_rent_pando|intcomma}}</td>
+    {% endfor %}
     </tr>
     <tr>
       <th>일반판도</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.paid_general_pando|intcomma}}</td>
+      <td>{{monthly_sales.not_paid_general_pando|intcomma}}</td>
+      <td>{{monthly_sales.paid_general_pando|add:monthly_sales.not_paid_general_pando|intcomma}}</td>
+    {% endfor %}
     </tr>
     <tr>
       <th>일반경정비</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.paid_general_expense|intcomma}}</td>
+      <td>{{monthly_sales.not_paid_general_expense|intcomma}}</td>
+      <td>{{monthly_sales.paid_general_expense|add:monthly_sales.not_paid_general_expense|intcomma}}</td>
+    {% endfor %}
     </tr>
     <tr>
       <th>인정매출</th>
+      {% for monthly_sales in chunk %}
+      <td class="disable"></td>
+      <td>{{monthly_sales.not_paid_recognized_sales|intcomma}}</td>
+      <td>{{monthly_sales.not_paid_recognized_sales|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th>계</th>
+      {% for monthly_sales in chunk %}
+      <td>{{monthly_sales.whole_paid_turnover|intcomma}}</td>
+      <td>{{monthly_sales.whole_not_paid_turnover|intcomma}}</td>
+      <td>{{monthly_sales.whole_paid_turnover|add:monthly_sales.whole_not_paid_turnover|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th colspan="2">공임매출</th>
+      {% for monthly_sales in chunk %}
+      <td class="disable"></td>
+      <td class="disable"></td>
+      <td>{{monthly_sales.wage_turnover|intcomma}}</td>
+      {% endfor %}
     </tr>
     <tr>
       <th colspan="2">부품매출</th>
+      {% for monthly_sales in chunk %}
+      <td class="disable"></td>
+      <td class="disable"></td>
+      <td>{{monthly_sales.component_turnover|intcomma}}</td>
+      {% endfor %}
     </tr>
   </table>

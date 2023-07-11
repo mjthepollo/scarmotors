@@ -27,25 +27,25 @@ class PeriodSales(TimeStampedModel):
 
     paid_insurance_sales = models.IntegerField(
         default=0, verbose_name="[입금]보험")
-    paid_general_expense = models.IntegerField(
-        default=0, verbose_name="[입금]일반경정비")
-    paid_general_pando = models.IntegerField(
-        default=0, verbose_name="[입금]일반판도")
     paid_general_rent = models.IntegerField(
         default=0, verbose_name="[입금]렌트일반")
     paid_rent_pando = models.IntegerField(
         default=0, verbose_name="[입금]렌트판도")
+    paid_general_pando = models.IntegerField(
+        default=0, verbose_name="[입금]일반판도")
+    paid_general_expense = models.IntegerField(
+        default=0, verbose_name="[입금]일반경정비")
 
     not_paid_insurance_sales = models.IntegerField(
         default=0, verbose_name="[미입금]보험")
-    not_paid_general_expense = models.IntegerField(
-        default=0, verbose_name="[미입금]일반경정비")
-    not_paid_general_pando = models.IntegerField(
-        default=0, verbose_name="[미입금]일반판도")
     not_paid_general_rent = models.IntegerField(
         default=0, verbose_name="[미입금]렌트일반")
     not_paid_rent_pando = models.IntegerField(
         default=0, verbose_name="[미입금]렌트판도")
+    not_paid_general_pando = models.IntegerField(
+        default=0, verbose_name="[미입금]일반판도")
+    not_paid_general_expense = models.IntegerField(
+        default=0, verbose_name="[미입금]일반경정비")
     not_paid_recognized_sales = models.IntegerField(
         default=0, verbose_name="[미입금]인정매출")
 
@@ -83,16 +83,16 @@ class PeriodSales(TimeStampedModel):
     @classmethod
     def get_kwargs(cls, orders, all_extra_sales, all_recognized_sales):
         paid_insurance_sales = 0
-        paid_general_expense = 0
-        paid_general_pando = 0
         paid_general_rent = 0
         paid_rent_pando = 0
+        paid_general_pando = 0
+        paid_general_expense = 0
 
         not_paid_insurance_sales = 0
-        not_paid_general_expense = 0
-        not_paid_general_pando = 0
         not_paid_general_rent = 0
         not_paid_rent_pando = 0
+        not_paid_general_pando = 0
+        not_paid_general_expense = 0
         not_paid_recognized_sales = 0
 
         wage_turnover = 0
@@ -139,12 +139,6 @@ class PeriodSales(TimeStampedModel):
                         number_of_abroad_etc_insurances += 1
                 else:
                     raise ValueError("잘못된 Abroad Type입니다. (보험)")
-            elif order.charge_type == "일반경정비":
-                paid_general_expense += order.get_paid_turnover()
-                not_paid_general_expense += order.get_not_paid_turnover()
-            elif order.charge_type == "일반판도":
-                paid_general_pando += order.get_paid_turnover()
-                not_paid_general_pando += order.get_not_paid_turnover()
             elif order.charge_type == "렌트일반":
                 paid_general_rent += order.get_paid_turnover()
                 not_paid_general_rent += order.get_not_paid_turnover()
@@ -157,6 +151,12 @@ class PeriodSales(TimeStampedModel):
                     number_of_abroad_rent += 1
                 else:
                     raise ValueError("잘못된 Abroad Type입니다. (렌트)")
+            elif order.charge_type == "일반판도":
+                paid_general_pando += order.get_paid_turnover()
+                not_paid_general_pando += order.get_not_paid_turnover()
+            elif order.charge_type == "일반경정비":
+                paid_general_expense += order.get_paid_turnover()
+                not_paid_general_expense += order.get_not_paid_turnover()
             else:
                 print_colored("잘못된 Charge Type입니다.", "magenta")
                 print_fields(order)
@@ -182,15 +182,15 @@ class PeriodSales(TimeStampedModel):
 
         return {
             "paid_insurance_sales": int(paid_insurance_sales/1000),
-            "paid_general_expense": int(paid_general_expense/1000),
-            "paid_general_pando": int(paid_general_pando/1000),
             "paid_general_rent": int(paid_general_rent/1000),
             "paid_rent_pando": int(paid_rent_pando/1000),
+            "paid_general_pando": int(paid_general_pando/1000),
+            "paid_general_expense": int(paid_general_expense/1000),
             "not_paid_insurance_sales": int(not_paid_insurance_sales/1000),
-            "not_paid_general_expense": int(not_paid_general_expense/1000),
-            "not_paid_general_pando": int(not_paid_general_pando/1000),
             "not_paid_general_rent": int(not_paid_general_rent/1000),
             "not_paid_rent_pando": int(not_paid_rent_pando/1000),
+            "not_paid_general_pando": int(not_paid_general_pando/1000),
+            "not_paid_general_expense": int(not_paid_general_expense/1000),
             "not_paid_recognized_sales": int(not_paid_recognized_sales/1000),
             "wage_turnover": int(wage_turnover/1000),
             "component_turnover": int(component_turnover/1000),
