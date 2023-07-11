@@ -22,7 +22,7 @@ DATABASES = {
     }
 }
 
-DEBUG = False
+DEBUG = True
 
 
 LOGGING = {

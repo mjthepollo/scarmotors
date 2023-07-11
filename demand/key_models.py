@@ -156,6 +156,16 @@ class Charge(KeyModel):
             else:
                 return f"주문없음({self.pk})"
 
+    def save(self, *args, **kwargs):
+        """
+        for the status consistency save method of order must be called
+        """
+        if self.wage_amount == None:
+            self.wage_amount = 0
+        if self.component_amount == None:
+            self.component_amount = 0
+        super(Charge, self).save(*args, **kwargs)
+
 
 class Deposit(KeyModel):
     """
