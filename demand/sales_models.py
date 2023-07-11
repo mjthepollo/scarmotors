@@ -550,6 +550,13 @@ class Register(TimeStampedModel):
     def __str__(self):
         return f"[{self.RO_number}]{self.car_number}({self.day_came_in.year}/{self.day_came_in.month}/{self.day_came_in.day})"
 
+    def save(self):
+        if self.number_of_exchange_works == None:
+            self.number_of_exchange_works = 0
+        if self.number_of_repair_works == None:
+            self.number_of_repair_works = 0
+        super(Register, self).save()
+
 
 class Order(Sales):
     """
