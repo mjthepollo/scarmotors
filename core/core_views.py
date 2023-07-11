@@ -48,8 +48,8 @@ def home(request):
         half = get_current_half()
         period_filter_form = PeriodFilter({"year": year, "half": half})
     start_date, end_date = get_start_and_end_dates_of_half(year, half)
-    monthly_sales = MonthlySales.objects.filter(
-        start_date__gte=start_date, end_date__lte=end_date)
+    monthly_sales = MonthlySales.create_or_get_all_monthly_sales(
+        year, start_date.month, end_date.month)
     chunks = []
     for i in range(ceil(monthly_sales.count()/3)):
         chunks.append(monthly_sales[i*3:i*3+3])

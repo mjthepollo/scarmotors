@@ -20,7 +20,7 @@ class PeriodSales(TimeStampedModel):
     Sales 모델들의 updated 정보를 기반으로 업데이트 하며, 자식 클래스로는 MonthlySales와 StatisticSales가 있다.
     """
     class Meta:
-        ordering = ["-created"]
+        ordering = ["created"]
         abstract = True
     start_date = models.DateField(verbose_name="시작 날짜")
     end_date = models.DateField(verbose_name="마지막 날짜")
@@ -218,17 +218,44 @@ class PeriodSales(TimeStampedModel):
         return int(self.attempted_amount / self.whole_turnover * 100)
 
     @property
-    def whole_turnover(self):
+    def whole_not_paid_turnover(self):
+        return self.not_paid_general_expense +\
+            self.not_paid_general_pando +\
+            self.not_paid_general_rent +\
+            self.not_paid_insurance_sales +\
+            self.not_paid_rent_pando +\
+            self.not_paid_recognized_sales
+
+    @property
+    def whole_paid_turnover(self):
         return self.paid_general_expense +\
             self.paid_general_pando +\
             self.paid_general_rent +\
             self.paid_insurance_sales +\
-            self.paid_rent_pando +\
-            self.not_paid_general_expense +\
-            self.not_paid_general_pando +\
-            self.not_paid_general_rent +\
-            self.not_paid_insurance_sales +\
-            self.not_paid_rent_pando
+            self.paid_rent_pando
+
+    @property
+    def whole_turnover(self):
+        return self.whole_not_paid_turnover + self.whole_paid_turnover
+
+    @property
+    def number_of_domestic_insurances(self):
+        return self.number_of_domestic_samsung_insurances +\
+            self.number_of_domestic_dongbu_insurances +\
+            self.number_of_domestic_meritz_insurances +\
+            self.number_of_domestic_etc_insurances
+
+    @property
+    def number_of_abroad_insurances(self):
+        return self.number_of_abroad_samsung_insurances +\
+            self.number_of_abroad_dongbu_insurances +\
+            self.number_of_abroad_meritz_insurances +\
+            self.number_of_abroad_etc_insurances
+
+    @property
+    def number_of_all_insurances(self):
+        return self.number_of_domestic_insurances +\
+            self.number_of_abroad_insurances
 
     @classmethod
     def create(cls, start_date, end_date):
@@ -274,6 +301,26 @@ class MonthlySales(PeriodSales):
         return self.start_date.month
 
     @classmethod
+    def create_or_get_all_monthly_sales(cls, year, start_month, finish_month):
+        """
+        start_month와 finish_month 까지의 MonthlySales를 가져오거나 없는 경우 생성하여,
+        start_month부터 finish_month 까지의 MonthlySales를 QuerySet으로 반환해준다.
+        """
+        for month in range(start_month, finish_month+1):
+            start_date = date(year, month, 1)
+            end_date = start_date + \
+                relativedelta(months=1) - relativedelta(days=1)
+            monthly_sales = cls.objects.filter(
+                start_date=start_date, end_date=end_date).first()
+            if not monthly_sales:
+                cls.create(start_date, end_date)
+        returned_start_date = date(year, start_month, 1)
+        returned_end_date = date(year, finish_month, 1) + \
+            relativedelta(months=1) - relativedelta(days=1)
+        return cls.objects.filter(
+            start_date__gte=returned_start_date, end_date__lte=returned_end_date)
+
+    @classmethod
     def create_monthly_sales(cls, year, month):
         start_date = date(year, month, 1)
         end_date = start_date + relativedelta(months=1) - relativedelta(days=1)
@@ -286,6 +333,9 @@ class MonthlySales(PeriodSales):
 def get_net_information(all_monthly_sales):
     return_dict = {}
     except_fields = ["id", "created", "updated", "start_date", "end_date"]
+    property_list = ["whole_not_paid_turnover", "whole_paid_turnover",
+                     "whole_turnover", "number_of_domestic_insurances",
+                     "number_of_abroad_insurances", "number_of_all_insurances"]
     for field in MonthlySales._meta.fields:
         if field.name not in except_fields:
             net_field_name = f"net_{field.name}"
@@ -293,6 +343,12 @@ def get_net_information(all_monthly_sales):
             for monthly_sales in all_monthly_sales:
                 return_dict[net_field_name] += getattr(
                     monthly_sales, field.name)
+    for property_name in property_list:
+        net_property_name = f"net_{property_name}"
+        return_dict[net_property_name] = 0
+        for monthly_sales in all_monthly_sales:
+            return_dict[net_property_name] += getattr(
+                monthly_sales, property_name)
     print(return_dict)
     return return_dict
 

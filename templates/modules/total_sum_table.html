@@ -47,9 +47,9 @@
     </tr>
     <tr>
       <th>계</th>
-      <td>{{net_paid_insurance_sales|add:net_paid_general_rent|add:net_paid_rent_pando|add:net_paid_general_pando|add:net_paid_general_expense|intcomma}}</td>
-      <td>{{net_not_paid_insurance_sales|add:net_not_paid_general_rent|add:net_not_paid_rent_pando|add:net_not_paid_general_pando|add:net_not_paid_general_expense|add:net_not_paid_recognized_sales|intcomma}}</td>
-      <td>{{net_paid_insurance_sales|add:net_paid_general_rent|add:net_paid_rent_pando|add:net_paid_general_pando|add:net_paid_general_expense|add:net_not_paid_insurance_sales|add:net_not_paid_general_rent|add:net_not_paid_rent_pando|add:net_not_paid_general_pando|add:net_not_paid_general_expense|add:net_not_paid_recognized_sales|intcomma}}</td>
+      <td>{{net_whole_paid_turnover|intcomma}}</td>
+      <td>{{net_whole_not_paid_turnover|intcomma}}</td>
+      <td>{{net_whole_turnover|intcomma}}</td>
     </tr>
     <tr>
       <th>공임매출</th>
@@ -95,9 +95,9 @@
     </tr>
     <tr>
         <th>계</th>
-        <td>{{net_number_of_abroad_samsung_insurances|add:net_number_of_abroad_dongbu_insurances|add:net_number_of_abroad_meritz_insurances|add:net_number_of_abroad_etc_insurances}}</td>
-        <td>{{net_number_of_domestic_samsung_insurances|add:net_number_of_domestic_dongbu_insurances|add:net_number_of_domestic_meritz_insurances|add:net_number_of_domestic_etc_insurances}}</td>
-        <td>{{net_number_of_abroad_samsung_insurances|add:net_number_of_abroad_dongbu_insurances|add:net_number_of_abroad_meritz_insurances|add:net_number_of_abroad_etc_insurances|add:net_number_of_domestic_samsung_insurances|add:net_number_of_domestic_dongbu_insurances|add:net_number_of_domestic_meritz_insurances|add:net_number_of_domestic_etc_insurances}}</td>
+        <td>{{net_number_of_abroad_insurances|intcomma}}</td>
+        <td>{{net_number_of_domestic_insurances|intcomma}}</td>
+        <td>{{net_number_of_abroad_insurances|add:net_number_of_domestic_insurances|intcomma}}</td>
     </tr>
     <tr>
       <th>렌트</th>
@@ -107,9 +107,9 @@
     </tr>
     <tr>
       <th>총계</th>
-      <td>{{net_number_of_abroad_samsung_insurances|add:net_number_of_abroad_dongbu_insurances|add:net_number_of_abroad_meritz_insurances|add:net_number_of_abroad_etc_insurances|add:net_number_of_abroad_rent}}</td>
-      <td>{{net_number_of_domestic_samsung_insurances|add:net_number_of_domestic_dongbu_insurances|add:net_number_of_domestic_meritz_insurances|add:net_number_of_domestic_etc_insurances|add:net_number_of_domestic_rent}}</td>
-      <td>{{net_number_of_abroad_samsung_insurances|add:net_number_of_abroad_dongbu_insurances|add:net_number_of_abroad_meritz_insurances|add:net_number_of_abroad_etc_insurances|add:net_number_of_domestic_rent|add:net_number_of_domestic_samsung_insurances|add:net_number_of_domestic_dongbu_insurances|add:net_number_of_domestic_meritz_insurances|add:net_number_of_domestic_etc_insurances|add:net_number_of_domestic_rent}}</td>
+      <td>{{net_number_of_abroad_insurances|add:net_number_of_abroad_rent|intcomma}}</td>
+      <td>{{net_number_of_domestic_insurances|add:net_number_of_domestic_rent|intcomma}}</td>
+      <td>{{net_number_of_abroad_insurances|add:net_number_of_domestic_insurances|add:net_number_of_abroad_rent|add:net_number_of_domestic_rent|intcomma}}</td>
     </tr>
   </table>
   <table class="payment" border="1">

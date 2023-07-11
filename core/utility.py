@@ -85,6 +85,9 @@ def get_start_and_end_dates_of_half(year, half):
     elif half == "second":
         start_date = date(year, 7, 1)
         end_date = date(year, 12, 31)
+    elif half == "all":
+        start_date = date(year, 1, 1)
+        end_date = date(year, 12, 31)
     else:
         raise ValueError(
             "half must be 'first' or 'second'"
