@@ -130,7 +130,10 @@ class Charge(KeyModel):
         default=0, verbose_name="부품비", blank=True, null=True)
 
     def get_repair_amount(self):
-        return self.wage_amount+self.component_amount
+        if self.wage_amount and self.component_amount:
+            return self.wage_amount + self.component_amount
+        else:
+            return 0
 
     def is_default(self):
         return self.charge_date == None and\
@@ -138,7 +141,7 @@ class Charge(KeyModel):
             (self.component_amount == 0 or self.component_amount == None)
 
     def is_stable(self):
-        return bool(self.charge_date)
+        return bool(self.charge_date and self.wage_amount != None and self.component_amount != None)
 
     def __str__(self):
         if hasattr(self, "order"):
