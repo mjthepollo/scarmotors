@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{% static 'css/demand/new_register.css' %}">
 {% endblock css %}
 {% block content %}
+{% if user.editable %}
 <form id="formset" method="POST" data-formset-prefix="{{order_formset.prefix}}">
     {% csrf_token %}
     <h2>차량 정보</h2>
@@ -37,6 +38,7 @@
     </div>
     <button id="complete" class="btn btn-dark">완료</button>
 </form>
+{% endif %}
 {% endblock content %}
 {% block inline_javascript %}
 <script type="module" src="{% static 'js/modal/car_number.js' %}"></script>

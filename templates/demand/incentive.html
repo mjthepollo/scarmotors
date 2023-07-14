@@ -26,7 +26,9 @@
         <label>지급 금액</label>
         <p id="incentive_info"></p>
     </div>
+    {% if user.editable %}
     <button class="btn btn-warning">지급처리</button>
+    {% endif %}
 </div>
 <table id="search_results" border="1">
     <tr>

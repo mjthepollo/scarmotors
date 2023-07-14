@@ -1,31 +1,32 @@
 from django import forms
 from django.utils.safestring import mark_safe
 
+from core.forms import DetailableModelForm
 from core.utility import insert_tag
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
                                Payment, Supporter)
 from demand.utility import zero_if_none
 
 
-class SupporterForm(forms.ModelForm):
+class SupporterForm(DetailableModelForm):
     class Meta:
         model = Supporter
         fields = ["name", "active"]
 
 
-class ChargedCompanyForm(forms.ModelForm):
+class ChargedCompanyForm(DetailableModelForm):
     class Meta:
         model = ChargedCompany
         fields = ["name", "active"]
 
 
-class InsuranceAgentForm(forms.ModelForm):
+class InsuranceAgentForm(DetailableModelForm):
     class Meta:
         model = InsuranceAgent
         fields = ["name", "active"]
 
 
-class PaymentForm(forms.ModelForm):
+class PaymentForm(DetailableModelForm):
     class Meta:
         model = Payment
         fields = ["indemnity_amount", "discount_amount", "refund_amount",
@@ -50,7 +51,7 @@ class PaymentForm(forms.ModelForm):
         return mark_safe(return_div)
 
 
-class ChargeForm(forms.ModelForm):
+class ChargeForm(DetailableModelForm):
     """
     init할 때 Order가 필요하다!
     """
@@ -94,7 +95,7 @@ class ChargeForm(forms.ModelForm):
         super(ChargeForm, self).__init__(*args, **kwargs)
 
 
-class DepositForm(forms.ModelForm):
+class DepositForm(DetailableModelForm):
     class Meta:
         model = Deposit
         fields = ["deposit_date", 'deposit_amount', "deposit_note"]
@@ -125,7 +126,7 @@ class DepositForm(forms.ModelForm):
         super(DepositForm, self).__init__(*args, **kwargs)
 
 
-class ChargeFormForExtraSales(forms.ModelForm):
+class ChargeFormForExtraSales(DetailableModelForm):
     """
     init할 때 Order가 필요하다!
     """

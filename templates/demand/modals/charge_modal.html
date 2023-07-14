@@ -1,4 +1,5 @@
 {% extends "modules/custom_modal.html"%}
+{% load custom_filters %}
 {% block modal_content %}
 <form class="modal-content" method="POST" action="{% url 'demand:charge_modal' order.pk %}">
     {% csrf_token %}
@@ -9,19 +10,21 @@
     <div class="modal-body">
         <p class="modal_sector_info">1센터 처리 여부</p>
         <div class="modal_checkboxes">
-            {{first_center_register_form.as_div}}
+            {{first_center_register_form|get_div:user}}
         </div>
         <p class="modal_sector_info">청구</p>
         <div class="modal_inputs">
-            {{charge_form.as_div}}
+            {{charge_form|get_div:user}}
         </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">닫기</button>
-        {% if order.charge %}
-        <button type="button" data-redirect_url="{% url 'demand:delete_charge' order.charge.pk %}" class="btn btn-danger delete_button">삭제</button>
+        {% if user.editable %}
+            {% if order.charge %}
+            <button type="button" data-redirect_url="{% url 'demand:delete_charge' order.charge.pk %}" class="btn btn-danger delete_button">삭제</button>
+            {% endif %}
+            <button class="btn btn-success">청구</button>
         {% endif %}
-        <button class="btn btn-success">청구</button>
     </div>
 </form>
 {% endblock modal_content %}

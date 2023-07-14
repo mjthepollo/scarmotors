@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load formset_tags %}
+{% load custom_filters %}
 {% load static %}
 {% block css %}
 {{block.super}}
@@ -9,8 +10,10 @@
 <form id="formset" method="POST">
     <h2>{{extra_sales_form.instance}}</h2>
     {% csrf_token %}
-    <div>{{extra_sales_form.as_div}}</div>
+    <div>{{extra_sales_form|get_div:user}}</div>
+    {% if user.editable %}
     <button id="complete" class="btn btn-dark">수정 완료</button>
+    {% endif %}
 </form>
 {% endblock content %}
 {% block inline_javascript %}

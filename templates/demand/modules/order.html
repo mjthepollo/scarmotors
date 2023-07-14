@@ -31,6 +31,7 @@
         <div class="deposit_button" data-modal_url="{% url 'demand:deposit_modal' order.pk%}">입금</div>
     </td>
     <td class="order bold {{order.get_status_class}}"><a href="{% url 'demand:edit_order' order.pk %}">{{order.get_status_display}}</td>
+{% if user.editable%}
     {% if not order.completed %}
     <td class="order_function bold make_manually_complete"><a href="{% url 'demand:make_manually_complete' order.pk %}">완료처리</a></td>
     {% elif order.manually_completed %}
@@ -38,4 +39,5 @@
     {% else %}
     <td class="order_function bold complete_class">완료</td>
     {% endif %}
+{% endif %}
 </tr>

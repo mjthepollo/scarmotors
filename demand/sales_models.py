@@ -491,7 +491,6 @@ class Register(TimeStampedModel):
 
 # region FOR HTML FUNCTIONS
 
-
     def get_status(self):
         orders = self.all_orders
         all_completed = True
@@ -719,3 +718,6 @@ class RecognizedSales(TimeStampedModel):
 
     def get_not_paid_turnover(self):
         return self.get_repair_amount() if self.get_repair_amount() else 0
+
+    def __str__(self):
+        return f"[{self.car_number}] {self.real_day_came_out.strftime('%Y/%m/%d')} 출고"

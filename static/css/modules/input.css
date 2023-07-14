@@ -33,3 +33,13 @@ textarea {
   height: 150px;
   padding: 20px;
 }
+
+p.detail_value {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 200px;
+  height: 30px;
+  margin-bottom: 0px;
+}

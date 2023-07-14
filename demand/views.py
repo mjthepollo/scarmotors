@@ -344,26 +344,6 @@ def order_charge(request, pk):
 
 
 @login_required
-def order_deposit(request, pk):
-    order = get_object_or_404(Order, pk=pk)
-    deposit_form = DepositForm(instance=order.deposit, order=order)
-    if request.method == "GET":
-        return render(request, "demand/order_deposit.html", context={
-            "deposit_form": deposit_form,
-        })
-    else:
-        deposit_form = DepositForm(
-            request.POST, instance=order.deposit, order=order)
-        if deposit_form.is_valid():
-            deposit_form.save()
-            return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
-        else:
-            return render(request, "demand/order_deposit.html", context={
-                "deposit_form": deposit_form,
-            })
-
-
-@login_required
 def make_manually_complete(request, pk):
     order = get_object_or_404(Order, pk=pk)
     order.make_manually_complete()

@@ -11,16 +11,16 @@
     {% csrf_token %}
     <h2>RO [{{register.RO_number}}]</h2>
     <div id="edit_special_register_form">
-        {{edit_special_register_form.as_div}}
+        {{edit_special_register_form|get_div:user}}
     </div>
     <div id="register_form">
-        {{register_form.as_div}}
+        {{register_form|get_div:user}}
     </div>
     {{order_formset.management_form}}
     <hr class="edit_order_hr">
     <div id="edit_order_formset">
     {% for order_form in order_forms %}
-    {% with order_form.instance as order and order_form.as_div as order_form_div and payment_forms|index_form:forloop.counter0 as payment_form_div and charge_forms|index_form:forloop.counter0 as charge_form_div and deposit_forms|index_form:forloop.counter0 as deposit_form_div%}
+    {% with order_form.instance as order and order_form|get_div:user as order_form_div and payment_forms|index_form:forloop.counter0|get_div:user as payment_form_div and charge_forms|index_form:forloop.counter0|get_div:user as charge_form_div and deposit_forms|index_form:forloop.counter0|get_div:user as deposit_form_div%}
     {% include "demand/forms/edit_order_form.html" %}
     {% endwith %}
     {% if not forloop.last%}
@@ -28,6 +28,7 @@
     {% endif %}
     {% endfor %}
     </div>
+    {% if user.editable %}
     <h2>추가주문</h2>
     <div data-formset-body id="extra_order_formset">
     </div>
@@ -45,11 +46,16 @@
             reorderMode: 'dom',
         });
     });</script>
+    {% endif %}
     <h2>비고</h2>
     <div id="register_note_form">
         {{register_note_form.note}}
     </div>
+    {% if user.editable %}
     <button id="complete" class="btn btn-dark">수정 완료</button>
+    {% else %}
+    <div style="height:30px;"></div>
+    {% endif %}
 </form>
 {% endblock content %}
 {% block inline_javascript %}

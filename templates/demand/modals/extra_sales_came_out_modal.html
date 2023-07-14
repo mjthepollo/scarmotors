@@ -1,4 +1,5 @@
 {% extends "modules/custom_modal.html"%}
+{% load custom_filters %}
 {% block modal_content %}
 <form class="modal-content" method="POST" action="{% url 'demand:extra_sales_came_out_modal' extra_sales.pk %}">
     {% csrf_token %}
@@ -9,21 +10,21 @@
     <div class="modal-body">
         <p class="modal_sector_info">등록 정보</p>
         <div class="modal_inputs">
-            <div>
-                {{real_day_came_out_form}}
-            </div>
+            {{real_day_came_out_form|get_div:user}}
         </div>
         <p class="modal_sector_info">결제 정보</p>
         <div class="modal_inputs payment_form">
-            {{payment_form.as_div}}
+            {{payment_form|get_div:user}}
         </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">닫기</button>
-        {% if extra_sales.payment %}
-        <button type="button" data-redirect_url="{% url 'demand:extra_sales_delete_charge' extra_sales.payment.pk %}" class="btn btn-danger delete_button">삭제</button>
+        {% if user.editable %}
+            {% if extra_sales.payment %}
+            <button type="button" data-redirect_url="{% url 'demand:extra_sales_delete_charge' extra_sales.payment.pk %}" class="btn btn-danger delete_button">삭제</button>
+            {% endif %}
+            <button class="btn btn-success">출고</button>
         {% endif %}
-        <button class="btn btn-success">출고</button>
     </div>
 </form>
 {% endblock modal_content %}

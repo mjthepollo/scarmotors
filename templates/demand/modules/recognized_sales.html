@@ -1,7 +1,7 @@
 {% load custom_filters %}
 {% load humanize %}
 <tr>
-    <td>{{recognized_sales.formatted_day_came_in}}</td>
+    <td><a href="{% url 'demand:edit_recognized_sales' recognized_sales.pk %}">{{recognized_sales.formatted_day_came_in}}</a></td>
     <td>{{recognized_sales.formatted_real_day_came_out}}</td>
     <td class="car_number">
         {{recognized_sales.car_number}}

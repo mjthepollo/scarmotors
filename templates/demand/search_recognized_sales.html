@@ -3,10 +3,11 @@
 <link rel="stylesheet" href="{% static 'css/demand/search.css' %}">
 <link rel="stylesheet" href="{% static 'css/demand/search_special_functions.css' %}">
 {% endblock css %} {% block content %}
-
+{% if user.editable %}
 <div id="special_functions">
-        <a class="btn btn-success special_function" href="{% url 'demand:new_recognized_sales' %}">인정 매출 등록</a>
+    <a class="btn btn-success special_function" href="{% url 'demand:new_recognized_sales' %}">인정 매출 등록</a>
 </div>
+{% endif %}
 <form id="search_form" method="GET">
     <table id="search_results" border="1">
     <tr>

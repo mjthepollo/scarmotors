@@ -6,12 +6,14 @@
 <link rel="stylesheet" href="{% static 'css/demand/extra_sales_form.css' %}">
 {% endblock css %}
 {% block content %}
+{% if user.editable %}
 <form id="formset" method="POST">
     <h2>기타 매출 등록</h2>
     {% csrf_token %}
     <div>{{extra_sales_form.as_div}}</div>
     <button id="complete" class="btn btn-dark">수정 완료</button>
 </form>
+{% endif %}
 {% endblock content %}
 {% block inline_javascript %}
 <script type="module" src="{% static 'js/edit_order.js' %}"></script>

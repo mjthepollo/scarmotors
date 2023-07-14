@@ -17,8 +17,6 @@ views_urlpatterns = [
     path("search_orders/", views.search_orders, name="search_orders"),
     path("search_orders_table_view/", views.search_orders_table_view,
          name="search_orders_table_view"),
-    path("order/charge/<int:pk>/", views.order_charge, name="order_charge"),
-    path("order/deposit/<int:pk>/", views.order_deposit, name="order_deposit"),
     path("order/make_manually_complete/<int:pk>/",
          views.make_manually_complete, name="make_manually_complete"),
     path("order/cancel_manually_complete/<int:pk>/",

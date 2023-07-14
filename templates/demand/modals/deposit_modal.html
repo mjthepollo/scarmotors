@@ -1,4 +1,5 @@
 {% extends "modules/custom_modal.html"%}
+{% load custom_filters %}
 {% block modal_content %}
 <form class="modal-content" method="POST" action="{% url 'demand:deposit_modal' order.pk %}">
     {% csrf_token %}
@@ -9,15 +10,17 @@
     <div class="modal-body">
         <p class="modal_sector_info">입금 정보</p>
         <div class="modal_inputs">
-            {{deposit_form.as_div}}
+            {{deposit_form|get_div:user}}
         </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary close_modal" data-bs-dismiss="modal">닫기</button>
-        {% if order.deposit %}
-        <button type="button" data-redirect_url="{% url 'demand:delete_deposit' order.deposit.pk %}" class="btn btn-danger delete_button">삭제</button>
+        {% if user.editable %}
+            {% if order.deposit %}
+            <button type="button" data-redirect_url="{% url 'demand:delete_deposit' order.deposit.pk %}" class="btn btn-danger delete_button">삭제</button>
+            {% endif %}
+            <button class="btn btn-success">입금</button>
         {% endif %}
-        <button class="btn btn-success">입금</button>
     </div>
 </form>
 {% endblock modal_content %}

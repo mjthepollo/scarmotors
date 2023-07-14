@@ -37,7 +37,7 @@
     <th>청구</th>
     <th>입금</th>
     <th>상태</th>
-    <th>완료</th>
+    {% if user.editable %}<th>완료</th>{% endif %}
   </tr>
 {% for order in orders %}
 {% include "demand/modules/one_line_order.html" %}

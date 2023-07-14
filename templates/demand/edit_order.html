@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load formset_tags %}
+{% load custom_filters %}
 {% load static %}
 {% block css %}
 {{block.super}}
@@ -9,11 +10,13 @@
 <form id="formset" method="POST">
     {% csrf_token %}
     <div id="edit_order_formset">
-    {% with order_form.instance as order and order_form.as_div as order_form_div and payment_form.as_div as payment_form_div and charge_form.as_div as charge_form_div and deposit_form.as_div as deposit_form_div%}
+    {% with order_form.instance as order and order_form|get_div:user as order_form_div and payment_form|get_div:user as payment_form_div and charge_form|get_div:user as charge_form_div and deposit_form|get_div:user as deposit_form_div%}
     {% include "demand/forms/edit_order_form.html" %}
     {% endwith %}
     </div>
+    {% if user.editable %}
     <button id="complete" class="btn btn-dark">수정 완료</button>
+    {% endif %}
 </form>
 {% endblock content %}
 {% block inline_javascript %}

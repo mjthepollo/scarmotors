@@ -2,11 +2,12 @@ from django import forms
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from core.forms import DetailableModelForm
 from core.utility import insert_tag
 from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
 
 
-class RealDayCameOutForm(forms.ModelForm):
+class RealDayCameOutForm(DetailableModelForm):
     class Meta:
         model = Register
         fields = ["real_day_came_out"]
@@ -15,25 +16,25 @@ class RealDayCameOutForm(forms.ModelForm):
         }
 
 
-class SpecialRegisterForm(forms.ModelForm):
+class SpecialRegisterForm(DetailableModelForm):
     class Meta:
         model = Register
         fields = ['wasted', 'unrepaired']
 
 
-class FirstCenterRegisterForm(forms.ModelForm):
+class FirstCenterRegisterForm(DetailableModelForm):
     class Meta:
         model = Register
         fields = ['first_center_repaired']
 
 
-class EditSpecialRegisterForm(forms.ModelForm):
+class EditSpecialRegisterForm(DetailableModelForm):
     class Meta:
         model = Register
         fields = ['wasted', 'unrepaired', 'first_center_repaired']
 
 
-class NewRegisterForm(forms.ModelForm):
+class NewRegisterForm(DetailableModelForm):
     class Meta:
         model = Register
         fields = ["car_number", "day_came_in", "expected_day_came_out",
@@ -61,7 +62,7 @@ class NewRegisterForm(forms.ModelForm):
         return mark_safe(return_div)
 
 
-class RegisterNoteForm(forms.ModelForm):
+class RegisterNoteForm(DetailableModelForm):
     class Meta:
         model = Register
         fields = ["note"]
@@ -70,7 +71,7 @@ class RegisterNoteForm(forms.ModelForm):
         }
 
 
-class EditRegisterForm(forms.ModelForm):
+class EditRegisterForm(DetailableModelForm):
     class Meta:
         model = Register
         fields = ["car_number", "day_came_in", "expected_day_came_out", "real_day_came_out",
@@ -90,7 +91,7 @@ class EditRegisterForm(forms.ModelForm):
         }
 
 
-class OrderForm(forms.ModelForm):
+class OrderForm(DetailableModelForm):
     template_name = "demand/forms/deletable_order_form.html"
 
     class Meta:
@@ -109,13 +110,13 @@ class OrderForm(forms.ModelForm):
         }
 
 
-class IncentiveForm(forms.ModelForm):
+class IncentiveForm(DetailableModelForm):
     class Meta:
         model = Order
         fields = ["incentive_paid"]
 
 
-class ExtraSalesForm(forms.ModelForm):
+class ExtraSalesForm(DetailableModelForm):
     class Meta:
         model = ExtraSales
         fields = ["day_came_in", "expected_day_came_out", "real_day_came_out",
@@ -133,7 +134,7 @@ class ExtraSalesForm(forms.ModelForm):
         }
 
 
-class ExtraSalesRealDayCameOutForm(forms.ModelForm):
+class ExtraSalesRealDayCameOutForm(DetailableModelForm):
     class Meta:
         model = ExtraSales
         fields = ["real_day_came_out"]
@@ -142,7 +143,7 @@ class ExtraSalesRealDayCameOutForm(forms.ModelForm):
         }
 
 
-class RecognizedSalesForm(forms.ModelForm):
+class RecognizedSalesForm(DetailableModelForm):
     class Meta:
         model = RecognizedSales
         fields = ["day_came_in", "real_day_came_out",
