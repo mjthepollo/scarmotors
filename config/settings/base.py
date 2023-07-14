@@ -88,6 +88,7 @@ INSTALLED_APPS = [
 ]
 
 LOCAL_APPS = [
+    "core",
     "users",
     "demand",
     "period_sales",

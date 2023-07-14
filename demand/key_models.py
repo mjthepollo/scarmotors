@@ -65,7 +65,7 @@ class KeyModel(TimeStampedModel):
         """
         if hasattr(self, "order"):
             self.order.save()
-        super().save(*args, **kwargs)
+        super(KeyModel, self).save(*args, **kwargs)
 
 
 class Payment(KeyModel):
@@ -130,7 +130,7 @@ class Charge(KeyModel):
         default=0, verbose_name="부품비", blank=True, null=True)
 
     def get_repair_amount(self):
-        if self.wage_amount and self.component_amount:
+        if self.wage_amount != None and self.component_amount != None:
             return self.wage_amount + self.component_amount
         else:
             return 0

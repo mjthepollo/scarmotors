@@ -9,9 +9,9 @@ from demand.key_models import ChargedCompany
 from demand.sales_models import ExtraSales, Order, RecognizedSales
 from demand.utility import print_fields
 
-SAMSUNG = ChargedCompany.objects.get(name="삼성")
-DONGBU = ChargedCompany.objects.get(name="DB")
-MERITZ = ChargedCompany.objects.get(name="메리츠")
+SAMSUNG, _ = ChargedCompany.objects.get_or_create(name="삼성")
+DONGBU, _ = ChargedCompany.objects.get_or_create(name="DB")
+MERITZ, _ = ChargedCompany.objects.get_or_create(name="메리츠")
 
 
 class PeriodSales(TimeStampedModel):

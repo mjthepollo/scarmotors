@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 from core.utility import print_colored
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
-                               Payment, Supporter)
+                               Payment, RequestDepartment, Supporter)
 from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
 
 # Create a logger with a custom log level
@@ -22,6 +22,8 @@ class Command(BaseCommand):
         Deposit.objects.all().delete()
         extra_sales_count = ExtraSales.objects.all().count()
         ExtraSales.objects.all().delete()
+        request_department_count = RequestDepartment.objects.all().count()
+        RequestDepartment.objects.all().delete()
         recognized_sales_count = RecognizedSales.objects.all().count()
         RecognizedSales.objects.all().delete()
         insurance_agent_count = InsuranceAgent.objects.all().count()
@@ -38,6 +40,8 @@ class Command(BaseCommand):
         print_colored(
             f"ChargedCompany Delete Count: {charget_company_count}", "green")
         print_colored(f"Deposit Delete Count: {deposit_count}", "green")
+        print_colored(
+            f"RequestDepartment Delete Count: {request_department_count}", "green")
         print_colored(f"ExtraSales Delete Count: {extra_sales_count}", "green")
         print_colored(
             f"RecognizedSales Delete Count: {recognized_sales_count}", "green")
