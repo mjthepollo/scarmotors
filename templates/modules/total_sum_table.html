@@ -4,7 +4,7 @@
     <table class="period_sales" border="1">
     <tr>
       <th colspan="1" rowspan="2">구분</th>
-      <th colspan="3">계</th>
+      <th colspan="3">{{period_filter_form.year.value}} {% if period_filter_form.half.value == "first" %}상반기{% elif period_filter_form.half.value == "second" %}하반기{% elif period_filter_form.half.value == "all" %}전체{% else %}???{% endif %} 누계</th>
     </tr>
     <tr>
       <th>입금</th><th>미입금</th><th>계</th>
