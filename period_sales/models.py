@@ -9,10 +9,6 @@ from demand.key_models import ChargedCompany
 from demand.sales_models import ExtraSales, Order, RecognizedSales
 from demand.utility import print_fields
 
-SAMSUNG, _ = ChargedCompany.objects.get_or_create(name="삼성")
-DONGBU, _ = ChargedCompany.objects.get_or_create(name="DB")
-MERITZ, _ = ChargedCompany.objects.get_or_create(name="메리츠")
-
 
 class PeriodSales(TimeStampedModel):
     """
@@ -82,6 +78,10 @@ class PeriodSales(TimeStampedModel):
 
     @classmethod
     def get_kwargs(cls, orders, all_extra_sales, all_recognized_sales):
+        SAMSUNG, _ = ChargedCompany.objects.get_or_create(name="삼성")
+        DONGBU, _ = ChargedCompany.objects.get_or_create(name="DB")
+        MERITZ, _ = ChargedCompany.objects.get_or_create(name="메리츠")
+
         paid_insurance_sales = 0
         paid_general_rent = 0
         paid_rent_pando = 0
