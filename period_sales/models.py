@@ -349,7 +349,6 @@ def get_net_information(all_monthly_sales):
         for monthly_sales in all_monthly_sales:
             return_dict[net_property_name] += getattr(
                 monthly_sales, property_name)
-    print(return_dict)
     return return_dict
 
 

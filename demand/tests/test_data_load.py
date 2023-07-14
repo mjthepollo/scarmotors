@@ -26,9 +26,11 @@ class DataLoadTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super(DataLoadTest, cls).setUpClass()
-        cls.original_df = load_data("src/data_load.xlsx", "23년 본사 상반기")
+        file_name = "src/data_load.xlsx"
+        sheet_name = "23년 본사 하반기"
+        cls.original_df = load_data(file_name, sheet_name)
         cls.df = get_effective_data_frame(
-            "src/data_load.xlsx", "23년 본사 상반기")
+            file_name, sheet_name)
         cls.lines = df_to_lines(cls.df)
         cls.line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(
             cls.df)

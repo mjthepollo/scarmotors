@@ -55,19 +55,25 @@ def check_wash_line_with_df_and_line_number(df, line_number):
     """
     effective DataFrame의 line number에 해당하는 line이 세차를 가리키는 line인지 확인한다.
     """
+    car_model = df.iloc[line_number, CAR_MODEL] or "차종"
     client_name_and_insurance_agent = df.iloc[line_number,
-                                              CLIENT_NAME_AND_INSURANCE_AGENT]
-    supporter_name = df.iloc[line_number, SUPPORTER]
-    return "세차" in client_name_and_insurance_agent or "세차" in supporter_name
+                                              CLIENT_NAME_AND_INSURANCE_AGENT] or "수리의뢰자"
+    supporter_name = df.iloc[line_number, SUPPORTER] or "입고지원"
+    if "세차" in car_model or "세차" in client_name_and_insurance_agent or "세차" in supporter_name:
+        return True
+    return False
 
 
 def check_wash_line(line):
     """
     line이 세차를 가리키는 line인지 확인한다.
     """
-    client_name_and_insurance_agent = line[CLIENT_NAME_AND_INSURANCE_AGENT]
-    supporter_name = line[SUPPORTER]
-    return "세차" in client_name_and_insurance_agent or "세차" in supporter_name
+    car_model = line[CAR_MODEL] or "차종"
+    client_name_and_insurance_agent = line[CLIENT_NAME_AND_INSURANCE_AGENT] or "수리의뢰자"
+    supporter_name = line[SUPPORTER] or "입고지원"
+    if "세차" in car_model or "세차" in client_name_and_insurance_agent or "세차" in supporter_name:
+        return True
+    return False
 
 
 def check_wasted_line(line):
@@ -148,7 +154,7 @@ def check_line_numbers_for_registers_have_same_car_number(effective_df):
                 assert all(car_number == all_car_number[0]
                            for car_number in all_car_number)
             except AssertionError as e:
-                print(all_car_number[0])
+                print(all_car_number)
                 raise e
 
 
