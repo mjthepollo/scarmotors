@@ -700,7 +700,7 @@ class RecognizedSales(TimeStampedModel):
                             null=True, verbose_name="비고")
 
     def get_repair_amount(self):
-        if self.wage_amount and self.component_amount:
+        if self.wage_amount != None and self.component_amount != None:
             return self.wage_amount + self.component_amount
         else:
             None

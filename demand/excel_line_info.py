@@ -1,4 +1,6 @@
-HEADER = 5  # HEADER는 load_data에서 처음으로 유효한 행의 인덱스를 알려준다.
+# HEADER는 load_data에서 처음으로 유효한 행의 인덱스를 알려준다. +2를 했을 때 excel의 line_number가된다.
+HEADER = 5
+
 
 RO_NUMBER = 2
 DAY_CAME_IN = 3
