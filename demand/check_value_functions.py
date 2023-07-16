@@ -13,6 +13,7 @@ def check_chargable_amount(obj, compared_value, expecting_value):
 
 
 def check_charge_amount(obj, compared_value, expecting_value):
+    expecting_value = expecting_value if expecting_value != None else 0
     if obj.charge:
         assert abs(expecting_value - compared_value) < 10
     else:

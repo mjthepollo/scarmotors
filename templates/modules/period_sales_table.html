@@ -1,4 +1,5 @@
 {% load humanize%}
+{% load custom_filters %}
 <table class="period_sales" border="1">
     <tr>
       <th colspan="2" rowspan="2">구분 (단위 : 1,000)</th>
@@ -13,57 +14,57 @@
       <th rowspan="7">매출</th>
       <th>보험</th>
       {% for monthly_sales in chunk %}
-        <td>{{monthly_sales.paid_insurance_sales|intcomma}}</td>
-        <td>{{monthly_sales.not_paid_insurance_sales|intcomma}}</td>
-        <td>{{monthly_sales.paid_insurance_sales|add:monthly_sales.not_paid_insurance_sales|intcomma}}</td>
+        <td>{{monthly_sales.paid_insurance_sales|thousand_format}}</td>
+        <td>{{monthly_sales.not_paid_insurance_sales|thousand_format}}</td>
+        <td>{{monthly_sales.paid_insurance_sales|add:monthly_sales.not_paid_insurance_sales|thousand_format}}</td>
       {% endfor %}
     </tr>
     <tr>
       <th>렌트일반</th>
       {% for monthly_sales in chunk %}
-      <td>{{monthly_sales.paid_general_rent|intcomma}}</td>
-      <td>{{monthly_sales.not_paid_general_rent|intcomma}}</td>
-      <td>{{monthly_sales.paid_general_rent|add:monthly_sales.not_paid_general_rent|intcomma}}</td>
+      <td>{{monthly_sales.paid_general_rent|thousand_format}}</td>
+      <td>{{monthly_sales.not_paid_general_rent|thousand_format}}</td>
+      <td>{{monthly_sales.paid_general_rent|add:monthly_sales.not_paid_general_rent|thousand_format}}</td>
     {% endfor %}
     </tr>
     <tr>
       <th>렌트판도</th>
       {% for monthly_sales in chunk %}
-      <td>{{monthly_sales.paid_rent_pando|intcomma}}</td>
-      <td>{{monthly_sales.not_paid_rent_pando|intcomma}}</td>
-      <td>{{monthly_sales.paid_rent_pando|add:monthly_sales.not_paid_rent_pando|intcomma}}</td>
+      <td>{{monthly_sales.paid_rent_pando|thousand_format}}</td>
+      <td>{{monthly_sales.not_paid_rent_pando|thousand_format}}</td>
+      <td>{{monthly_sales.paid_rent_pando|add:monthly_sales.not_paid_rent_pando|thousand_format}}</td>
     {% endfor %}
     </tr>
     <tr>
       <th>일반판도</th>
       {% for monthly_sales in chunk %}
-      <td>{{monthly_sales.paid_general_pando|intcomma}}</td>
-      <td>{{monthly_sales.not_paid_general_pando|intcomma}}</td>
-      <td>{{monthly_sales.paid_general_pando|add:monthly_sales.not_paid_general_pando|intcomma}}</td>
+      <td>{{monthly_sales.paid_general_pando|thousand_format}}</td>
+      <td>{{monthly_sales.not_paid_general_pando|thousand_format}}</td>
+      <td>{{monthly_sales.paid_general_pando|add:monthly_sales.not_paid_general_pando|thousand_format}}</td>
     {% endfor %}
     </tr>
     <tr>
       <th>일반경정비</th>
       {% for monthly_sales in chunk %}
-      <td>{{monthly_sales.paid_general_expense|intcomma}}</td>
-      <td>{{monthly_sales.not_paid_general_expense|intcomma}}</td>
-      <td>{{monthly_sales.paid_general_expense|add:monthly_sales.not_paid_general_expense|intcomma}}</td>
+      <td>{{monthly_sales.paid_general_expense|thousand_format}}</td>
+      <td>{{monthly_sales.not_paid_general_expense|thousand_format}}</td>
+      <td>{{monthly_sales.paid_general_expense|add:monthly_sales.not_paid_general_expense|thousand_format}}</td>
     {% endfor %}
     </tr>
     <tr>
       <th>인정매출</th>
       {% for monthly_sales in chunk %}
       <td class="disable"></td>
-      <td>{{monthly_sales.not_paid_recognized_sales|intcomma}}</td>
-      <td>{{monthly_sales.not_paid_recognized_sales|intcomma}}</td>
+      <td>{{monthly_sales.not_paid_recognized_sales|thousand_format}}</td>
+      <td>{{monthly_sales.not_paid_recognized_sales|thousand_format}}</td>
       {% endfor %}
     </tr>
     <tr>
       <th>계</th>
       {% for monthly_sales in chunk %}
-      <td>{{monthly_sales.whole_paid_turnover|intcomma}}</td>
-      <td>{{monthly_sales.whole_not_paid_turnover|intcomma}}</td>
-      <td>{{monthly_sales.whole_paid_turnover|add:monthly_sales.whole_not_paid_turnover|intcomma}}</td>
+      <td>{{monthly_sales.whole_paid_turnover|thousand_format}}</td>
+      <td>{{monthly_sales.whole_not_paid_turnover|thousand_format}}</td>
+      <td>{{monthly_sales.whole_paid_turnover|add:monthly_sales.whole_not_paid_turnover|thousand_format}}</td>
       {% endfor %}
     </tr>
     <tr>
@@ -71,7 +72,7 @@
       {% for monthly_sales in chunk %}
       <td class="disable"></td>
       <td class="disable"></td>
-      <td>{{monthly_sales.wage_turnover|intcomma}}</td>
+      <td>{{monthly_sales.wage_turnover|thousand_format}}</td>
       {% endfor %}
     </tr>
     <tr>
@@ -79,7 +80,7 @@
       {% for monthly_sales in chunk %}
       <td class="disable"></td>
       <td class="disable"></td>
-      <td>{{monthly_sales.component_turnover|intcomma}}</td>
+      <td>{{monthly_sales.component_turnover|thousand_format}}</td>
       {% endfor %}
     </tr>
   </table>

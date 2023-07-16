@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <canvas id="wage_sale_graph" style="width:400px;height:550px;"></canvas>
 <script>
 const wageSaleGrpah = document.getElementById('wage_sale_graph');
@@ -7,7 +8,7 @@ new Chart(wageSaleGrpah, {
       labels: [{% for monthly_sale in monthly_sales %}"{{monthly_sale.month}}월",{% endfor %}],
       datasets: [{
         label: '공임 매출',
-        data: [{% for monthly_sale in monthly_sales %}{{monthly_sale.wage_turnover}},{% endfor %}],
+        data: [{% for monthly_sale in monthly_sales %}{{monthly_sale.wage_turnover|per_thousand}},{% endfor %}],
         backgroundColor: "#800000",
         borderWidth: 1
       }]

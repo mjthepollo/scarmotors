@@ -72,7 +72,14 @@ class Sales(TimeStampedModel):
     def formatted_charge_amount(self):
         charge_amount = self.get_charge_amount()
         if charge_amount:
-            return format(charge_amount, ",")
+            return format(int(charge_amount), ",")
+        else:
+            return "-"
+
+    def formatted_chargable_amount(self):
+        chargable_amount = self.get_chargable_amount()
+        if chargable_amount:
+            return format(int(chargable_amount), ",")
         else:
             return "-"
 
@@ -92,7 +99,7 @@ class Sales(TimeStampedModel):
     def formatted_turnover(self):
         turnover = self.get_turnover()
         if turnover:
-            return format(turnover, ",")
+            return format(int(turnover), ",")
         else:
             return "-"
 
@@ -107,15 +114,15 @@ class Sales(TimeStampedModel):
 
 # region Sales Utility Functions
 
-    def get_chargable_amount(self):
+    def get_chargable_amount(self) -> float:
         """
-        청구 가능 금액을 반환한다. 청구객체가 없어서 반환이 불가능할시 None을 반환한다.
+        청구 가능 금액을 반환한다. 청구객체가 없어서 반환이 불가능할시 None을 반환한다. 형태는 항상 float
         """
         if self.charge:
             if isinstance(self, Order):
                 if self.fault_ratio:
-                    return round(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
-            return round(self.charge.get_repair_amount()*1.1)
+                    return float(self.charge.get_repair_amount()*1.1*self.fault_ratio/100)
+            return float(self.charge.get_repair_amount()*1.1)
         else:
             return None
 
@@ -125,15 +132,15 @@ class Sales(TimeStampedModel):
         else:
             return 0
 
-    def get_charge_amount(self):
+    def get_charge_amount(self) -> float:
         """
-        청구금을 반환한다. 청구객체가 없어서 반환이 불가능할시 None을 반환한다.
+        청구금을 반환한다. 청구객체가 없어서 반환이 불가능할시 None을 반환한다. 형태는 항상 float
         """
         if self.charge:
             refund_amount = zero_if_none(
                 self.payment.refund_amount if self.payment else 0)
-            charge_amount = self.get_chargable_amount() - self.get_indemnity_amount() + \
-                refund_amount
+            charge_amount = self.get_chargable_amount() - float(self.get_indemnity_amount()) + \
+                float(refund_amount)
             if charge_amount > 0:
                 return charge_amount
             else:
@@ -152,12 +159,12 @@ class Sales(TimeStampedModel):
 
     def get_attempted_amount(self):
         """
-        미수액을 반환한다. 미수액이란 청구는 됐으나 입금이 되지 않은 경우의 청구금액을 의미한다.
+        미수액을 반환한다. 미수액이란 청구는 됐으나 입금이 되지 않은 경우의 청구금액을 의미한다. 형태는 항상 float
         """
         if not self.deposit:
             return self.get_charge_amount()
         else:
-            return 0
+            return float(0)
 
     def get_payment_rate_for_input(self):
         """
@@ -186,9 +193,9 @@ class Sales(TimeStampedModel):
 
     def get_net_payment_sales(self):
         """
-        Preiod Sales
+        Preiod Sales. 형태는 float
         """
-        return int(self.get_net_payment()/1.1)
+        return self.get_net_payment()/1.1
 
     def get_payment_rate(self):
         """
@@ -221,38 +228,38 @@ class Sales(TimeStampedModel):
         else:
             return 0
 
-    def get_turnover(self):
+    def get_turnover(self) -> int:
         deposit_amount = self.deposit.deposit_amount if self.deposit else 0
         return deposit_amount+self.get_net_payment()
 
     def get_factory_turnover(self):
-        return int(self.get_turnover()/1.1)
+        return float(self.get_turnover()/1.1)
 
-    def get_paid_turnover(self):
-        return self.get_factory_turnover() if self.get_factory_turnover() > 0 else 0
+    def get_paid_turnover(self) -> float:
+        return self.get_factory_turnover() if self.get_factory_turnover() > float(0) else float(0)
 
-    def get_not_paid_turnover(self):
+    def get_not_paid_turnover(self) -> float:
         if self.charge:
             if not self.deposit:
-                return round(self.get_charge_amount()/1.1*0.95)
+                return self.get_charge_amount()/1.1*0.95
             else:
                 return 0.0
         else:
             return 0.0
 
-    def get_integrated_turnover(self):
+    def get_integrated_turnover(self) -> float:
         return self.get_not_paid_turnover()+self.get_paid_turnover()
 
-    def get_component_turnover(self):
+    def get_component_turnover(self) -> float:
         if self.charge:
             if self.charge.component_amount:
                 if isinstance(self, Order):
                     if self.fault_ratio:
-                        return int(self.fault_ratio*self.charge.component_amount/100)
+                        return float(self.fault_ratio*self.charge.component_amount/100)
                 return self.charge.component_amount
         return 0
 
-    def get_wage_turnover(self):
+    def get_wage_turnover(self) -> float:
         return self.get_integrated_turnover() - self.get_component_turnover()
 
     def check_no_came_out(self):
@@ -491,6 +498,7 @@ class Register(TimeStampedModel):
 
 # region FOR HTML FUNCTIONS
 
+
     def get_status(self):
         orders = self.all_orders
         all_completed = True
@@ -718,6 +726,12 @@ class RecognizedSales(TimeStampedModel):
 
     def get_not_paid_turnover(self):
         return self.get_repair_amount() if self.get_repair_amount() else 0
+
+    def get_wage_turnover(self):
+        return self.wage_amount if self.wage_amount else 0
+
+    def get_component_turnover(self):
+        return self.component_amount if self.component_amount else 0
 
     def __str__(self):
         return f"[{self.car_number}] {self.real_day_came_out.strftime('%Y/%m/%d')} 출고"

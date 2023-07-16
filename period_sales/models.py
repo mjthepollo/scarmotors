@@ -164,6 +164,9 @@ class PeriodSales(TimeStampedModel):
             component_turnover += order.get_component_turnover()
             charge_amount += order.get_charge_amount()
             deposit_amount += order.get_deposit_amount()
+            if order.get_deposit_amount() != 0:
+                print_colored(
+                    f"ORDER: {str(order)}, {order.get_deposit_amount()}", "magenta")
             attempted_amount += order.get_attempted_amount()
             net_payment_sales += order.get_net_payment_sales()
 
@@ -179,21 +182,23 @@ class PeriodSales(TimeStampedModel):
 
         for recognized_sales in all_recognized_sales:
             not_paid_recognized_sales += recognized_sales.get_not_paid_turnover()
+            wage_turnover += recognized_sales.get_wage_turnover()
+            component_turnover += recognized_sales.get_component_turnover()
 
         return {
-            "paid_insurance_sales": int(paid_insurance_sales/1000),
-            "paid_general_rent": int(paid_general_rent/1000),
-            "paid_rent_pando": int(paid_rent_pando/1000),
-            "paid_general_pando": int(paid_general_pando/1000),
-            "paid_general_expense": int(paid_general_expense/1000),
-            "not_paid_insurance_sales": int(not_paid_insurance_sales/1000),
-            "not_paid_general_rent": int(not_paid_general_rent/1000),
-            "not_paid_rent_pando": int(not_paid_rent_pando/1000),
-            "not_paid_general_pando": int(not_paid_general_pando/1000),
-            "not_paid_general_expense": int(not_paid_general_expense/1000),
-            "not_paid_recognized_sales": int(not_paid_recognized_sales/1000),
-            "wage_turnover": int(wage_turnover/1000),
-            "component_turnover": int(component_turnover/1000),
+            "paid_insurance_sales": paid_insurance_sales,
+            "paid_general_rent": paid_general_rent,
+            "paid_rent_pando": paid_rent_pando,
+            "paid_general_pando": paid_general_pando,
+            "paid_general_expense": paid_general_expense,
+            "not_paid_insurance_sales": not_paid_insurance_sales,
+            "not_paid_general_rent": not_paid_general_rent,
+            "not_paid_rent_pando": not_paid_rent_pando,
+            "not_paid_general_pando": not_paid_general_pando,
+            "not_paid_general_expense": not_paid_general_expense,
+            "not_paid_recognized_sales": not_paid_recognized_sales,
+            "wage_turnover": wage_turnover,
+            "component_turnover": component_turnover,
 
             "number_of_domestic_samsung_insurances": number_of_domestic_samsung_insurances,
             "number_of_domestic_dongbu_insurances": number_of_domestic_dongbu_insurances,
@@ -207,15 +212,15 @@ class PeriodSales(TimeStampedModel):
             "number_of_abroad_etc_insurances": number_of_abroad_etc_insurances,
             "number_of_abroad_rent": number_of_abroad_rent,
 
-            "charge_amount": int(charge_amount/1000),
-            "deposit_amount": int(deposit_amount/1000),
-            "attempted_amount": int(attempted_amount/1000),
-            "net_payment_sales": int(net_payment_sales/1000),
+            "charge_amount": charge_amount,
+            "deposit_amount": deposit_amount,
+            "attempted_amount": attempted_amount,
+            "net_payment_sales": net_payment_sales,
         }
 
     @property
     def rate_of_attempt(self):
-        return int(self.attempted_amount / self.whole_turnover * 100)
+        return self.attempted_amount / self.whole_turnover * 100
 
     @property
     def whole_not_paid_turnover(self):

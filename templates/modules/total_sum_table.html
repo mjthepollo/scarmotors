@@ -11,57 +11,57 @@
     </tr>
     <tr>
       <th>보험</th>
-      <td>{{net_paid_insurance_sales|intcomma}}</td>
-      <td>{{net_not_paid_insurance_sales|intcomma}}</td>
-      <td>{{net_paid_insurance_sales|add:net_not_paid_insurance_sales|intcomma}}</td>
+      <td>{{net_paid_insurance_sales|thousand_format}}</td>
+      <td>{{net_not_paid_insurance_sales|thousand_format}}</td>
+      <td>{{net_paid_insurance_sales|add:net_not_paid_insurance_sales|thousand_format}}</td>
     </tr>
     <tr>
       <th>렌트일반</th>
-      <td>{{net_paid_general_rent|intcomma}}</td>
-      <td>{{net_not_paid_general_rent|intcomma}}</td>
-      <td>{{net_paid_general_rent|add:net_not_paid_general_rent|intcomma}}</td>
+      <td>{{net_paid_general_rent|thousand_format}}</td>
+      <td>{{net_not_paid_general_rent|thousand_format}}</td>
+      <td>{{net_paid_general_rent|add:net_not_paid_general_rent|thousand_format}}</td>
     </tr>
     <tr>
       <th>렌트판도</th>
-      <td>{{net_paid_rent_pando|intcomma}}</td>
-      <td>{{net_not_paid_rent_pando|intcomma}}</td>
-      <td>{{net_paid_rent_pando|add:net_not_paid_rent_pando|intcomma}}</td>
+      <td>{{net_paid_rent_pando|thousand_format}}</td>
+      <td>{{net_not_paid_rent_pando|thousand_format}}</td>
+      <td>{{net_paid_rent_pando|add:net_not_paid_rent_pando|thousand_format}}</td>
     </tr>
     <tr>
       <th>일반판도</th>
-      <td>{{net_paid_general_pando|intcomma}}</td>
-      <td>{{net_not_paid_general_pando|intcomma}}</td>
-      <td>{{net_paid_general_pando|add:net_not_paid_general_pando|intcomma}}</td>
+      <td>{{net_paid_general_pando|thousand_format}}</td>
+      <td>{{net_not_paid_general_pando|thousand_format}}</td>
+      <td>{{net_paid_general_pando|add:net_not_paid_general_pando|thousand_format}}</td>
     </tr>
     <tr>
       <th>일반경정비</th>
-      <td>{{net_paid_general_expense|intcomma}}</td>
-      <td>{{net_not_paid_general_expense|intcomma}}</td>
-      <td>{{net_paid_general_expense|add:net_not_paid_general_expense|intcomma}}</td>
+      <td>{{net_paid_general_expense|thousand_format}}</td>
+      <td>{{net_not_paid_general_expense|thousand_format}}</td>
+      <td>{{net_paid_general_expense|add:net_not_paid_general_expense|thousand_format}}</td>
     </tr>
     <tr>
       <th>인정매출</th>
       <td class="disable"></td>
-      <td>{{net_not_paid_recognized_sales|intcomma}}</td>
-      <td>{{net_not_paid_recognized_sales|intcomma}}</td>
+      <td>{{net_not_paid_recognized_sales|thousand_format}}</td>
+      <td>{{net_not_paid_recognized_sales|thousand_format}}</td>
     </tr>
     <tr>
       <th>계</th>
-      <td>{{net_whole_paid_turnover|intcomma}}</td>
-      <td>{{net_whole_not_paid_turnover|intcomma}}</td>
-      <td>{{net_whole_turnover|intcomma}}</td>
+      <td>{{net_whole_paid_turnover|thousand_format}}</td>
+      <td>{{net_whole_not_paid_turnover|thousand_format}}</td>
+      <td>{{net_whole_turnover|thousand_format}}</td>
     </tr>
     <tr>
       <th>공임매출</th>
       <td class="disable"></td>
       <td class="disable"></td>
-      <td>{{net_wage_turnover|intcomma}}</td>
+      <td>{{net_wage_turnover|thousand_format}}</td>
     </tr>
     <tr>
       <th>부품매출</th>
       <td class="disable"></td>
       <td class="disable"></td>
-      <td>{{net_component_turnover|intcomma}}</td>
+      <td>{{net_component_turnover|thousand_format}}</td>
     </tr>
   </table>
   <table class="insurance" border="1">
@@ -119,13 +119,13 @@
     </tr>
     <tr>
       <th>금액</th>
-      <td>{{net_charge_amount|intcomma}}</td>
-      <td>{{net_deposit_amount|intcomma}}</td>
-      <td>{{net_attempted_amount|intcomma}}</td>
+      <td>{{net_charge_amount|thousand_format}}</td>
+      <td>{{net_deposit_amount|thousand_format}}</td>
+      <td>{{net_attempted_amount|thousand_format}}</td>
     </tr>
     <tr>
       <th>면책금</th>
-      <td>{{net_net_payment_sales|intcomma}}</td>
+      <td>{{net_net_payment_sales|thousand_format}}</td>
       <th>미수율</th>
       <td>{{net_attempted_amount|get_percent:net_charge_amount}}</td>
     </tr>

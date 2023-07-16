@@ -9,15 +9,15 @@
     <tr>
       <th colspan="2">금액</th>
       {% for monthly_sales in chunk %}
-      <td>{{monthly_sales.charge_amount|intcomma}}</td>
-      <td>{{monthly_sales.deposit_amount|intcomma}}</td>
-      <td>{{monthly_sales.attempted_amount|intcomma}}</td>
+      <td>{{monthly_sales.charge_amount|thousand_format}}</td>
+      <td>{{monthly_sales.deposit_amount|thousand_format}}</td>
+      <td>{{monthly_sales.attempted_amount|thousand_format}}</td>
     {% endfor %}
     </tr>
     <tr>
       <th colspan="2">면책금</th>
       {% for monthly_sales in chunk %}
-      <td>{{monthly_sales.net_payment_sales|intcomma}}</td>
+      <td>{{monthly_sales.net_payment_sales|thousand_format}}</td>
       <th>미수율</th>
       <td>{{monthly_sales.attempted_amount|get_percent:monthly_sales.charge_amount}}</td>
     {% endfor %}

@@ -36,14 +36,14 @@ def per_thousand(value):
 
 
 @register.filter
-def thousnad_format(value):
+def thousand_format(value):
     return format(int(value/1000), ',')
 
 
 @register.filter
 def get_percent(value, dividor):
     try:
-        return f"{int(value/dividor*100)}%"
+        return f"{format(value/dividor, '10.2%')}"
     except ZeroDivisionError:
         return "-%"
 
