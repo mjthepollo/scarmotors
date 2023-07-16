@@ -53,8 +53,10 @@
             {% if not incentive_form.instance.incentive_paid %}
             {{incentive_form.incentive_paid}}{{incentive_form.id}}
             {% else %}
+            {% if user.editable %}
             {{incentive_form.instance.get_incentive_paid_month_display}}
             <div class="hidden">{{incentive_form.incentive_paid}}{{incentive_form.id}}</div>
+            {% else %}-{% endif %}
             {% endif %}
         </td>
         <td>{{order.register.supporter}}</td>
