@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 
 from core.forms import DetailableModelForm
 from core.utility import insert_tag
+from demand.key_models import InsuranceAgent, RequestDepartment, Supporter
 from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
 
 
@@ -35,6 +36,11 @@ class EditSpecialRegisterForm(DetailableModelForm):
 
 
 class NewRegisterForm(DetailableModelForm):
+    supporter = forms.ModelChoiceField(
+        queryset=Supporter.objects.filter(active=True), label="입고지원")
+    insurance_agent = forms.ModelChoiceField(
+        queryset=InsuranceAgent.objects.filter(active=True), label="보험 담당자")
+
     class Meta:
         model = Register
         fields = ["car_number", "day_came_in", "expected_day_came_out",
@@ -72,6 +78,11 @@ class RegisterNoteForm(DetailableModelForm):
 
 
 class EditRegisterForm(DetailableModelForm):
+    supporter = forms.ModelChoiceField(
+        queryset=Supporter.objects.filter(active=True), label="입고지원")
+    insurance_agent = forms.ModelChoiceField(
+        queryset=InsuranceAgent.objects.filter(active=True), label="보험 담당자")
+
     class Meta:
         model = Register
         fields = ["car_number", "day_came_in", "expected_day_came_out", "real_day_came_out",
@@ -93,6 +104,9 @@ class EditRegisterForm(DetailableModelForm):
 
 class OrderForm(DetailableModelForm):
     template_name = "demand/forms/deletable_order_form.html"
+
+    charged_company = forms.ModelChoiceField(
+        queryset=RequestDepartment.objects.filter(active=True), label="보험(렌트)")
 
     class Meta:
         model = Order
@@ -117,6 +131,11 @@ class IncentiveForm(DetailableModelForm):
 
 
 class ExtraSalesForm(DetailableModelForm):
+    supporter = forms.ModelChoiceField(
+        queryset=Supporter.objects.filter(active=True), label="입고지원")
+    insurance_agent = forms.ModelChoiceField(
+        queryset=InsuranceAgent.objects.filter(active=True), label="보험 담당자")
+
     class Meta:
         model = ExtraSales
         fields = ["day_came_in", "expected_day_came_out", "real_day_came_out",
@@ -144,6 +163,9 @@ class ExtraSalesRealDayCameOutForm(DetailableModelForm):
 
 
 class RecognizedSalesForm(DetailableModelForm):
+    request_department = forms.ModelChoiceField(
+        queryset=RequestDepartment.objects.filter(active=True), label="요청부서")
+
     class Meta:
         model = RecognizedSales
         fields = ["day_came_in", "real_day_came_out",

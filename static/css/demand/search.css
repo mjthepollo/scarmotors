@@ -35,6 +35,11 @@ main.container {
   margin-left: 20px;
 }
 
+input,
+select {
+  width: 180px;
+}
+
 input[type="submit"] {
   height: auto;
 }

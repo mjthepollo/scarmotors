@@ -10,13 +10,32 @@
   margin-top: 40px;
 }
 
-#incentive_filter input,
+#incentive_filter input[type="date"],
 #incentive_filter select {
   width: 130px;
 }
+#incentive_filter input {
+  width: 80px;
+}
+
+#incentive_filter select[name="incentive_paid"] {
+  width: 50px;
+}
+
+#incentive_filter > div > label {
+  display: flex;
+  justify-content: center;
+
+  margin-right: 0px;
+}
 
 #incentive_filter > div {
-  width: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0px 5px;
 }
 
 #incentive_search_form label {

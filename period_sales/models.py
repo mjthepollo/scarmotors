@@ -164,9 +164,6 @@ class PeriodSales(TimeStampedModel):
             component_turnover += order.get_component_turnover()
             charge_amount += order.get_charge_amount()
             deposit_amount += order.get_deposit_amount()
-            if order.get_deposit_amount() != 0:
-                print_colored(
-                    f"ORDER: {str(order)}, {order.get_deposit_amount()}", "magenta")
             attempted_amount += order.get_attempted_amount()
             net_payment_sales += order.get_net_payment_sales()
 

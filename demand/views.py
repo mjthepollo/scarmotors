@@ -363,6 +363,7 @@ def incentive(request):
         return redirect(reverse("demand:incentive")+f"?day_came_in__gt={date.today().replace(day=1)}&day_came_in__ls={date.today()}")
     incentive_filter = IncentiveFilter(
         request.GET, queryset=Order.objects.all())
+    incentive_filter.form.label_suffix = ""
     if request.GET.get("register__supporter", None):
         orders = incentive_filter.qs
     else:

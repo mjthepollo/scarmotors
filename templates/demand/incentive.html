@@ -44,6 +44,7 @@
         <th>과실</th>
         <th>타입</th>
         <th>공임매출</th>
+        <th>입금</th>
     </tr>
     {% for incentive_form in incentive_formset %}
     {% with incentive_form.instance as order %}
@@ -74,6 +75,7 @@
         <td>{{order.fault_ratio}}</td>
         <td>{{order.order_type|none_to_dash}}</td>
         <td>{{order.formatted_wage_turnover}}</td>
+        <td class="order {{order.get_deposit_class}}">입금</td>
     </tr>
     {% endwith %}
     {% endfor %}

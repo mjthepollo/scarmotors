@@ -23,8 +23,8 @@ class Supporter(TimeStampedModel):
 class ChargedCompany(TimeStampedModel):
     class Meta:
         ordering = ["name",]
-        verbose_name = "보험회사"
-        verbose_name_plural = "보험회사(들)"
+        verbose_name = "보험사"
+        verbose_name_plural = "보험사(들)"
     name = models.CharField(max_length=100, verbose_name="보험(렌트)")
     active = models.BooleanField(default=True, verbose_name="활성화")
 

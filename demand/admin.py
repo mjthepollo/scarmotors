@@ -7,9 +7,20 @@ from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
 
 @admin.register(Supporter)
 class SupporterAdmin(admin.ModelAdmin):
+
+    admin
     list_display = ["name", "active"]
     list_filter = ["active"]
     search_fields = ["name"]
+    actions = ["make_active", "make_inactive",]
+
+    @admin.action(description=f"선택한 {Supporter._meta.verbose_name_plural}을 비활성화합니다.")
+    def make_inactive(modeladmin, request, queryset):
+        queryset.update(active=False)
+
+    @admin.action(description=f"선택한 {Supporter._meta.verbose_name_plural}을 활성화합니다.")
+    def make_active(modeladmin, request, queryset):
+        queryset.update(active=True)
 
 
 @admin.register(ChargedCompany)
@@ -18,12 +29,32 @@ class ChargedCompanyAdmin(admin.ModelAdmin):
     list_filter = ["active"]
     search_fields = ["name"]
 
+    actions = ["make_active", "make_inactive",]
+
+    @admin.action(description=f"선택한 {ChargedCompany._meta.verbose_name_plural}을 비활성화합니다.")
+    def make_inactive(modeladmin, request, queryset):
+        queryset.update(active=False)
+
+    @admin.action(description=f"선택한 {ChargedCompany._meta.verbose_name_plural}을 활성화합니다.")
+    def make_active(modeladmin, request, queryset):
+        queryset.update(active=True)
+
 
 @admin.register(InsuranceAgent)
 class InsuranceAgentAdmin(admin.ModelAdmin):
     list_display = ["name", "active"]
     list_filter = ["active"]
     search_fields = ["name"]
+
+    actions = ["make_active", "make_inactive",]
+
+    @admin.action(description=f"선택한 {InsuranceAgent._meta.verbose_name_plural}을 비활성화합니다.")
+    def make_inactive(modeladmin, request, queryset):
+        queryset.update(active=False)
+
+    @admin.action(description=f"선택한 {InsuranceAgent._meta.verbose_name_plural}을 활성화합니다.")
+    def make_active(modeladmin, request, queryset):
+        queryset.update(active=True)
 
 
 @admin.register(Payment)
@@ -79,3 +110,13 @@ class RequestDepartmentAdmin(admin.ModelAdmin):
     list_display = ["name", "active"]
     list_filter = ["active"]
     search_fields = ["name"]
+
+    actions = ["make_active", "make_inactive",]
+
+    @admin.action(description=f"선택한 {RequestDepartment._meta.verbose_name_plural}을 비활성화합니다.")
+    def make_inactive(modeladmin, request, queryset):
+        queryset.update(active=False)
+
+    @admin.action(description=f"선택한 {RequestDepartment._meta.verbose_name_plural}을 활성화합니다.")
+    def make_active(modeladmin, request, queryset):
+        queryset.update(active=True)

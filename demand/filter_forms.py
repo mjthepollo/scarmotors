@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django_filters.widgets import BooleanWidget
 
-from demand.key_models import Supporter
+from demand.key_models import ChargedCompany, InsuranceAgent, Supporter
 from demand.sales_models import Order, Register
 
 
@@ -30,7 +30,12 @@ class RegisterFilter(django_filters.FilterSet):
     car_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='car_number', lookup_expr='icontains', label="차량번호")
-
+    insurance_agent = django_filters.ModelChoiceFilter(
+        field_name='insurance_agent', queryset=InsuranceAgent.objects.filter(active=True),
+        label="보험 담당자")
+    supporter = django_filters.ModelChoiceFilter(
+        field_name='supporter', queryset=Supporter.objects.filter(active=True),
+        label="입고지원")
     day_came_in__gt = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
         field_name='day_came_in', lookup_expr='gt', label="입고일(부터)")
@@ -58,15 +63,19 @@ class RegisterFilter(django_filters.FilterSet):
 
     class Meta:
         model = Register
-        fields = ["RO_number", "car_number",
-                  "supporter", "client_name", "insurance_agent"]
+        fields = ["RO_number", "car_number", "client_name"]
 
 
 class RegisterFilterForOrderFilter(django_filters.FilterSet):
     car_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='car_number', lookup_expr='icontains', label="차량번호")
-
+    insurance_agent = django_filters.ModelChoiceFilter(
+        field_name='insurance_agent', queryset=InsuranceAgent.objects.filter(active=True),
+        label="보험 담당자")
+    supporter = django_filters.ModelChoiceFilter(
+        field_name='supporter', queryset=Supporter.objects.filter(active=True),
+        label="입고지원")
     day_came_in__gt = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
         field_name='day_came_in', lookup_expr='gt', label="입고일(부터)")
@@ -91,11 +100,13 @@ class RegisterFilterForOrderFilter(django_filters.FilterSet):
 
     class Meta:
         model = Register
-        fields = ["car_number", "supporter",
-                  "client_name", "insurance_agent", "note"]
+        fields = []
 
 
 class OrderFilter(django_filters.FilterSet):
+    charged_company = django_filters.ModelChoiceFilter(
+        field_name='charged_company', queryset=ChargedCompany.objects.filter(active=True),
+        label="보험사")
     receipt_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='receipt_number', lookup_expr='icontains', label="접수번호")
@@ -105,7 +116,7 @@ class OrderFilter(django_filters.FilterSet):
 
     class Meta:
         model = Order
-        fields = ["charged_company", "charge_type", "order_type"]
+        fields = ["charge_type", "order_type"]
 
 
 INCENTIVE_FILTER_CHOICES = (
@@ -117,8 +128,12 @@ INCENTIVE_FILTER_CHOICES = (
 
 
 class IncentiveFilter(django_filters.FilterSet):
+    register__car_number = django_filters.CharFilter(
+        widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
+        field_name='register__car_number', lookup_expr='icontains', label="차량 번호"
+    )
     register__supporter = django_filters.ModelChoiceFilter(
-        queryset=Supporter.objects.all(), label="업체명")
+        queryset=Supporter.objects.filter(active=True), label="업체명")
     incentive_paid = django_filters.BooleanFilter(
         field_name='incentive_paid', label="지급여부",
         widget=OXBooleanWidget())
@@ -130,5 +145,7 @@ class IncentiveFilter(django_filters.FilterSet):
         field_name='register__day_came_in', lookup_expr='lt', label="입고일(까지)")
 
     class Meta:
+        label_suffix = ""
         model = Order
-        fields = ["register__supporter", 'incentive_paid']
+        fields = ["register__car_number",
+                  "register__supporter", 'incentive_paid']
