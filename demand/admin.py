@@ -90,8 +90,7 @@ class InsuranceAgentAdmin(admin.ModelAdmin):
 @admin.register(Register)
 class RegisterAdmin(admin.ModelAdmin):
     list_display = ["RO_number", "car_number", "insurance_agent"]
-    list_filter = ["day_came_in", "expected_day_came_out",
-                   "real_day_came_out", "phone_number"]
+    list_filter = ["day_came_in", "expected_day_came_out", "real_day_came_out"]
     search_fields = ["RO_number", "insurance_agent"]
 
 
