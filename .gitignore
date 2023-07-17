@@ -5,6 +5,7 @@
 #Except basicResource!
 src/
 *.xlsx
+*.log
 
 db.sqlite3
 

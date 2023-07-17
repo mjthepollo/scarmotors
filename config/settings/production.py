@@ -10,7 +10,7 @@ from config.settings.base import env
 ALLOWED_HOSTS = ["www.scartech.site", "scartech.site",
                  "azurewebsites.net", "20.196.198.30"]
 
-CSRF_TRUSTED_ORIGINS = ["scartech.site", "www.scartech.site"]
+CSRF_TRUSTED_ORIGINS = ["https://scartech.site", "https://www.scartech.site"]
 
 # LOGGING
 # ------------------------------------------------------------------------------
