@@ -1,1 +1,1 @@
-ssh -i ../scar-key.pem scar@20.196.194.192
+ssh -i ../scarmotors_key.pem scar@20.196.198.30
