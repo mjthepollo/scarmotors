@@ -127,6 +127,7 @@ class IncentiveAdmin(admin.ModelAdmin):
     list_display = ["register_RO_number", "register_car_number",
                     "incentive_paid", "incentive_paid_date"]
     search_fields = ["register__RO_number", "register__car_number"]
+    list_filter = ["incentive_paid"]
 
     def register_RO_number(self, obj):
         return obj.register.RO_number if obj.register else None
