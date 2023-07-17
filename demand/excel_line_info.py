@@ -1,4 +1,6 @@
 # HEADER는 load_data에서 처음으로 유효한 행의 인덱스를 알려준다. +2를 했을 때 excel의 line_number가된다.
+from demand.utility import zero_if_none, zero_if_not_number
+
 HEADER = 5
 
 
@@ -168,69 +170,78 @@ def order_to_excel_dictionary(order):
         register = order.register
         RO_number = register.RO_number or "NO-RO"
         day_came_in = register.day_came_in.strftime(
-            "%Y-%m-%d") if register.day_came_in else ""
+            "%Y-%m-%d") if register.day_came_in else "-"
         expected_day_came_out = register.expected_day_came_out.strftime(
-            "%Y-%m-%d") if register.expected_day_came_out else ""
+            "%Y-%m-%d") if register.expected_day_came_out else "-"
         real_day_came_out = register.real_day_came_out.strftime(
-            "%Y-%m-%d") if register.real_day_came_out else ""
-        days_needed_to_fix = register.get_work_days()
-        car_number = register.car_number or ""
-        car_model = register.car_model or ""
-        abroad_type = register.abroad_type or ""
+            "%Y-%m-%d") if register.real_day_came_out else "-"
+        days_needed_to_fix = zero_if_none(register.get_work_days())
+        car_number = register.car_number or "-"
+        car_model = register.car_model or "-"
+        abroad_type = register.abroad_type or "-"
         number_of_repair_works = register.number_of_repair_works or 0
         number_of_exchange_works = register.number_of_exchange_works or 0
         number_of_works = number_of_repair_works + number_of_exchange_works
-        supporter = register.supporter.name if register.supporter else ""
-        client_name = register.client_name or ""
-        insurance_agent = register.insurance_agent.name if register.insurance_agent else ""
-        rentcar_company_name = register.rentcar_company_name or ""
-        phone_number = register.phone_number or ""
-        register_note = register.note or ""
+        supporter = register.supporter.name if register.supporter else "-"
+        client_name = register.client_name or "-"
+        insurance_agent = register.insurance_agent.name if register.insurance_agent else "-"
+        rentcar_company_name = register.rentcar_company_name or "-"
+        phone_number = register.phone_number or "-"
+        register_note = register.note or "-"
     else:
         (RO_number, day_came_in, expected_day_came_out,
             real_day_came_out, days_needed_to_fix, car_number, car_model, abroad_type,
             number_of_repair_works, number_of_exchange_works,
             number_of_works, supporter, client_name, insurance_agent, rentcar_company_name, phone_number, register_note) = [""] * 16
-    charge_type = order.charge_type or ""
-    charged_company = order.charged_company.name if order.charged_company else ""
-    order_type = order.order_type or ""
-    receipt_number = order.receipt_number or ""
-    fault_ratio = order.fault_ratio or 0
-    charge_month = order.charge.charge_date.month if order.charge else ""
-    charge_date = order.charge.charge_date.strftime(
-        "%Y-%m-%d") if order.charge else ""
+    charge_type = order.charge_type or "-"
+    charged_company = order.charged_company.name if order.charged_company else "-"
+    order_type = order.order_type or "-"
+    receipt_number = order.receipt_number or "-"
+    fault_ratio = order.fault_ratio or "-"
+    charge_date = order.charge.charge_date if order.charge else None
+    charge_month = charge_date.month if charge_date else "-"
+    charge_date = charge_date.strftime(
+        "%Y-%m-%d") if charge_date else "-"
     wage_amount = order.charge.wage_amount if order.charge else 0
+    wage_amount = zero_if_none(wage_amount)
     component_amount = order.charge.component_amount if order.charge else 0
+    component_amount = zero_if_none(component_amount)
     repair_amount = wage_amount + component_amount
     vat_amouunt = int(repair_amount/10)
     chargable_amount = int(order.get_chargable_amount()
                            ) if order.get_chargable_amount() else 0
-    indemnity_amount = order.get_indemnity_amount()
-    discount_amount = order.payment.discount_amount if order.payment else 0
-    refund_amount = order.payment.refund_amount if order.payment else 0
-    payment_type = order.payment.payment_type if order.payment else ""
-    payment_info = order.payment.payment_info if order.payment else ""
-    payment_date = order.payment.payment_date.strftime(
-        "%Y-%m-%d") if order.payment and order.payment.payment_date else ""
-    charge_amount = order.get_charge_amount()
-    deposit_month = order.deposit.deposit_date.month if order.deposit else ""
-    deposit_date = order.deposit.deposit_date.strftime(
-        "%Y-%m-%d") if order.deposit else ""
+    indemnity_amount = zero_if_none(order.get_indemnity_amount())
+    payment = order.payment
+    discount_amount = payment.discount_amount if payment else 0
+    discount_amount = zero_if_none(discount_amount)
+    refund_amount = order.payment.refund_amount if payment else 0
+    refund_amount = zero_if_none(refund_amount)
+    payment_type = payment.payment_type if payment else "-"
+    payment_type = payment_type or "-"
+    payment_info = payment.payment_info if payment else "-"
+    payment_info = payment_info or "-"
+    payment_date = payment.payment_date if payment else None
+    payment_date = payment_date.strftime("%Y-%m-%d") if payment_date else "-"
+    charge_amount = int(zero_if_none(order.get_charge_amount()))
+    deposit_date = order.deposit.deposit_date if order.deposit else None
+    deposit_month = deposit_date.month if deposit_date else "-"
+    deposit_date = deposit_date.strftime(
+        "%Y-%m-%d") if deposit_date else "-"
     deposit_amount = order.deposit.deposit_amount if order.deposit else 0
+    deposit_amount = zero_if_none(deposit_amount)
     payment_rate = int(order.get_payment_rate() *
-                       100) if order.get_payment_rate() else "계산불가능"
+                       100) if order.get_payment_rate() else "-"
     not_paid_amount = int(order.get_not_paid_amount())
     not_paid_rate = int(100 - order.get_payment_rate() *
-                        100) if order.get_payment_rate() else "계산불가능"
-    turnover = order.get_turnover()
+                        100) if order.get_payment_rate() else "-"
+    turnover = int(zero_if_none(order.get_turnover()))
     turnover_vat = int(turnover*10/11)
-    factory_turnover = order.get_factory_turnover()
-    note = register_note + (order.note or "-")
-    paid_turnover = order.get_paid_turnover()
-    not_paid_turnover = int(order.get_not_paid_turnover())
-    integrated_turnover = int(order.get_integrated_turnover())
-    wage_turnover = int(order.get_wage_turnover())
-    component_turnover = int(order.get_component_turnover())
+    factory_turnover = int(zero_if_none(order.get_factory_turnover()))
+    paid_turnover = int(zero_if_none(order.get_paid_turnover()))
+    not_paid_turnover = int(zero_if_none(order.get_not_paid_turnover()))
+    integrated_turnover = int(zero_if_none(order.get_integrated_turnover()))
+    wage_turnover = int(zero_if_none(order.get_wage_turnover()))
+    component_turnover = int(zero_if_none(order.get_component_turnover()))
     status = order.status
     return {
         "RO_number": RO_number,
@@ -261,7 +272,7 @@ def order_to_excel_dictionary(order):
         "repair_amount": repair_amount,
         "vat_amouunt": vat_amouunt,
         "chargable_amount": chargable_amount,
-        "estimate_amount": None,
+        "estimate_amount": "-",
         "indemnity_amount": indemnity_amount,
         "discount_amount": discount_amount,
         "refund_amount": refund_amount,
@@ -278,7 +289,7 @@ def order_to_excel_dictionary(order):
         "turnover": turnover,
         "turnover_vat": turnover_vat,
         "factory_turnover": factory_turnover,
-        "note": note,
+        "note": register_note,
         "paid_turnover": paid_turnover,
         "not_paid_turnover": not_paid_turnover,
         "integrated_turnover": integrated_turnover,
@@ -291,64 +302,77 @@ def order_to_excel_dictionary(order):
 def extra_sales_to_excel_dictionary(extra_sales):
     RO_number = f"기타매출{extra_sales.pk}"
     day_came_in = extra_sales.day_came_in.strftime(
-        "%Y-%m-%d") if extra_sales.day_came_in else ""
+        "%Y-%m-%d") if extra_sales.day_came_in else "-"
     expected_day_came_out = extra_sales.expected_day_came_out.strftime(
-        "%Y-%m-%d") if extra_sales.expected_day_came_out else ""
+        "%Y-%m-%d") if extra_sales.expected_day_came_out else "-"
     real_day_came_out = extra_sales.real_day_came_out.strftime(
-        "%Y-%m-%d") if extra_sales.real_day_came_out else ""
+        "%Y-%m-%d") if extra_sales.real_day_came_out else "-"
     days_needed_to_fix = (
-        real_day_came_out-day_came_in).days if real_day_came_out and day_came_in else ""
-    car_number = extra_sales.car_number or ""
-    car_model = extra_sales.car_model or ""
-    abroad_type = extra_sales.abroad_type or ""
+        real_day_came_out-day_came_in).days if real_day_came_out and day_came_in else "-"
+    car_number = extra_sales.car_number or "-"
+    car_model = extra_sales.car_model or "-"
+    abroad_type = extra_sales.abroad_type or "-"
     number_of_repair_works = extra_sales.number_of_repair_works or 0
     number_of_exchange_works = extra_sales.number_of_exchange_works or 0
     number_of_works = number_of_repair_works + number_of_exchange_works
-    supporter = extra_sales.supporter.name if extra_sales.supporter else ""
-    client_name = extra_sales.client_name or ""
-    insurance_agent = extra_sales.insurance_agent.name if extra_sales.insurance_agent else ""
-    rentcar_company_name = extra_sales.rentcar_company_name or ""
-    phone_number = extra_sales.phone_number or ""
+    supporter = extra_sales.supporter.name if extra_sales.supporter else "-"
+    client_name = extra_sales.client_name or "-"
+    insurance_agent = extra_sales.insurance_agent.name if extra_sales.insurance_agent else "-"
+    rentcar_company_name = extra_sales.rentcar_company_name or "-"
+    phone_number = extra_sales.phone_number or "-"
 
-    charge_type = extra_sales.charge_type or ""
-    charged_company = extra_sales.charged_company.name if extra_sales.charged_company else ""
-    order_type = extra_sales.order_type or ""
-    receipt_number = extra_sales.receipt_number or ""
-    fault_ratio = extra_sales.fault_ratio or 0
-    charge_month = extra_sales.charge.charge_date.month if extra_sales.charge else ""
-    charge_date = extra_sales.charge.charge_date.strftime(
-        "%Y-%m-%d") if extra_sales.charge else ""
+    charge_type = extra_sales.charge_type or "-"
+    charged_company = extra_sales.charged_company.name if extra_sales.charged_company else "-"
+    order_type = extra_sales.order_type or "-"
+    receipt_number = extra_sales.receipt_number or "-"
+    fault_ratio = extra_sales.fault_ratio or "-"
+    charge_date = extra_sales.charge_date if extra_sales.charge_date else None
+    charge_month = extra_sales.charge.charge_date.month if charge_date else "-"
+    charge_date = charge_date.strftime(
+        "%Y-%m-%d") if charge_date else "-"
     wage_amount = extra_sales.charge.wage_amount if extra_sales.charge else 0
+    wage_amount = zero_if_none(wage_amount)
     component_amount = extra_sales.charge.component_amount if extra_sales.charge else 0
+    component_amount = zero_if_none(component_amount)
     repair_amount = wage_amount + component_amount
     vat_amouunt = int(repair_amount/10)
-    chargable_amount = extra_sales.get_chargable_amount()
-    indemnity_amount = extra_sales.get_indemnity_amount()
-    discount_amount = extra_sales.payment.discount_amount if extra_sales.payment else 0
-    refund_amount = extra_sales.payment.refund_amount if extra_sales.payment else 0
-    payment_type = extra_sales.payment.payment_type if extra_sales.payment else ""
-    payment_info = extra_sales.payment.payment_info if extra_sales.payment else ""
-    payment_date = extra_sales.payment.payment_date.strftime(
-        "%Y-%m-%d") if extra_sales.payment else ""
-    charge_amount = extra_sales.get_charge_amount()
-    deposit_month = extra_sales.deposit.deposit_date.month if extra_sales.deposit else ""
-    deposit_date = extra_sales.deposit.deposit_date.strftime(
-        "%Y-%m-%d") if extra_sales.deposit else ""
+    chargable_amount = int(extra_sales.get_chargable_amount())
+    indemnity_amount = int(zero_if_none(extra_sales.get_indemnity_amount()))
+    payment = extra_sales.payment
+    discount_amount = payment.discount_amount if payment else 0
+    discount_amount = int(zero_if_none(discount_amount))
+    refund_amount = payment.refund_amount if payment else 0
+    refund_amount = int(zero_if_none(refund_amount))
+    payment_type = extra_sales.payment.payment_type if payment else "-"
+    payment_type = payment_type or "-"
+    payment_info = extra_sales.payment.payment_info if payment else "-"
+    payment_info = payment_info or "-"
+    payment_date = payment.payment_date if payment else None
+    payment_date = payment_date.strftime(
+        "%Y-%m-%d") if payment_date else "-"
+    charge_amount = int(zero_if_none(extra_sales.get_charge_amount()))
+    deposit_date = extra_sales.deposit.deosit_date if extra_sales.deposit else None
+    deposit_month = deposit_date.month if deposit_date else "-"
+    deposit_date = deposit_date.strftime(
+        "%Y-%m-%d") if deposit_date else "-"
     deposit_amount = extra_sales.deposit.deposit_amount if extra_sales.deposit else 0
+    deposit_amount = int(zero_if_none(deposit_amount))
     payment_rate = int(extra_sales.get_payment_rate() *
-                       100) if extra_sales.get_payment_rate() else "계산불가능"
+                       100) if extra_sales.get_payment_rate() else "-"
     not_paid_amount = extra_sales.get_not_paid_amount()
     not_paid_rate = int(100 - 100*extra_sales.get_payment_rate()
-                        ) if extra_sales.get_payment_rate() else "계산불가능"
-    turnover = extra_sales.get_turnover()
-    turnover_vat = turnover*10/11
-    factory_turnover = extra_sales.get_factory_turnover()
+                        ) if extra_sales.get_payment_rate() else "-"
+    turnover = int(zero_if_none(extra_sales.get_turnover()))
+    turnover_vat = int(turnover*10/11)
+    factory_turnover = int(zero_if_none(extra_sales.get_factory_turnover()))
     note = extra_sales.note or ""
-    paid_turnover = extra_sales.get_paid_turnover()
-    not_paid_turnover = extra_sales.get_not_paid_turnover()
-    integrated_turnover = extra_sales.get_integrated_turnover()
-    wage_turnover = extra_sales.get_wage_turnover()
-    component_turnover = extra_sales.get_component_turnover()
+    paid_turnover = int(zero_if_none(extra_sales.get_paid_turnover()))
+    not_paid_turnover = int(zero_if_none(extra_sales.get_not_paid_turnover()))
+    integrated_turnover = int(zero_if_none(
+        extra_sales.get_integrated_turnover()))
+    wage_turnover = int(zero_if_none(extra_sales.get_wage_turnover()))
+    component_turnover = int(zero_if_none(
+        extra_sales.get_component_turnover()))
     status = extra_sales.status
     return {
         "RO_number": RO_number,

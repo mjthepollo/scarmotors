@@ -221,6 +221,16 @@ def detail_register(request, pk):
     pass
 
 
+def get_registers_from_filter_and_page(request):
+    register_filter = RegisterFilter(
+        request.GET, queryset=Register.objects.all())
+    page_num = int(request.GET.get('page_num', 20))
+    paginator = Paginator(register_filter.qs, page_num)
+    page = request.GET.get('page')
+    registers = paginator.get_page(page)
+    return registers
+
+
 @ login_required
 def search_registers(request):
     register_filter = RegisterFilter(
@@ -239,9 +249,7 @@ def search_registers(request):
 
 
 def search_registers_table_view(request):
-    register_filter = RegisterFilter(
-        request.GET, queryset=Register.objects.all())
-    registers = register_filter.qs
+    registers = get_registers_from_filter_and_page(request)
     lines = [order.to_excel_line()
              for register in registers for order in register.orders.all()]
     df = pd.DataFrame(lines, columns=INDEXES.values())
@@ -251,21 +259,30 @@ def search_registers_table_view(request):
 
 
 def registers_to_excel(request):
-    register_filter = RegisterFilter(
-        request.GET, queryset=Register.objects.all())
-    registers = register_filter.qs
+    registers = get_registers_from_filter_and_page(request)
     lines = [order.to_excel_line()
              for register in registers for order in register.orders.all()]
     df = pd.DataFrame(lines, columns=INDEXES.values())
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Sheet1')
-        writer.book.save(output)
     output.seek(0)
     response = FileResponse(
         output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="{datetime.now()}.xlsx'
     return response
+
+
+def get_orders_from_filter_and_page(request):
+    register_filter = RegisterFilterForOrderFilter(
+        request.GET, queryset=Register.objects.all())
+    order_filter = OrderFilter(
+        request.GET, queryset=Order.objects.filter(register__in=register_filter.qs))
+    page_num = int(request.GET.get('page_num', 20))
+    paginator = Paginator(order_filter.qs, page_num)
+    page = request.GET.get('page')
+    orders = paginator.get_page(page)
+    return orders
 
 
 @ login_required
@@ -288,11 +305,7 @@ def search_orders(request):
 
 
 def search_orders_table_view(request):
-    register_filter = RegisterFilterForOrderFilter(
-        request.GET, queryset=Register.objects.all())
-    order_filter = OrderFilter(
-        request.GET, queryset=Order.objects.filter(register__in=register_filter.qs))
-    orders = order_filter.qs
+    orders = get_orders_from_filter_and_page(request)
     lines = [order.to_excel_line() for order in orders]
     df = pd.DataFrame(lines, columns=INDEXES.values())
     return render(request, "demand/table_view.html", context={
@@ -301,17 +314,12 @@ def search_orders_table_view(request):
 
 
 def orders_to_excel(request):
-    register_filter = RegisterFilterForOrderFilter(
-        request.GET, queryset=Register.objects.all())
-    order_filter = OrderFilter(
-        request.GET, queryset=Order.objects.filter(register__in=register_filter.qs))
-    orders = order_filter.qs
+    orders = get_orders_from_filter_and_page(request)
     lines = [order.to_excel_line() for order in orders]
     df = pd.DataFrame(lines, columns=INDEXES.values())
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Sheet1')
-        writer.book.save(output)
     output.seek(0)
     response = FileResponse(
         output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
