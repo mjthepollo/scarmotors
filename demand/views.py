@@ -397,6 +397,19 @@ def incentive(request):
 
 
 @login_required
+def undo_incentive(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    order.incentive_paid_date = None
+    order.incentive_paid = False
+    order.save()
+    previous_url = request.META.get('HTTP_REFERER', None)
+    if previous_url:
+        return redirect(previous_url)
+    else:
+        return redirect(reverse("demand:incentive"))
+
+
+@login_required
 def search_extra_sales(request):
     all_extra_sales = ExtraSales.objects.all()
     for extra_sales in all_extra_sales:

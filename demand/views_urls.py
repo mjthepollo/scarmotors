@@ -23,6 +23,7 @@ views_urlpatterns = [
          views.cancel_manually_complete, name="cancel_manually_complete"),
     path("orders_to_excel/", views.orders_to_excel, name="orders_to_excel"),
     path("incentive/", views.incentive, name="incentive"),
+    path("undo_incentive/<int:pk>/", views.undo_incentive, name="undo_incentive"),
     path("search_extra_sales/", views.search_extra_sales,
          name="search_extra_sales"),
     path("new_extra_sales/",

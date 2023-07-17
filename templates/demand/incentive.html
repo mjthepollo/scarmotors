@@ -52,12 +52,18 @@
         <td data-incentive="{{order.get_incentive}}" data-turnover="{{order.get_wage_turnover}}" class="incentive_check incentive"><input type='checkbox' {% if order.incentive_paid %}checked{% endif%}></td>
         <td class="incentive_paid incentive">
             {% if not incentive_form.instance.incentive_paid %}
-            {{incentive_form.incentive_paid}}{{incentive_form.id}}
+                {% if user.editable %}
+                    {{incentive_form.id}}{{incentive_form.incentive_paid}}
+                {% else %}-{% endif %}
             {% else %}
-            {% if user.editable %}
-            {{incentive_form.instance.get_incentive_paid_month_display}}
-            <div class="hidden">{{incentive_form.incentive_paid}}{{incentive_form.id}}</div>
-            {% else %}-{% endif %}
+                {% if user.editable %}
+                <a href="{% url 'demand:undo_incentive' incentive_form.instance.pk %}">
+                    {{incentive_form.instance.get_incentive_paid_month_display}}
+                </a>
+                <div class="hidden">{{incentive_form.incentive_paid}}{{incentive_form.id}}</div>
+                {% else %}
+                {{incentive_form.instance.get_incentive_paid_month_display}}
+                {% endif %}
             {% endif %}
         </td>
         <td>{{order.register.supporter}}</td>
