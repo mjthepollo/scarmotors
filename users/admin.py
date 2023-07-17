@@ -14,7 +14,7 @@ class UserAdmin(auth_admin.UserAdmin):
     form = UserAdminChangeForm
     add_form = UserAdminCreationForm
     fieldsets = (
-        (None, {"fields": ("username", "editable", "password")}),
+        (None, {"fields": ("username", "name", "editable", "password")}),
 
     )
     list_display = ["username", "name", "editable", "is_superuser"]

@@ -574,7 +574,7 @@ class Order(Sales):
         verbose_name = "주문 매출"
         verbose_name_plural = "주문 매출(들)"
     register = models.ForeignKey(
-        Register, null=True, on_delete=models.SET_NULL, verbose_name="등록", related_name="orders")
+        Register, null=True, on_delete=models.CASCADE, verbose_name="등록", related_name="orders")
     charged_company = models.ForeignKey(
         ChargedCompany, null=True, related_name="orders", verbose_name="보험(렌트)", on_delete=models.SET_NULL)
     charge_type = models.CharField(choices=(("보험", "보험"), ("일반경정비", "일반경정비"), (

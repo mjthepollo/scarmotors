@@ -22,11 +22,11 @@ PAID_SALES_LIST_DISPLAY = [
 ]
 
 
-@admin.register(MonthlySales)
+# @admin.register(MonthlySales)
 class MonthlySalesAdmin(admin.ModelAdmin):
     list_display = PAID_SALES_LIST_DISPLAY
 
 
-@admin.register(StatisticSales)
+# @admin.register(StatisticSales)
 class StatisticSalesAdmin(admin.ModelAdmin):
     list_display = PAID_SALES_LIST_DISPLAY
