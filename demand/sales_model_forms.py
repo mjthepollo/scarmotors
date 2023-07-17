@@ -4,7 +4,8 @@ from django.utils.safestring import mark_safe
 
 from core.forms import DetailableModelForm
 from core.utility import insert_tag
-from demand.key_models import InsuranceAgent, RequestDepartment, Supporter
+from demand.key_models import (ChargedCompany, InsuranceAgent,
+                               RequestDepartment, Supporter)
 from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
 
 
@@ -106,7 +107,7 @@ class OrderForm(DetailableModelForm):
     template_name = "demand/forms/deletable_order_form.html"
 
     charged_company = forms.ModelChoiceField(
-        queryset=RequestDepartment.objects.filter(active=True), label="보험(렌트)")
+        queryset=ChargedCompany.objects.filter(active=True), label="보험(렌트)")
 
     class Meta:
         model = Order

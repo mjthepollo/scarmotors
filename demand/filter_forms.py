@@ -31,10 +31,10 @@ class RegisterFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='car_number', lookup_expr='icontains', label="차량번호")
     insurance_agent = django_filters.ModelChoiceFilter(
-        field_name='insurance_agent', queryset=InsuranceAgent.objects.filter(active=True),
+        field_name='insurance_agent', queryset=InsuranceAgent.objects.all(),
         label="보험 담당자")
     supporter = django_filters.ModelChoiceFilter(
-        field_name='supporter', queryset=Supporter.objects.filter(active=True),
+        field_name='supporter', queryset=Supporter.objects.all(),
         label="입고지원")
     day_came_in__gt = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
@@ -71,10 +71,10 @@ class RegisterFilterForOrderFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='car_number', lookup_expr='icontains', label="차량번호")
     insurance_agent = django_filters.ModelChoiceFilter(
-        field_name='insurance_agent', queryset=InsuranceAgent.objects.filter(active=True),
+        field_name='insurance_agent', queryset=InsuranceAgent.objects.all(),
         label="보험 담당자")
     supporter = django_filters.ModelChoiceFilter(
-        field_name='supporter', queryset=Supporter.objects.filter(active=True),
+        field_name='supporter', queryset=Supporter.objects.all(),
         label="입고지원")
     day_came_in__gt = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
@@ -105,7 +105,7 @@ class RegisterFilterForOrderFilter(django_filters.FilterSet):
 
 class OrderFilter(django_filters.FilterSet):
     charged_company = django_filters.ModelChoiceFilter(
-        field_name='charged_company', queryset=ChargedCompany.objects.filter(active=True),
+        field_name='charged_company', queryset=ChargedCompany.objects.all(),
         label="보험사")
     receipt_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
@@ -133,7 +133,7 @@ class IncentiveFilter(django_filters.FilterSet):
         field_name='register__car_number', lookup_expr='icontains', label="차량 번호"
     )
     register__supporter = django_filters.ModelChoiceFilter(
-        queryset=Supporter.objects.filter(active=True), label="업체명")
+        queryset=Supporter.objects.all(), label="업체명")
     incentive_paid = django_filters.BooleanFilter(
         field_name='incentive_paid', label="지급여부",
         widget=OXBooleanWidget())
