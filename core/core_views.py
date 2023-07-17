@@ -77,3 +77,17 @@ def download_db(request):
     db_path = settings.DATABASES['default']['NAME']
     response = FileResponse(open(db_path, 'rb'))
     return response
+
+
+@login_required
+def set_db(request):
+    if request.method == "GET":
+        return render(request, "set_db.html")
+    else:
+        DB = request.FILES.get("DB")
+        db_file = DB.read()
+        db_path = settings.DATABASES['default']['NAME']
+        with open(db_path, "wb") as f:
+            f.write(db_file)
+
+        return redirect(reverse("home"))

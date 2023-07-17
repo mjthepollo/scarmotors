@@ -6,7 +6,7 @@ from openpyxl import load_workbook
 
 from core.utility import print_colored
 from demand.excel_line_info import *
-from demand.sales_models import Order
+from demand.sales_models import Order, Register
 
 # Create a logger with a custom log level
 
@@ -17,6 +17,19 @@ class NoDateException(Exception):
 
 def get_incentive_commnet(row):
     return row[SUPPORTER].comment.text.replace("Windows 사용자:", "").replace("\n", "")
+
+
+def get_merged_cell_value(sheet, cell):
+    rng = [s for s in sheet.merged_cells.ranges if cell.coordinate in s]
+
+    cell_value = sheet.cell(rng[0].min_row, rng[0].min_col).value if len(
+        rng) != 0 else cell.value
+
+    if len(rng) != 0:
+        index = list(rng[0].cols)[0].index((cell.row, cell.column))
+        return cell_value, index
+    else:
+        return cell_value, 0
 
 
 def get_incentive_date_from_row(row):
@@ -59,61 +72,40 @@ workbook = load_workbook('src/data_load.xlsx')
 sheet_names = ["22년 12월 미청구", "23년 본사 상반기", "23년 본사 하반기"]
 worksheets = (workbook.get_sheet_by_name(
     sheet_name) for sheet_name in sheet_names)
-print(worksheets)
 INCENTIVED_SET = set()
 NOT_INCENTIVED_SET = set()
+
+
+def get_incentive_data(sheet_index, row_index, row, date):
+    return f"{row[RO_NUMBER].value}/{row[RECEIPT_NUMBER].value}/{row[CAR_NUMBER].value}/{row[SUPPORTER].value}:{date.strftime('%y/%m')}"
 
 
 class Command(BaseCommand):
     help = 'clean models by 입출고대장'
 
     def handle(self, *args, **options):
-        for worksheet in worksheets:
-            for row in worksheet.iter_rows():
+        for sheet_index, worksheet in enumerate(worksheets):
+            for row_index, row in enumerate(worksheet.iter_rows()):
                 if row[SUPPORTER].comment:
                     try:
                         date = get_incentive_date_from_row(row)
                     except NoDateException:
                         print_colored(
-                            f"NO DATE: {row[RECEIPT_NUMBER].value}/{row[CAR_NUMBER].value}", "red")
+                            f"NO DATE: {row[RECEIPT_NUMBER].value}/{row[CAR_NUMBER].value}", "yellow")
                         continue
                     receipt_number = row[RECEIPT_NUMBER].value
-                    RO_number = row[RO_NUMBER].value
-                    if receipt_number == None:
-                        print_colored(
-                            f"{row[RO_NUMBER].value}/{row[RECEIPT_NUMBER].value}/{row[CAR_NUMBER].value}/{row[SUPPORTER].value}:{date.strftime('%y/%m')}", "magenta")
-                        NOT_INCENTIVED_SET.add(
-                            f"{row[RO_NUMBER].value}/{row[RECEIPT_NUMBER].value}/{row[CAR_NUMBER].value}/{row[SUPPORTER].value}:{date.strftime('%y/%m')}")
-                        continue
+                    RO_number, index = get_merged_cell_value(
+                        worksheet, row[RO_NUMBER])
+
+                    register = Register.objects.get(RO_number=RO_number)
+                    order = register.all_orders[index]
                     if receipt_number:
-                        orders = Order.objects.filter(
-                            receipt_number=receipt_number)
-                        if orders.count() != 1:
-                            RO_number = row[RO_NUMBER].value
-                            orders = orders.filter(
-                                register__RO_number=RO_number)
-                            if orders.count() != 1:
-                                print_colored(
-                                    f"receipt_number: {receipt_number} is not unique", "red")
-                                NOT_INCENTIVED_SET.add(
-                                    f"{row[RO_NUMBER].value}/{row[RECEIPT_NUMBER].value}/{row[CAR_NUMBER].value}/{row[SUPPORTER].value}:{date.strftime('%y/%m')}")
-                                continue
-                    else:
-                        orders = Order.objects.filter(
-                            register__RO_number=RO_number)
-                        if orders.count() != 1:
-                            print_colored(
-                                f"receipt_number: {receipt_number} is not unique", "red")
-                            NOT_INCENTIVED_SET.add(
-                                f"{row[RO_NUMBER].value}/{row[RECEIPT_NUMBER].value}/{row[CAR_NUMBER].value}/{row[SUPPORTER].value}:{date.strftime('%y/%m')}")
-                            continue
-                    order = orders.first()
+                        assert order.receipt_number == receipt_number
                     order.incentive_paid_date = date
                     order.incentive_paid = True
                     order.save()
-                    INCENTIVED_SET.add(order)
-        print_colored("---INCENTIVED_SET---", "blue")
-        print_colored(str(INCENTIVED_SET), "blue")
-        print_colored("---NOT_INCENTIVED_SET---", "red")
-        for item in NOT_INCENTIVED_SET:
-            print_colored(item, "red")
+                    INCENTIVED_SET.add(get_incentive_data(
+                        sheet_index, row_index, row, date))
+        print_colored("----- INCENTIVED ORDER DATA -----", "blue")
+        for incentived_order_data in INCENTIVED_SET:
+            print_colored(incentived_order_data, "blue")
