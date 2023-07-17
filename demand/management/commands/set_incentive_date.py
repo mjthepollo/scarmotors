@@ -57,9 +57,9 @@ def get_incentive_date_from_row(row):
 
 workbook = load_workbook('src/data_load.xlsx')
 sheet_names = ["22년 12월 미청구", "23년 본사 상반기", "23년 본사 하반기"]
-worksheets = [workbook.get_sheet_by_name(
-    sheet_name) for sheet_name in sheet_names]
-
+worksheets = (workbook.get_sheet_by_name(
+    sheet_name) for sheet_name in sheet_names)
+print(worksheets)
 INCENTIVED_SET = set()
 NOT_INCENTIVED_SET = set()
 
