@@ -305,7 +305,7 @@ def search_orders(request):
 
 
 def search_orders_table_view(request):
-    orders = get_orders_from_filter_and_page(request)
+    orders = get_orders_from_filter_and_page(request).order_by("created")
     lines = [order.to_excel_line() for order in orders]
     df = pd.DataFrame(lines, columns=INDEXES.values())
     return render(request, "demand/table_view.html", context={
@@ -314,7 +314,7 @@ def search_orders_table_view(request):
 
 
 def orders_to_excel(request):
-    orders = get_orders_from_filter_and_page(request)
+    orders = get_orders_from_filter_and_page(request).order_by("created")
     lines = [order.to_excel_line() for order in orders]
     df = pd.DataFrame(lines, columns=INDEXES.values())
     output = BytesIO()
@@ -325,30 +325,6 @@ def orders_to_excel(request):
         output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="{datetime.now()}.xlsx'
     return response
-
-
-@login_required
-def order_charge(request, pk):
-    order = get_object_or_404(Order, pk=pk)
-    charge_form = ChargeForm(instance=order.charge)
-    payment_form = PaymentForm(instance=order.payment)
-    if request.method == "GET":
-        return render(request, "demand/order_charge.html", context={
-            "charge_form": charge_form,
-            "payment_form": payment_form,
-        })
-    else:
-        charge_form = ChargeForm(request.POST, instance=order.charge)
-        payment_form = PaymentForm(request.POST, instance=order.payment)
-        if charge_form.is_valid() and payment_form.is_valid():
-            charge_form.save()
-            payment_form.save()
-            return redirect(reverse("demand:search_registers")+"?RO_number="+order.register.RO_number)
-        else:
-            return render(request, "demand/order_charge.html", context={
-                "charge_form": charge_form,
-                "payment_form": payment_form,
-            })
 
 
 @login_required
