@@ -117,7 +117,7 @@ class OrderForm(DetailableModelForm):
             "charge_type": forms.Select(attrs={'required': 'required'}),
             "charged_company": forms.Select(attrs={'required': 'required'}),
             'receipt_number': forms.TextInput(attrs={"placeholder": "12-3456"}),
-            'fault_ratio': forms.NumberInput(attrs={"placeholder": "100"}),
+            'fault_ratio': forms.NumberInput(attrs={"placeholder": "100", "class":"bold"}),
         }
 
         labels = {

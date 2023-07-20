@@ -634,7 +634,7 @@ class Order(Sales):
             return f"{self.register.RO_number}[{self.order_index}] {self.order_type} {self.charge_type}"
         except Exception as e:
             print(f"Exception in __str__ of Order : {e}")
-            return "Exception in __str__ of Order"
+            return f"{self.register.RO_number}[{self.order_index}]"
 
 
 class ExtraSales(Sales):

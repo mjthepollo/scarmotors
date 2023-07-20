@@ -111,6 +111,13 @@ class OrderFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='receipt_number', lookup_expr='icontains', label="접수번호")
 
+    charge__charge_date = django_filters.DateFilter(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        field_name='charge__charge_date', lookup_expr='exact', label="청구일")
+    deposit__deposit_date = django_filters.DateFilter(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        field_name='deposit__deposit_date', lookup_expr='exact', label="입금일")
+
     status = django_filters.ChoiceFilter(
         choices=Order._meta.get_field('status').choices, label="상태")
 
