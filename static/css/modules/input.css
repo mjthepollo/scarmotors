@@ -34,6 +34,13 @@ textarea {
   padding: 20px;
 }
 
+input::placeholder,
+textarea::placeholder {
+  font-style: italic;
+
+  color: rgba(0, 0, 0, 0.1);
+}
+
 p.detail_value {
   display: flex;
   justify-content: center;
