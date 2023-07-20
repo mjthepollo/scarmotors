@@ -252,6 +252,7 @@ def search_registers_table_view(request):
     registers = get_registers_from_filter_and_page(request)
     lines = [order.to_excel_line()
              for register in registers for order in register.orders.all()]
+    lines.reverse()
     df = pd.DataFrame(lines, columns=INDEXES.values())
     return render(request, "demand/table_view.html", context={
         "table": df.to_html(classes="table table-striped table-bordered table-hover")
@@ -262,6 +263,7 @@ def registers_to_excel(request):
     registers = get_registers_from_filter_and_page(request)
     lines = [order.to_excel_line()
              for register in registers for order in register.orders.all()]
+    lines.reverse()
     df = pd.DataFrame(lines, columns=INDEXES.values())
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -305,8 +307,9 @@ def search_orders(request):
 
 
 def search_orders_table_view(request):
-    orders = get_orders_from_filter_and_page(request).order_by("created")
+    orders = get_orders_from_filter_and_page(request)
     lines = [order.to_excel_line() for order in orders]
+    lines.reverse()
     df = pd.DataFrame(lines, columns=INDEXES.values())
     return render(request, "demand/table_view.html", context={
         "table": df.to_html(classes="table table-striped table-bordered table-hover")
@@ -314,8 +317,9 @@ def search_orders_table_view(request):
 
 
 def orders_to_excel(request):
-    orders = get_orders_from_filter_and_page(request).order_by("created")
+    orders = get_orders_from_filter_and_page(request)
     lines = [order.to_excel_line() for order in orders]
+    lines.reverse()
     df = pd.DataFrame(lines, columns=INDEXES.values())
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
