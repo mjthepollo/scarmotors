@@ -110,7 +110,10 @@ def differences(request):
             settings.ROOT_DIR, "src/difference.xlsx")
         with open(excel_save_path, "wb") as f:
             f.write(excel_file)
-        df = get_effective_data_frame(excel_save_path, sheet_name)
+        try:
+            df = get_effective_data_frame(excel_save_path, sheet_name)
+        except Exception as e:
+            return render(request, "differences_get.html", context={"error": e})
         line_numbers_for_registers = get_line_numbers_for_registers(df)
         list_of_check_list = get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(
             df, line_numbers_for_registers)

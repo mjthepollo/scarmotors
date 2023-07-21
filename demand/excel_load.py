@@ -482,6 +482,9 @@ def check_all_fields(equal, check_list, obj, temp_obj, except_list, suffix=None)
                 excel_value = excel_value.date()
             if isinstance(scartech_value, datetime):
                 scartech_value = scartech_value.date()
+            if field.name == 'phone_number':
+                excel_value = excel_value.replace("-", "")
+                scartech_value = scartech_value.replace("-", "")
             if excel_value != scartech_value:
                 field_name = field.name+suffix if suffix else field.name
                 check_list[field_name] = {
