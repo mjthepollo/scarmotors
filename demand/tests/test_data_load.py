@@ -73,10 +73,10 @@ class DataLoadTest(TestCase):
         make_models_from_effective_df(self.df)
         all_equal = True
         for line_numbers_for_register in self.line_numbers_for_registers:
-            equal, check_list = compare_register_using_line_numbers_for_register(
+            equal, check_list, RO_number = compare_register_using_line_numbers_for_register(
                 self.df, line_numbers_for_register)
             if not equal:
-                print(check_list)
+                print(RO_number, check_list)
             all_equal = all_equal and equal
         assert all_equal
 

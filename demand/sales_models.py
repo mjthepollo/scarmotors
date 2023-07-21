@@ -602,7 +602,11 @@ class Order(Sales):
 
     @property
     def order_index(self):
-        return list(self.register.orders.all().order_by("created")).index(self)+1
+        try:
+            return list(self.register.orders.all().order_by("created")).index(self)+1
+        except Exception as e:
+            print(f"ORDER INDEX PROBLEM {self.pk}")
+            return None
 
     def get_description(self):
         try:

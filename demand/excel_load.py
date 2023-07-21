@@ -471,83 +471,55 @@ def make_complete_register_for_line_numbers(df, line_numbers):
         print_colored(f"SKIPPED {str(first_line)}", "red")
 
 
-def compare_register_with_first_line(register, first_line, equal, check_list):
-    temp_register = make_register_from_first_line(first_line)
-    for field in register._meta.model._meta.fields:
+def check_all_fields(equal, check_list, obj, temp_obj, except_list, suffix=None):
+    except_list = ["id"] + except_list
+    for field in obj._meta.model._meta.fields:
         if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
-                not field.name in ["id", "note"]:
-            excel_value = getattr(temp_register, field.name)
-            scartech_value = getattr(register, field.name)
+                not field.name in except_list:
+            excel_value = getattr(temp_obj, field.name)
+            scartech_value = getattr(obj, field.name)
             if isinstance(excel_value, datetime):
                 excel_value = excel_value.date()
             if isinstance(scartech_value, datetime):
                 scartech_value = scartech_value.date()
             if excel_value != scartech_value:
-                check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
+                field_name = field.name+suffix if suffix else field.name
+                check_list[field_name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
                 equal = False
+    return equal, check_list
+
+
+def compare_register_with_first_line(register, first_line, equal, check_list):
+    temp_register = make_register_from_first_line(first_line)
+    except_list = ["note"]
+    equal, check_list = check_all_fields(
+        equal, check_list, register, temp_register, except_list)
     temp_register.delete()
     return equal, check_list
 
 
 def compare_order_with_line(order, line, equal, check_list):
     temp_order = make_order_payment_charge_and_deposit_with_line(line, None)
-    for field in order._meta.model._meta.fields:
-        if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
-                not field.name in ["id", "register", "charge", "deposit", "payment", "status"]:
-            excel_value = getattr(temp_order, field.name)
-            scartech_value = getattr(order, field.name)
-            if isinstance(excel_value, datetime):
-                excel_value = excel_value.date()
-            if isinstance(scartech_value, datetime):
-                scartech_value = scartech_value.date()
-            if excel_value != scartech_value:
-                check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
-                equal = False
+    except_list_for_order = ["register",
+                             'charge', "deposit", "payment", "status"]
+    suffix = str(order.order_index)
+    equal, check_list = check_all_fields(
+        equal, check_list, order, temp_order, except_list_for_order, suffix)
     if order.payment and temp_order.payment:
-        for field in order.payment._meta.model._meta.fields:
-            if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
-                    not field.name in ["id"]:
-                excel_value = getattr(temp_order.payment, field.name)
-                scartech_value = getattr(order.payment, field.name)
-                if isinstance(excel_value, datetime):
-                    excel_value = excel_value.date()
-                if isinstance(scartech_value, datetime):
-                    scartech_value = scartech_value.date()
-                if excel_value != scartech_value:
-                    check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
-                    equal = False
+        equal, check_list = check_all_fields(equal, check_list, order.payment,
+                                             temp_order.payment, [], suffix)
     if bool(order.payment) != bool(temp_order.payment):
         check_list["payment"] = "다름"
         equal = False
     if order.charge and temp_order.charge:
-        for field in order.charge._meta.model._meta.fields:
-            if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
-                    not field.name in ["id"]:
-                excel_value = getattr(temp_order.charge, field.name)
-                scartech_value = getattr(order.charge, field.name)
-                if isinstance(excel_value, datetime):
-                    excel_value = excel_value.date()
-                if isinstance(scartech_value, datetime):
-                    scartech_value = scartech_value.date()
-                if excel_value != scartech_value:
-                    check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
-                    equal = False
+        equal, check_list = check_all_fields(equal, check_list, order.charge,
+                                             temp_order.charge, [], suffix)
     if bool(order.charge) != bool(temp_order.charge):
         check_list["charge"] = "다름"
         equal = False
     if order.deposit and temp_order.deposit:
-        for field in order.deposit._meta.model._meta.fields:
-            if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
-                    not field.name in ["id", "deposit_note"]:
-                excel_value = getattr(temp_order.deposit, field.name)
-                scartech_value = getattr(order.deposit, field.name)
-                if isinstance(excel_value, datetime):
-                    excel_value = excel_value.date()
-                if isinstance(scartech_value, datetime):
-                    scartech_value = scartech_value.date()
-                if excel_value != scartech_value:
-                    check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
-                    equal = False
+        equal, check_list = check_all_fields(equal, check_list, order.deposit,
+                                             temp_order.deposit, ["deposit_note"], suffix)
     if bool(order.deposit) != bool(temp_order.deposit):
         check_list["deposit"] = "다름"
         equal = False
@@ -564,7 +536,7 @@ def compare_order_with_line(order, line, equal, check_list):
 def compare_register_using_line_numbers_for_register(df, line_numbers_for_register):
     """
     튜플을 리턴. 첫번째 것은 입력값이 동일한지, 두 번째 것은 비교한 지점에 대한 str을 담은 리스트다.
-    (equal, check_list)를 리턴한다.
+    (equal, RO_number, heck_list)를 리턴한다.
     """
     equal = True
     check_list = {}
@@ -597,16 +569,16 @@ def compare_register_using_line_numbers_for_register(df, line_numbers_for_regist
                 break
             equal, check_list = compare_order_with_line(
                 order_matched_with_line, line, equal, check_list)
-    return equal, check_list
+    return equal, check_list, RO_number
 
 
 def get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(df, line_numbers_for_registers):
-    list_of_check_list = []
+    list_of_check_list = {}
     for line_nubmers_for_register in line_numbers_for_registers:
-        equal, check_list = compare_register_using_line_numbers_for_register(
+        equal, RO_number, check_list = compare_register_using_line_numbers_for_register(
             df, line_nubmers_for_register)
         if not equal:
-            list_of_check_list.append(check_list)
+            list_of_check_list[RO_number] = check_list
     return list_of_check_list
 
 
