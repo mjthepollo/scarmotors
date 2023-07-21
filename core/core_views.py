@@ -67,13 +67,6 @@ def home(request):
 
 @login_required
 def update_period_sales(request):
-    year = int(request.GET.get("year", date.today().year))
-    half = request.GET.get("half", get_current_half())
-    start_date, end_date = get_start_and_end_dates_of_half(year, half)
-    monthly_sales = MonthlySales.objects.filter(
-        start_date__gte=start_date, end_date__lte=end_date)
-    for monthly_sale in monthly_sales:
-        monthly_sale.update()
     none_register_orders = Order.objects.filter(register__isnull=True)
     for none_register_order in none_register_orders:
         if none_register_order.payment:
@@ -85,6 +78,13 @@ def update_period_sales(request):
         none_register_order.delete()
     none_RO_number_registers = Register.objects.filter(RO_number__isnull=True)
     none_RO_number_registers.delete()
+    year = int(request.GET.get("year", date.today().year))
+    half = request.GET.get("half", get_current_half())
+    start_date, end_date = get_start_and_end_dates_of_half(year, half)
+    monthly_sales = MonthlySales.objects.filter(
+        start_date__gte=start_date, end_date__lte=end_date)
+    for monthly_sale in monthly_sales:
+        monthly_sale.update()
     return redirect(reverse("home")+"?year="+str(year)+"&half="+half)
 
 
