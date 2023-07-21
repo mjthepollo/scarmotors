@@ -114,20 +114,20 @@ def differences(request):
     if request.method == "GET":
         return render(request, "differences_get.html")
     else:
-        EXCEL = request.FILES.get("EXCEL")
-        excel_file = EXCEL.read()
-        sheet_name = request.POST.get("sheet_name")
-        sheet_name = sheet_name if sheet_name else "23년 본사 하반기"
-        excel_save_path = os.path.join(
-            settings.ROOT_DIR, "src/difference.xlsx")
-        with open(excel_save_path, "wb") as f:
-            f.write(excel_file)
         try:
-            df = get_effective_data_frame(excel_save_path, sheet_name)
+            EXCEL = request.FILES.get("EXCEL")
+            excel_file = EXCEL.read()
+            sheet_name = request.POST.get("sheet_name")
+            sheet_name = sheet_name if sheet_name else "23년 본사 하반기"
+            excel_save_path = os.path.join(
+                settings.ROOT_DIR, "src/difference.xlsx")
+            with open(excel_save_path, "wb") as f:
+                f.write(excel_file)
+                df = get_effective_data_frame(excel_save_path, sheet_name)
+            line_numbers_for_registers = get_line_numbers_for_registers(df)
+            list_of_check_list = get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(
+                df, line_numbers_for_registers)
+            return render(request, "differences_post.html",
+                          context={"list_of_check_list": list_of_check_list, "sheet_name": sheet_name})
         except Exception as e:
             return render(request, "differences_get.html", context={"error": e})
-        line_numbers_for_registers = get_line_numbers_for_registers(df)
-        list_of_check_list = get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(
-            df, line_numbers_for_registers)
-        return render(request, "differences_post.html",
-                      context={"list_of_check_list": list_of_check_list, "sheet_name": sheet_name})
