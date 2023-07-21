@@ -1,20 +1,17 @@
 
 from django.test import TestCase
 
-from demand.excel_load import (CHARGABLE_AMOUNT, CHARGE_AMOUNT,
-                               CLIENT_NAME_AND_INSURANCE_AGENT,
-                               COMPONENT_TURNOVER, FACTORY_TURNOVER,
-                               INTEGRATED_TURNOVER, NOT_PAID_AMOUNT,
-                               NOT_PAID_TURNOVER, PAID_TURNOVER, PAYMENT_RATE,
-                               TURNOVER, WAGE_TURNOVER, check_values_of_column,
-                               df_to_lines,
-                               get_client_name_and_insurance_agent_name,
-                               get_effective_data_frame,
-                               get_line_numbers_for_extra_sales,
-                               get_line_numbers_for_registers, load_data,
-                               make_extra_sales_from_line,
-                               make_models_from_effective_df,
-                               register_to_tuple)
+from demand.excel_load import (
+    CHARGABLE_AMOUNT, CHARGE_AMOUNT, CLIENT_NAME_AND_INSURANCE_AGENT,
+    COMPONENT_TURNOVER, FACTORY_TURNOVER, INTEGRATED_TURNOVER, NOT_PAID_AMOUNT,
+    NOT_PAID_TURNOVER, PAID_TURNOVER, PAYMENT_RATE, TURNOVER, WAGE_TURNOVER,
+    check_values_of_column, compare_register_using_line_numbers_for_register,
+    df_to_lines, get_client_name_and_insurance_agent_name,
+    get_effective_data_frame, get_line_numbers_for_extra_sales,
+    get_line_numbers_for_registers,
+    get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers,
+    load_data, make_extra_sales_from_line, make_models_from_effective_df,
+    register_to_tuple)
 from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import ExtraSales, Order, Register
 
@@ -97,6 +94,27 @@ class ExcelLoadTest(TestCase):
         assert Deposit.objects.count() == 5
         assert Charge.objects.count() == 10
         assert Payment.objects.count() == 6
+
+    def test_compare_register_using_line_numbers_for_register(self):
+        """
+        실제로 만들어진 Register의 Excel로 들어온 Register를 비교합니다.
+        """
+        all_equal = True
+        for line_numbers_for_register in self.line_numbers_for_registers:
+            equal, check_list = compare_register_using_line_numbers_for_register(
+                self.df, line_numbers_for_register)
+            if not equal:
+                print(check_list)
+            all_equal = all_equal and equal
+        assert all_equal
+
+    def test_get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(self):
+        """
+        실제로 만들어진 Register의 Excel로 들어온 Register를 비교합니다.
+        """
+        list_of_check_list = get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(
+            self.df, self.line_numbers_for_registers)
+        assert len(list_of_check_list) == 0
 
     def test_chargable_amount(self):
         check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,

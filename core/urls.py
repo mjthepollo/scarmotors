@@ -17,6 +17,7 @@ urlpatterns = [
     path("demand/", include("demand.urls", namespace="demand")),
     path("download_db/", core_views.download_db, name="download_db"),
     path("set_db/", core_views.set_db, name="set_db"),
+    path("differences/", core_views.differences, name="differences"),
     path(settings.ADMIN_URL, admin.site.urls),
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)\

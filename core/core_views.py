@@ -10,6 +10,10 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from core.utility import get_current_half, get_start_and_end_dates_of_half
+from demand.excel_load import (
+    check_line_numbers_for_registers_have_same_car_number,
+    check_line_numbers_for_registers_have_unique_RO_number,
+    get_effective_data_frame, get_line_numbers_for_registers)
 from period_sales.forms import PeriodFilter
 from period_sales.models import (MonthlySales, StatisticSales,
                                  get_net_information)
@@ -91,3 +95,13 @@ def set_db(request):
             f.write(db_file)
 
         return redirect(reverse("home"))
+
+
+@login_required
+def differences(request):
+    if request.method == "GET":
+        return render(request, "differences_get.html")
+    else:
+        EXCEL = request.FILES.get("EXCEL")
+        excel_file = EXCEL.read()
+        return render(request, "differences_post.html")

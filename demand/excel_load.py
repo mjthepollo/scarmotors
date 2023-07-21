@@ -1,7 +1,10 @@
+from datetime import date, datetime
+
 import numpy as np
 import pandas as pd
 from django.core.management import call_command
 
+from core.models import TimeStampedModel
 from core.utility import print_colored
 from demand.check_value_functions import (check_chargable_amount,
                                           check_charge_amount,
@@ -277,12 +280,13 @@ def check_values_of_column(df, lines, line_numbers_for_registers,
 
 
 def create_order_from_line(line, register):
-    if line[NOTE]:
-        if register.note:
-            register.note += "\n"+line[NOTE]
-        else:
-            register.note = line[NOTE]
-    register.save()
+    if register:
+        if line[NOTE]:
+            if register.note:
+                register.note += "\n"+line[NOTE]
+            else:
+                register.note = line[NOTE]
+        register.save()
     if line[CHARGED_COMPANY]:
         charged_company, _ = ChargedCompany.objects.get_or_create(
             name=line[CHARGED_COMPANY])
@@ -465,6 +469,145 @@ def make_complete_register_for_line_numbers(df, line_numbers):
             raise e
     else:
         print_colored(f"SKIPPED {str(first_line)}", "red")
+
+
+def compare_register_with_first_line(register, first_line, equal, check_list):
+    temp_register = make_register_from_first_line(first_line)
+    for field in register._meta.model._meta.fields:
+        if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
+                not field.name in ["id", "note"]:
+            excel_value = getattr(temp_register, field.name)
+            scartech_value = getattr(register, field.name)
+            if isinstance(excel_value, datetime):
+                excel_value = excel_value.date()
+            if isinstance(scartech_value, datetime):
+                scartech_value = scartech_value.date()
+            if excel_value != scartech_value:
+                check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
+                equal = False
+    temp_register.delete()
+    return equal, check_list
+
+
+def compare_order_with_line(order, line, equal, check_list):
+    temp_order = make_order_payment_charge_and_deposit_with_line(line, None)
+    for field in order._meta.model._meta.fields:
+        if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
+                not field.name in ["id", "register", "charge", "deposit", "payment", "status"]:
+            excel_value = getattr(temp_order, field.name)
+            scartech_value = getattr(order, field.name)
+            if isinstance(excel_value, datetime):
+                excel_value = excel_value.date()
+            if isinstance(scartech_value, datetime):
+                scartech_value = scartech_value.date()
+            if excel_value != scartech_value:
+                check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
+                equal = False
+    if order.payment and temp_order.payment:
+        for field in order.payment._meta.model._meta.fields:
+            if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
+                    not field.name in ["id"]:
+                excel_value = getattr(temp_order.payment, field.name)
+                scartech_value = getattr(order.payment, field.name)
+                if isinstance(excel_value, datetime):
+                    excel_value = excel_value.date()
+                if isinstance(scartech_value, datetime):
+                    scartech_value = scartech_value.date()
+                if excel_value != scartech_value:
+                    check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
+                    equal = False
+    if bool(order.payment) != bool(temp_order.payment):
+        check_list["payment"] = "다름"
+        equal = False
+    if order.charge and temp_order.charge:
+        for field in order.charge._meta.model._meta.fields:
+            if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
+                    not field.name in ["id"]:
+                excel_value = getattr(temp_order.charge, field.name)
+                scartech_value = getattr(order.charge, field.name)
+                if isinstance(excel_value, datetime):
+                    excel_value = excel_value.date()
+                if isinstance(scartech_value, datetime):
+                    scartech_value = scartech_value.date()
+                if excel_value != scartech_value:
+                    check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
+                    equal = False
+    if bool(order.charge) != bool(temp_order.charge):
+        check_list["charge"] = "다름"
+        equal = False
+    if order.deposit and temp_order.deposit:
+        for field in order.deposit._meta.model._meta.fields:
+            if not field.name in [timestamp_field.name for timestamp_field in TimeStampedModel._meta.model._meta.fields] and\
+                    not field.name in ["id", "deposit_note"]:
+                excel_value = getattr(temp_order.deposit, field.name)
+                scartech_value = getattr(order.deposit, field.name)
+                if isinstance(excel_value, datetime):
+                    excel_value = excel_value.date()
+                if isinstance(scartech_value, datetime):
+                    scartech_value = scartech_value.date()
+                if excel_value != scartech_value:
+                    check_list[field.name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
+                    equal = False
+    if bool(order.deposit) != bool(temp_order.deposit):
+        check_list["deposit"] = "다름"
+        equal = False
+    if temp_order.payment:
+        temp_order.payment.delete()
+    if temp_order.charge:
+        temp_order.charge.delete()
+    if temp_order.deposit:
+        temp_order.deposit.delete()
+    temp_order.delete()
+    return equal, check_list
+
+
+def compare_register_using_line_numbers_for_register(df, line_numbers_for_register):
+    """
+    튜플을 리턴. 첫번째 것은 입력값이 동일한지, 두 번째 것은 비교한 지점에 대한 str을 담은 리스트다.
+    (equal, check_list)를 리턴한다.
+    """
+    equal = True
+    check_list = {}
+    first_line = df.iloc[line_numbers_for_register[0], :].values.tolist()
+    RO_number = first_line[RO_NUMBER]
+    register = Register.objects.filter(RO_number=RO_number).first()
+    if not register:
+        check_list["RO_NUMBER"] = f"{RO_number} 없음"
+        equal = False
+    else:
+        equal, check_list = compare_register_with_first_line(
+            register, first_line, equal, check_list)
+        lines = [df.iloc[line_number, :].values.tolist()
+                 for line_number in line_numbers_for_register]
+        for line in lines:
+            if line[CHARGED_COMPANY]:
+                charged_company, _ = ChargedCompany.objects.get_or_create(
+                    name=line[CHARGED_COMPANY])
+            else:
+                charged_company = None
+            fault_ratio = fault_ratio_to_int(line[FAULT_RATIO])
+            charge_type = line[CHARGE_TYPE] or "기타"
+            order_matched_with_line = register.all_orders.filter(
+                charged_company=charged_company, charge_type=charge_type,
+                order_type=line[ORDER_TYPE], fault_ratio=fault_ratio,
+                receipt_number=str_or_none(line[RECEIPT_NUMBER], )).first()
+            if not order_matched_with_line:
+                check_list["ORDER"] = "타입, 보험사, 차대일, 과실분, 접수번호 확인필요"
+                equal = False
+                break
+            equal, check_list = compare_order_with_line(
+                order_matched_with_line, line, equal, check_list)
+    return equal, check_list
+
+
+def get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(df, line_numbers_for_registers):
+    list_of_check_list = []
+    for line_nubmers_for_register in line_numbers_for_registers:
+        equal, check_list = compare_register_using_line_numbers_for_register(
+            df, line_nubmers_for_register)
+        if not equal:
+            list_of_check_list.append(check_list)
+    return list_of_check_list
 
 
 def make_models_from_effective_df(df):

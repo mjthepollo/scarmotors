@@ -5,18 +5,22 @@
             <a id="home_link" href="{% url 'home'%}"><img src="{% static 'images/scar_tech.png'%}"></a>
             {% if user.editable %}
             {% url 'demand:new_register' as url %}
-            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:new_register'%}">입고</a>
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">입고</a>
             {% endif %}
             {% url 'demand:search_registers' as url %}
-            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_registers'%}">매출 검색</a>
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">매출 검색</a>
             {% url 'demand:search_orders' as url %}
-            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_orders'%}">상세 검색</a>
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">상세 검색</a>
             {% url 'demand:incentive' as url %}
-            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:incentive'%}">입고 인센</a>
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">입고 인센</a>
             {% url 'demand:search_extra_sales' as url %}
-            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_extra_sales'%}">기타 매출</a>
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">기타 매출</a>
             {% url 'demand:search_recognized_sales' as url %}
-            <a class="header_link {% if request.path == url %}active{% endif %}" href="{% url 'demand:search_recognized_sales'%}">인정 매출</a>
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">인정 매출</a>
+            {% if user.editable%}
+            {% url 'differences' as url %}
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">비교</a>
+            {% endif %}
         </div>
         <div id="inner_header_right">
             <a class="header_link" href="{% url 'logout'%}">로그아웃</a>

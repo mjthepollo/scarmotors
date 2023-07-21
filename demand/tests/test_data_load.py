@@ -10,11 +10,12 @@ from demand.excel_load import (
     PAYMENT_RATE, TURNOVER, WAGE_TURNOVER,
     check_line_numbers_for_registers_have_same_car_number,
     check_line_numbers_for_registers_have_unique_RO_number,
-    check_values_of_column, df_to_lines,
-    get_client_name_and_insurance_agent_name, get_effective_data_frame,
-    get_line_numbers, get_line_numbers_for_extra_sales,
-    get_line_numbers_for_registers, load_data, make_extra_sales_from_line,
-    make_models_from_effective_df)
+    check_values_of_column, compare_register_using_line_numbers_for_register,
+    df_to_lines, get_client_name_and_insurance_agent_name,
+    get_effective_data_frame, get_line_numbers,
+    get_line_numbers_for_extra_sales, get_line_numbers_for_registers,
+    get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers,
+    load_data, make_extra_sales_from_line, make_models_from_effective_df)
 from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import ExtraSales, Order, Register
 
@@ -64,6 +65,29 @@ class DataLoadTest(TestCase):
         # 폐차, 미수리출고, 세차의 경우의 line_numbers를 구한다. 이는 말그대로 line_numbers이므로, index 기준에서 6을 빼줘야 한다.
         # assert get_line_numbers_for_extra_sales(self.df) == [660, 673]
         pass
+
+    def test_compare_register_using_line_numbers_for_register(self):
+        """
+        실제로 만들어진 Register의 Excel로 들어온 Register를 비교합니다.
+        """
+        make_models_from_effective_df(self.df)
+        all_equal = True
+        for line_numbers_for_register in self.line_numbers_for_registers:
+            equal, check_list = compare_register_using_line_numbers_for_register(
+                self.df, line_numbers_for_register)
+            if not equal:
+                print(check_list)
+            all_equal = all_equal and equal
+        assert all_equal
+
+    def test_get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(self):
+        """
+        실제로 만들어진 Register의 Excel로 들어온 Register를 비교합니다.
+        """
+        make_models_from_effective_df(self.df)
+        list_of_check_list = get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(
+            self.df, self.line_numbers_for_registers)
+        assert len(list_of_check_list) == 0
 
     def test_chargable_amount(self):
         check_values_of_column(self.df, self.lines, self.line_numbers_for_registers,

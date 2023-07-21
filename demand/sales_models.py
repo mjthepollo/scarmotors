@@ -285,6 +285,8 @@ class Sales(TimeStampedModel):
         """
         try:
             if isinstance(self, Order):
+                if not self.register:
+                    return STATUS_DICT["ERROR"]
                 if self.register.wasted:
                     return STATUS_DICT["WASTED"]
                 if self.register.unrepaired:
@@ -498,7 +500,6 @@ class Register(TimeStampedModel):
 
 # region FOR HTML FUNCTIONS
 
-
     def get_status(self):
         orders = self.all_orders
         all_completed = True
@@ -633,7 +634,13 @@ class Order(Sales):
         try:
             return f"{self.register.RO_number}[{self.order_index}] {self.order_type} {self.charge_type}"
         except Exception as e:
-            print(f"Exception in __str of order : {str(self.register)}[{self.order_index}]")
+            try:
+                print(
+                    f"Exception in __str__ of order : {str(self.register)}[{self.order_index}]")
+            except Exception:
+                print(
+                    f"Double Exception in __str__ of order which has pk of {self.pk}")
+                return f"Order [pk:{self.pk}]"
             return f"{str(self.register)}[{self.order_index}]"
 
 
