@@ -14,6 +14,7 @@ from core.utility import get_current_half, get_start_and_end_dates_of_half
 from demand.excel_load import (
     get_effective_data_frame, get_line_numbers_for_registers,
     get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers)
+from demand.sales_models import Order, Register
 from period_sales.forms import PeriodFilter
 from period_sales.models import (MonthlySales, StatisticSales,
                                  get_net_information)
@@ -73,6 +74,17 @@ def update_period_sales(request):
         start_date__gte=start_date, end_date__lte=end_date)
     for monthly_sale in monthly_sales:
         monthly_sale.update()
+    none_register_orders = Order.objects.filter(register__isnull=True)
+    for none_register_order in none_register_orders:
+        if none_register_order.payment:
+            none_register_order.payment.delete()
+        if none_register_order.charge:
+            none_register_order.charge.delete()
+        if none_register_order.deposit:
+            none_register_order.deposit.delete()
+        none_register_order.delete()
+    none_RO_number_registers = Register.objects.filter(RO_number__isnull=True)
+    none_RO_number_registers.delete()
     return redirect(reverse("home")+"?year="+str(year)+"&half="+half)
 
 
