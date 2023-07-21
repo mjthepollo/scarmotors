@@ -11,11 +11,11 @@
 <form method="POST" id="excel_form" enctype="multipart/form-data">
     {% csrf_token %}
     <div>
-        <label for="EXCEL">엑셀 파일</label>
+        <label class='bold' for="EXCEL">엑셀 파일</label>
         <input type="file" name="EXCEL" id="EXCEL">
     </div>
     <div>
-        <label for="sheet_name">시트명</label>
+        <label class='bold' for="sheet_name">시트명</label>
         <input type="text" id='sheet_name' name="sheet_name" placeholder="23년 본사 하반기">
     </div>
     <button class="btn btn-danger">비교</button>
