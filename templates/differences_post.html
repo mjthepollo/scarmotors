@@ -5,5 +5,18 @@
 <link rel="stylesheet" href="{% static 'css/differences.css' %}">
 {% endblock css %}
 {% block content %}
-<p>Differences  POST</p>
+<div style='height:50px;'></div>
+<h1>비교 결과</h1>
+<div>
+{% for RO_number, check_list in list_of_check_list.items %} 
+    <h5 class="card-title" style="margin-top:15px;margin-bottom:5px;">RO_number : {{RO_number}}</h5>
+    <ul class="list-group">
+    {% for problem_point, value in check_list.items %}
+        <li class="list-group-item">{{problem_point}} | {{value}}</li>
+    {% endfor %}
+    </ul>
+{% empty %}
+    <p>비교할 내용이 없습니다.</p>
+{% endfor %}
+</div>
 {% endblock content %}

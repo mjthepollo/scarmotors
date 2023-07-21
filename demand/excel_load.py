@@ -484,7 +484,8 @@ def check_all_fields(equal, check_list, obj, temp_obj, except_list, suffix=None)
                 scartech_value = scartech_value.date()
             if excel_value != scartech_value:
                 field_name = field.name+suffix if suffix else field.name
-                check_list[field_name] = f"EXCEL:{excel_value}/SCARTECH:{scartech_value}"
+                check_list[field_name] = {
+                    "EXCEL": str(excel_value), "SCARTECH": str(scartech_value)}
                 equal = False
     return equal, check_list
 
@@ -500,9 +501,9 @@ def compare_register_with_first_line(register, first_line, equal, check_list):
 
 def compare_order_with_line(order, line, equal, check_list):
     temp_order = make_order_payment_charge_and_deposit_with_line(line, None)
-    except_list_for_order = ["register",
+    except_list_for_order = ["register", 'incentive_paid', "incentive_paid_date",
                              'charge', "deposit", "payment", "status"]
-    suffix = str(order.order_index)
+    suffix = f"[{str(order.order_index)}]"
     equal, check_list = check_all_fields(
         equal, check_list, order, temp_order, except_list_for_order, suffix)
     if order.payment and temp_order.payment:
@@ -536,7 +537,7 @@ def compare_order_with_line(order, line, equal, check_list):
 def compare_register_using_line_numbers_for_register(df, line_numbers_for_register):
     """
     튜플을 리턴. 첫번째 것은 입력값이 동일한지, 두 번째 것은 비교한 지점에 대한 str을 담은 리스트다.
-    (equal, RO_number, heck_list)를 리턴한다.
+    (equal, check_list, RO_number)를 리턴한다.
     """
     equal = True
     check_list = {}
@@ -575,7 +576,7 @@ def compare_register_using_line_numbers_for_register(df, line_numbers_for_regist
 def get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(df, line_numbers_for_registers):
     list_of_check_list = {}
     for line_nubmers_for_register in line_numbers_for_registers:
-        equal, RO_number, check_list = compare_register_using_line_numbers_for_register(
+        equal, check_list, RO_number = compare_register_using_line_numbers_for_register(
             df, line_nubmers_for_register)
         if not equal:
             list_of_check_list[RO_number] = check_list

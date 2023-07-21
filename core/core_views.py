@@ -1,3 +1,4 @@
+import os
 from datetime import date
 from math import ceil
 
@@ -11,9 +12,8 @@ from django.urls import reverse
 
 from core.utility import get_current_half, get_start_and_end_dates_of_half
 from demand.excel_load import (
-    check_line_numbers_for_registers_have_same_car_number,
-    check_line_numbers_for_registers_have_unique_RO_number,
-    get_effective_data_frame, get_line_numbers_for_registers)
+    get_effective_data_frame, get_line_numbers_for_registers,
+    get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers)
 from period_sales.forms import PeriodFilter
 from period_sales.models import (MonthlySales, StatisticSales,
                                  get_net_information)
@@ -104,4 +104,15 @@ def differences(request):
     else:
         EXCEL = request.FILES.get("EXCEL")
         excel_file = EXCEL.read()
-        return render(request, "differences_post.html")
+        sheet_name = request.POST.get("sheet_name")
+        sheet_name = sheet_name if sheet_name else "23년 본사 하반기"
+        excel_save_path = os.path.join(
+            settings.ROOT_DIR, "src/difference.xlsx")
+        with open(excel_save_path, "wb") as f:
+            f.write(excel_file)
+        df = get_effective_data_frame(excel_save_path, sheet_name)
+        line_numbers_for_registers = get_line_numbers_for_registers(df)
+        list_of_check_list = get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(
+            df, line_numbers_for_registers)
+        return render(request, "differences_post.html",
+                      context={"list_of_check_list": list_of_check_list, "sheet_name": sheet_name})
