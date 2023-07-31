@@ -96,8 +96,14 @@ class Command(BaseCommand):
                     receipt_number = row[RECEIPT_NUMBER].value
                     RO_number, index = get_merged_cell_value(
                         worksheet, row[RO_NUMBER])
-
-                    register = Register.objects.get(RO_number=RO_number)
+                    try:
+                        register = Register.objects.get(RO_number=RO_number)
+                    except Register.DoesNotExist as e:
+                        print_colored(
+                            f"WORK SHEET : {sheet_names[sheet_index]}, ROW_INDEX:{row_index}", "yellow")
+                        print_colored(
+                            f"NO REGISTER: {RO_number}[{index}]/{row[CAR_NUMBER].value}", "yellow")
+                        raise e
                     order = register.all_orders[index]
                     if receipt_number:
                         assert order.receipt_number == receipt_number

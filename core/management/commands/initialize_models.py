@@ -37,7 +37,7 @@ class Command(BaseCommand):
         print_colored("\n-----CREATING RECOGNIZED SALES!-----", "magenta")
         call_command(
             'create_recognized_sales', f'--file_name={file_name}', f'--sheet_name={recognized_sales_sheet_name}')
-        print_colored("----- RECOGNIZED SALES!-----", "magenta")
+        print_colored("----- RECOGNIZED SALES FINISHED!-----", "magenta")
         print_colored("\n-----CREATE MONTHLY SALES!------", "magenta")
         call_command('create_initial_monthly_sales')
         print_colored("-----CREATE MONTHLY SALES FINISHED!-----", "magenta")
