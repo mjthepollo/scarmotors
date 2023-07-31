@@ -28,9 +28,9 @@ class DataLoadTest(TestCase):
     def setUpClass(cls):
         super(DataLoadTest, cls).setUpClass()
         file_name = "src/data_load.xlsx"
-        sheet_name = "22년 12월 미청구"
+        # sheet_name = "22년 12월 미청구"
         # sheet_name = "23년 본사 상반기"
-        # sheet_name = "23년 본사 하반기"
+        sheet_name = "23년 본사 하반기"
         cls.original_df = load_data(file_name, sheet_name)
         cls.df = get_effective_data_frame(
             file_name, sheet_name)

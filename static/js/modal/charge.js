@@ -13,7 +13,8 @@ function setChargeInfoFactory(wageAmountInput, componentAmountInput, paymentData
     const chargableAmount = faultRatio * (repairAmount + vatAmount);
     const indemnityAmount = parseFloat(paymentData.dataset.indemnity_amount);
     const refundAmount = parseFloat(paymentData.dataset.refund_amount);
-    const chargeAmount = chargableAmount - indemnityAmount + refundAmount;
+    let chargeAmount = chargableAmount - indemnityAmount + refundAmount;
+    chargeAmount = chargeAmount > 0 ? chargeAmount : 0;
     repairAmountInfo.innerHTML = isNaN(repairAmount) ? "-" : numberWithCommas(parseInt(repairAmount));
     vatInfo.innerHTML = isNaN(vatAmount) ? "-" : numberWithCommas(parseInt(vatAmount));
     chargableAmountInfo.innerHTML = isNaN(chargableAmount) ? "-" : numberWithCommas(parseInt(chargableAmount));

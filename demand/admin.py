@@ -87,8 +87,18 @@ class InsuranceAgentAdmin(admin.ModelAdmin):
         queryset.update(active=True)
 
 
+class OrderInline(admin.TabularInline):
+    model = Order
+    extra = 0
+    fields = ["charged_company", "charge_type",
+              "order_type", "receipt_number", "fault_ratio"]
+    readonly_fields = ["register"]
+    show_change_link = True
+
+
 @admin.register(Register)
 class RegisterAdmin(admin.ModelAdmin):
+    inlines = [OrderInline, ]
     list_display = ["RO_number", "car_number", "insurance_agent"]
     list_filter = ["day_came_in", "expected_day_came_out", "real_day_came_out"]
     search_fields = ["RO_number", "insurance_agent"]

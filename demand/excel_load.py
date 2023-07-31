@@ -62,7 +62,8 @@ def check_wash_line_with_df_and_line_number(df, line_number):
     client_name_and_insurance_agent = df.iloc[line_number,
                                               CLIENT_NAME_AND_INSURANCE_AGENT] or "수리의뢰자"
     supporter_name = df.iloc[line_number, SUPPORTER] or "입고지원"
-    if "세차" in car_model or "세차" in client_name_and_insurance_agent or "세차" in supporter_name:
+    receipt_number = df.iloc[line_number, RECEIPT_NUMBER] or "접수번호"
+    if "세차" in car_model or "세차" in client_name_and_insurance_agent or "세차" in supporter_name or "세차" in receipt_number:
         return True
     return False
 
@@ -74,7 +75,8 @@ def check_wash_line(line):
     car_model = line[CAR_MODEL] or "차종"
     client_name_and_insurance_agent = line[CLIENT_NAME_AND_INSURANCE_AGENT] or "수리의뢰자"
     supporter_name = line[SUPPORTER] or "입고지원"
-    if "세차" in car_model or "세차" in client_name_and_insurance_agent or "세차" in supporter_name:
+    receipt_number = line[RECEIPT_NUMBER] or "접수번호"
+    if "세차" in car_model or "세차" in client_name_and_insurance_agent or "세차" in supporter_name or "세차" in receipt_number:
         return True
     return False
 

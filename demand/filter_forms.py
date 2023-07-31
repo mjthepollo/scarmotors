@@ -25,11 +25,14 @@ class OXBooleanWidget(BooleanWidget):
 
 class RegisterFilter(django_filters.FilterSet):
     RO_number = django_filters.CharFilter(
-        widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
-        field_name='RO_number', lookup_expr='icontains', label="RO번호")
+        widget=forms.TextInput(attrs={'placeholder': '일치 검색'}),
+        field_name='RO_number', lookup_expr='exact', label="RO번호")
     car_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='car_number', lookup_expr='icontains', label="차량번호")
+    abroad_type = django_filters.ChoiceFilter(
+        choices=Register._meta.get_field('abroad_type').choices,
+        label="해외차여부")
     insurance_agent = django_filters.ModelChoiceFilter(
         field_name='insurance_agent', queryset=InsuranceAgent.objects.all(),
         label="보험 담당자")
@@ -42,13 +45,6 @@ class RegisterFilter(django_filters.FilterSet):
     day_came_in__ls = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
         field_name='day_came_in', lookup_expr='lt', label="입고일(까지)")
-
-    real_day_came_out__gt = django_filters.DateFilter(
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='real_day_came_out', lookup_expr='gt', label="출고일(부터)")
-    real_day_came_out__ls = django_filters.DateFilter(
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='real_day_came_out', lookup_expr='lt', label="출고일(까지)")
 
     client_name = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
@@ -63,13 +59,16 @@ class RegisterFilter(django_filters.FilterSet):
 
     class Meta:
         model = Register
-        fields = ["RO_number", "car_number", "client_name"]
+        fields = ["RO_number", "car_number", "client_name", ]
 
 
 class RegisterFilterForOrderFilter(django_filters.FilterSet):
     car_number = django_filters.CharFilter(
-        widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
-        field_name='car_number', lookup_expr='icontains', label="차량번호")
+        widget=forms.TextInput(attrs={'placeholder': '일치 검색'}),
+        field_name='car_number', lookup_expr='exact', label="차량번호")
+    abroad_type = django_filters.ChoiceFilter(
+        choices=Register._meta.get_field('abroad_type').choices,
+        label="해외차여부")
     insurance_agent = django_filters.ModelChoiceFilter(
         field_name='insurance_agent', queryset=InsuranceAgent.objects.all(),
         label="보험 담당자")
@@ -82,13 +81,6 @@ class RegisterFilterForOrderFilter(django_filters.FilterSet):
     day_came_in__ls = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
         field_name='day_came_in', lookup_expr='lt', label="입고일(까지)")
-
-    real_day_came_out__gt = django_filters.DateFilter(
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='real_day_came_out', lookup_expr='gt', label="출고일(부터)")
-    real_day_came_out__ls = django_filters.DateFilter(
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='real_day_came_out', lookup_expr='lt', label="출고일(까지)")
 
     client_name = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
@@ -111,9 +103,12 @@ class OrderFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='receipt_number', lookup_expr='icontains', label="접수번호")
 
-    charge__charge_date = django_filters.DateFilter(
+    charge__charge_date__gt = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='charge__charge_date', lookup_expr='exact', label="청구일")
+        field_name='charge__charge_date', lookup_expr='gt', label="청구일(부터)")
+    charge__charge_date__lt = django_filters.DateFilter(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        field_name='charge__charge_date', lookup_expr='lt', label="청구일(까지)")
     deposit__deposit_date = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
         field_name='deposit__deposit_date', lookup_expr='exact', label="입금일")
