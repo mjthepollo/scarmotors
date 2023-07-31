@@ -5,7 +5,8 @@
 {% endblock css %} {% block content %}
 {% if user.editable %}
 <div id="special_functions">
-    <a class="btn btn-success special_function" href="{% url 'demand:new_recognized_sales' %}">인정 매출 등록</a>
+    <a class="btn btn-primary special_function" href="{% url 'demand:new_recognized_sales' %}">인정 매출 등록</a>
+    <a class="btn btn-success special_function" href="{% url 'demand:recognized_sales_to_excel' %}" download>엑셀 다운로드</a>
 </div>
 {% endif %}
 <form id="search_form" method="GET">

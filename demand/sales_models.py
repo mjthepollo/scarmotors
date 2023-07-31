@@ -500,6 +500,7 @@ class Register(TimeStampedModel):
 
 # region FOR HTML FUNCTIONS
 
+
     def get_status(self):
         orders = self.all_orders
         all_completed = True
@@ -716,6 +717,20 @@ class RecognizedSales(TimeStampedModel):
     component_amount = models.IntegerField(default=0, verbose_name="부품비")
     note = models.TextField(default="부가세 별도", blank=True,
                             null=True, verbose_name="비고")
+
+    def to_excel_line(self):
+        return [
+            self.day_came_in.month,
+            self.day_came_in.strftime("%Y-%m-%d"),
+            self.real_day_came_out.strftime("%Y-%m-%d"),
+            self.car_number or "-",
+            self.request_department.name or "-",
+            self.wage_amount or 0,
+            self.component_amount or 0,
+            self.get_repair_amount() or 0,
+            self.note or "-",
+            int(self.get_not_paid_turnover()) or "-",
+        ]
 
     def get_repair_amount(self):
         if self.wage_amount != None and self.component_amount != None:

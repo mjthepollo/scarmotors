@@ -440,8 +440,25 @@ def edit_extra_sales(request, pk):
 @login_required
 def search_recognized_sales(request):
     all_recognized_sales = RecognizedSales.objects.all()
-    print(all_recognized_sales)
     return render(request, "demand/search_recognized_sales.html", context={"all_recognized_sales": all_recognized_sales})
+
+
+@login_required
+def recognized_sales_to_excel(request):
+    all_recognized_sales = RecognizedSales.objects.all()
+    lines = [recognized_sales.to_excel_line()
+             for recognized_sales in all_recognized_sales]
+    lines.reverse()
+    df = pd.DataFrame(lines, columns=[
+                      "월", "입고", "출고", "차량번호", "요청부서", "공임", "부품", "수리금액", "비고", "공장매출"])
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='인정매출')
+    output.seek(0)
+    response = FileResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="인정매출{datetime.now()}.xlsx'
+    return response
 
 
 @login_required

@@ -13,7 +13,7 @@ class ExtraSalesAdmin(admin.ModelAdmin):
 
 
 @admin.register(RecognizedSales)
-class RecongnizedSalesAdmin(admin.ModelAdmin):
+class RecognizedSalesAdmin(admin.ModelAdmin):
     list_display = ["day_came_in", "real_day_came_out", "car_number",
                     "wage_amount", "component_amount", "request_department"]
 

@@ -517,19 +517,19 @@ def compare_order_with_line(order, line, equal, check_list):
         equal, check_list = check_all_fields(equal, check_list, order.payment,
                                              temp_order.payment, [], suffix)
     if bool(order.payment) != bool(temp_order.payment):
-        check_list["payment"] = "다름"
+        check_list[f"payment{suffix}"] = "다름"
         equal = False
     if order.charge and temp_order.charge:
         equal, check_list = check_all_fields(equal, check_list, order.charge,
                                              temp_order.charge, [], suffix)
     if bool(order.charge) != bool(temp_order.charge):
-        check_list["charge"] = "다름"
+        check_list[f"charge{suffix}"] = "다름"
         equal = False
     if order.deposit and temp_order.deposit:
         equal, check_list = check_all_fields(equal, check_list, order.deposit,
                                              temp_order.deposit, ["deposit_note"], suffix)
     if bool(order.deposit) != bool(temp_order.deposit):
-        check_list["deposit"] = "다름"
+        check_list[f"deposit{suffix}"] = "다름"
         equal = False
     if temp_order.payment:
         temp_order.payment.delete()
@@ -570,9 +570,13 @@ def compare_register_using_line_numbers_for_register(df, line_numbers_for_regist
             order_matched_with_line = register.all_orders.filter(
                 charged_company=charged_company, charge_type=charge_type,
                 order_type=line[ORDER_TYPE], fault_ratio=fault_ratio,
-                receipt_number=str_or_none(line[RECEIPT_NUMBER], )).first()
-            if not order_matched_with_line:
+                receipt_number=str_or_none(line[RECEIPT_NUMBER], ))
+            if not order_matched_with_line.first():
                 check_list["ORDER"] = "타입, 보험사, 차대일, 과실분, 접수번호 확인필요"
+                equal = False
+                break
+            if order_matched_with_line.count() > 1:
+                check_list["ORDER"] = "중복 가능성 존재"
                 equal = False
                 break
             equal, check_list = compare_order_with_line(

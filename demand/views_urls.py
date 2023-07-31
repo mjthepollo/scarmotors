@@ -32,6 +32,8 @@ views_urlpatterns = [
          views.edit_extra_sales, name="edit_extra_sales"),
     path("search_recognized_sales/", views.search_recognized_sales,
          name="search_recognized_sales"),
+    path("recognized_sales_to_excel/", views.recognized_sales_to_excel,
+         name="recognized_sales_to_excel"),
     path("new_recognized_sales/",
          views.new_recognized_sales, name="new_recognized_sales"),
     path("edit_recognized_sales/<int:pk>/",
