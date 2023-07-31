@@ -70,8 +70,6 @@ def get_incentive_date_from_row(row):
 
 workbook = load_workbook('src/data_load.xlsx')
 sheet_names = ["22년 12월 미청구", "23년 본사 상반기", "23년 본사 하반기"]
-worksheets = (workbook.get_sheet_by_name(
-    sheet_name) for sheet_name in sheet_names)
 INCENTIVED_SET = set()
 NOT_INCENTIVED_SET = set()
 
@@ -84,7 +82,8 @@ class Command(BaseCommand):
     help = 'clean models by 입출고대장'
 
     def handle(self, *args, **options):
-        for sheet_index, worksheet in enumerate(worksheets):
+        for sheet_index, worksheet in enumerate(sheet_names):
+            worksheet = workbook.get_sheet_by_name(worksheet)
             for row_index, row in enumerate(worksheet.iter_rows()):
                 if row[SUPPORTER].comment:
                     try:
