@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize%}
 {% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
 <link rel="stylesheet" href="{% static 'css/deadline.css' %}">
 {% endblock css %} {% block content %}
@@ -21,44 +22,44 @@
         <td rowspan="3">일반경정비, 렌트일반, 인정</td>
         <td>기간</td>
         <td>{{deadline_info_of_period.numbers_of_car_for_general}}</td>
-        <td>{{deadline_info_of_period.component_turnover_of_general|thousand_format}}</td>
-        <td>{{deadline_info_of_period.wage_turnover_of_general|thousand_format}}</td>
+        <td>{{deadline_info_of_period.component_turnover_of_general|intcomma}}</td>
+        <td>{{deadline_info_of_period.wage_turnover_of_general|intcomma}}</td>
     </tr>
     <tr>
         <td>인정</td>
         <td>{{deadline_info_of_period.numbers_of_car_for_recognized_sales}}</td>
-        <td>{{deadline_info_of_period.component_turnover_of_recognized_sales|thousand_format}}</td>
-        <td>{{deadline_info_of_period.wage_turnover_of_recognized_sales|thousand_format}}</td>
+        <td>{{deadline_info_of_period.component_turnover_of_recognized_sales|intcomma}}</td>
+        <td>{{deadline_info_of_period.wage_turnover_of_recognized_sales|intcomma}}</td>
     </tr>
     <tr>
         <td class='bold gray'>계</td>
         <td class='bold gray'>{{deadline_info_of_period.numbers_of_car_for_recognized_sales|add:deadline_info_of_period.numbers_of_car_for_general}}</td>
-        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_recognized_sales|add:deadline_info_of_period.component_turnover_of_general|thousand_format}}</td>
-        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_recognized_sales|add:deadline_info_of_period.wage_turnover_of_general|thousand_format}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_recognized_sales|add:deadline_info_of_period.component_turnover_of_general|intcomma}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_recognized_sales|add:deadline_info_of_period.wage_turnover_of_general|intcomma}}</td>
     </tr>
     <tr>
         <td>렌터카</td>
         <td>렌트판도</td>
         <td class='bold gray'>계</td>
         <td class='bold gray'>{{deadline_info_of_period.numbers_of_car_for_rent}}</td>
-        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_rent|thousand_format}}</td>
-        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_rent|thousand_format}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_rent|intcomma}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_rent|intcomma}}</td>
     </tr>
     <tr>
         <td>국산</td>
         <td>보험,일반판도/국산</td>
         <td class='bold gray'>계</td>
         <td class='bold gray'>{{deadline_info_of_period.numbers_of_car_for_domestic_insurance}}</td>
-        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_domestic_insurance|thousand_format}}</td>
-        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_domestic_insurance|thousand_format}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_domestic_insurance|intcomma}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_domestic_insurance|intcomma}}</td>
     </tr>
     <tr>
         <td>수입</td>
         <td>보험,일반판도/수입</td>
         <td class='bold gray'>계</td>
         <td class='bold gray'>{{deadline_info_of_period.numbers_of_car_for_abroad_insurance}}</td>
-        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_abroad_insurance|thousand_format}}</td>
-        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_abroad_insurance|thousand_format}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_abroad_insurance|intcomma}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_abroad_insurance|intcomma}}</td>
     </tr>
 </table>
 {% endif %}

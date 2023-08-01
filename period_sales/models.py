@@ -389,7 +389,7 @@ class DeadlineInfoOfPeriod():
         all_registers = Register.objects.filter(pk__in=pk_of_registers)
 
         for register in all_registers:
-            first_order = register.all_orders.first()
+            first_order = register.orders.order_by("created").first()
             if first_order.charge_type == "일반경정비" or first_order.charge_type == "렌트일반":
                 self.numbers_of_car_for_general += 1
             elif first_order.charge_type == "렌트판도":
@@ -425,3 +425,22 @@ class DeadlineInfoOfPeriod():
             self.numbers_of_car_for_recognized_sales += 1
             self.component_turnover_of_recognized_sales += recognized_sales.get_component_turnover()
             self.wage_turnover_of_recognized_sales += recognized_sales.get_wage_turnover()
+
+        self.component_turnover_of_abroad_insurance = int(
+            self.component_turnover_of_abroad_insurance)
+        self.component_turnover_of_domestic_insurance = int(
+            self.component_turnover_of_domestic_insurance)
+        self.component_turnover_of_general = int(
+            self.component_turnover_of_general)
+        self.component_turnover_of_recognized_sales = int(
+            self.component_turnover_of_recognized_sales)
+        self.component_turnover_of_rent = int(self.component_turnover_of_rent)
+
+        self.wage_turnover_of_abroad_insurance = int(
+            self.wage_turnover_of_abroad_insurance)
+        self.wage_turnover_of_domestic_insurance = int(
+            self.wage_turnover_of_domestic_insurance)
+        self.wage_turnover_of_general = int(self.wage_turnover_of_general)
+        self.wage_turnover_of_recognized_sales = int(
+            self.wage_turnover_of_recognized_sales)
+        self.wage_turnover_of_rent = int(self.wage_turnover_of_rent)
