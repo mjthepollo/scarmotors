@@ -426,6 +426,10 @@ def make_register_from_first_line(first_line):
             note=None,  # Note is handled in create_order_from_line
             wasted=wasted,
             unrepaired=unrepaired,
+            created=datetime.combine(input_to_date(
+                first_line[DAY_CAME_IN]), datetime.min.time()),
+            updated=datetime.combine(input_to_date(
+                first_line[DAY_CAME_IN]), datetime.min.time())
         )
     except Exception as e:
         print_colored(f"REGISTER CREATION FAILURE : {first_line}", "magenta")
@@ -571,16 +575,17 @@ def compare_register_using_line_numbers_for_register(df, line_numbers_for_regist
                 charged_company=charged_company, charge_type=charge_type,
                 order_type=line[ORDER_TYPE], fault_ratio=fault_ratio,
                 receipt_number=str_or_none(line[RECEIPT_NUMBER], ))
-            if not order_matched_with_line.first():
+            if order_matched_with_line.count() == 0:
                 check_list["ORDER"] = "타입, 보험사, 차대일, 과실분, 접수번호 확인필요"
                 equal = False
                 break
-            if order_matched_with_line.count() > 1:
+            elif order_matched_with_line.count() > 1:
                 check_list["ORDER"] = "중복 가능성 존재"
                 equal = False
                 break
-            equal, check_list = compare_order_with_line(
-                order_matched_with_line, line, equal, check_list)
+            else:
+                equal, check_list = compare_order_with_line(
+                    order_matched_with_line.first(), line, equal, check_list)
     return equal, check_list, RO_number
 
 

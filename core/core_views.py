@@ -16,8 +16,7 @@ from demand.excel_load import (
     get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers)
 from demand.sales_models import Order, Register
 from period_sales.forms import PeriodFilter
-from period_sales.models import (MonthlySales, StatisticSales,
-                                 get_net_information)
+from period_sales.models import MonthlySales, get_net_information
 from users.forms import CustomAuthForm
 
 

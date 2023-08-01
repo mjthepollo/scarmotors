@@ -38,4 +38,5 @@ views_urlpatterns = [
          views.new_recognized_sales, name="new_recognized_sales"),
     path("edit_recognized_sales/<int:pk>/",
          views.edit_recognized_sales, name="edit_recognized_sales"),
+    path("deadline", views.deadline, name="deadline"),
 ]

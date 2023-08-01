@@ -21,6 +21,8 @@ from demand.sales_model_forms import (EditRegisterForm,
                                       RegisterNoteForm)
 from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
 from demand.utility import print_fields
+from period_sales.forms import DeadlineFilter
+from period_sales.models import DeadlineInfoOfPeriod
 
 
 @login_required
@@ -224,7 +226,7 @@ def detail_register(request, pk):
 def get_registers_from_filter_and_page(request):
     register_filter = RegisterFilter(
         request.GET, queryset=Register.objects.all())
-    page_num = int(request.GET.get('page_num', 20))
+    page_num = int(request.GET.get('page_num', 50))
     paginator = Paginator(register_filter.qs, page_num)
     page = request.GET.get('page')
     registers = paginator.get_page(page)
@@ -235,7 +237,7 @@ def get_registers_from_filter_and_page(request):
 def search_registers(request):
     register_filter = RegisterFilter(
         request.GET, queryset=Register.objects.all())
-    page_num = int(request.GET.get('page_num', 20))
+    page_num = int(request.GET.get('page_num', 50))
     paginator = Paginator(register_filter.qs, page_num)
     page = request.GET.get('page')
     registers = paginator.get_page(page)
@@ -280,7 +282,7 @@ def get_orders_from_filter_and_page(request):
         request.GET, queryset=Register.objects.all())
     order_filter = OrderFilter(
         request.GET, queryset=Order.objects.filter(register__in=register_filter.qs))
-    page_num = int(request.GET.get('page_num', 20))
+    page_num = int(request.GET.get('page_num', 50))
     paginator = Paginator(order_filter.qs, page_num)
     page = request.GET.get('page')
     orders = paginator.get_page(page)
@@ -293,7 +295,7 @@ def search_orders(request):
         request.GET, queryset=Register.objects.all())
     order_filter = OrderFilter(
         request.GET, queryset=Order.objects.filter(register__in=register_filter.qs))
-    page_num = int(request.GET.get('page_num', 20))
+    page_num = int(request.GET.get('page_num', 50))
     paginator = Paginator(order_filter.qs, page_num)
     page = request.GET.get('page')
     orders = paginator.get_page(page)
@@ -497,3 +499,23 @@ def edit_recognized_sales(request, pk):
             return render(request, "demand/edit_recognized_sales.html", context={
                 "recognized_sales_form": recognized_sales_form,
             })
+
+
+@login_required
+def deadline(request):
+    deadline_filter = DeadlineFilter(request.GET)
+    deadline_filter.label_suffix = ""
+    if deadline_filter.is_valid():
+        charge__charge_date__gte = deadline_filter.cleaned_data["charge__charge_date__gte"]
+        charge__charge_date__lte = deadline_filter.cleaned_data["charge__charge_date__lte"]
+    else:
+        raise ("DeadlineFilter is not valid!")
+    if charge__charge_date__gte and charge__charge_date__lte:
+        deadline_info_of_period = DeadlineInfoOfPeriod(
+            charge__charge_date__gte, charge__charge_date__lte)
+    else:
+        deadline_info_of_period = None
+    return render(request, "deadline.html", context={
+        "deadline_filter": deadline_filter,
+        "deadline_info_of_period": deadline_info_of_period,
+    })

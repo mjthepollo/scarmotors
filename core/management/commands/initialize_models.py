@@ -41,6 +41,7 @@ class Command(BaseCommand):
         print_colored("\n-----CREATE MONTHLY SALES!------", "magenta")
         call_command('create_initial_monthly_sales')
         print_colored("-----CREATE MONTHLY SALES FINISHED!-----", "magenta")
+        print_colored("-----SET INCENTIVE DATE!-----", "magenta")
         call_command('set_incentive_date')
         print_colored("-----SET INCENTIVE DATE FINISHED!-----", "magenta")
 

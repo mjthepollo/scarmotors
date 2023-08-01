@@ -10,3 +10,10 @@ class PeriodFilter(forms.Form):
     half = forms.ChoiceField(
         choices=[("first", "상반기"), ("second", "하반기"), ("all", "전체")], label="분기",
         widget=forms.Select(attrs={'class': 'form-select'}))
+
+
+class DeadlineFilter(forms.Form):
+    charge__charge_date__gte = forms.DateField(
+        label="청구일(부터)", widget=forms.DateInput(attrs={'type': 'date', 'required': 'required'}), required=False)
+    charge__charge_date__lte = forms.DateField(
+        label="청구일(까지)", widget=forms.DateInput(attrs={'type': 'date', "required": "required"}), required=False)

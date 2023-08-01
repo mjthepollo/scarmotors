@@ -58,7 +58,7 @@ def string_to_date(string):
         elif re.match(pattern, string):
             return datetime.strptime(string, "%y%m%d").date()
         else:
-            print("ERROR : WRONG INPUT TYPE - FORMAT")
+            print(f"ERROR : WRONG INPUT TYPE - FORMAT :: {string}")
             return None
     else:
         raise Exception("ERROR : WRONG INPUT TYPE, NOT STRING!")

@@ -39,12 +39,12 @@ class RegisterFilter(django_filters.FilterSet):
     supporter = django_filters.ModelChoiceFilter(
         field_name='supporter', queryset=Supporter.objects.all(),
         label="입고지원")
-    day_came_in__gt = django_filters.DateFilter(
+    day_came_in__gte = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='day_came_in', lookup_expr='gt', label="입고일(부터)")
-    day_came_in__ls = django_filters.DateFilter(
+        field_name='day_came_in', lookup_expr='gte', label="입고일(부터)")
+    day_came_in__lte = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='day_came_in', lookup_expr='lt', label="입고일(까지)")
+        field_name='day_came_in', lookup_expr='lte', label="입고일(까지)")
 
     client_name = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
@@ -64,8 +64,8 @@ class RegisterFilter(django_filters.FilterSet):
 
 class RegisterFilterForOrderFilter(django_filters.FilterSet):
     car_number = django_filters.CharFilter(
-        widget=forms.TextInput(attrs={'placeholder': '일치 검색'}),
-        field_name='car_number', lookup_expr='exact', label="차량번호")
+        widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
+        field_name='car_number', lookup_expr='icontains', label="차량번호")
     abroad_type = django_filters.ChoiceFilter(
         choices=Register._meta.get_field('abroad_type').choices,
         label="해외차여부")
@@ -75,12 +75,12 @@ class RegisterFilterForOrderFilter(django_filters.FilterSet):
     supporter = django_filters.ModelChoiceFilter(
         field_name='supporter', queryset=Supporter.objects.all(),
         label="입고지원")
-    day_came_in__gt = django_filters.DateFilter(
+    day_came_in__gte = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='day_came_in', lookup_expr='gt', label="입고일(부터)")
-    day_came_in__ls = django_filters.DateFilter(
+        field_name='day_came_in', lookup_expr='gte', label="입고일(부터)")
+    day_came_in__lte = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='day_came_in', lookup_expr='lt', label="입고일(까지)")
+        field_name='day_came_in', lookup_expr='lte', label="입고일(까지)")
 
     client_name = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
@@ -103,12 +103,12 @@ class OrderFilter(django_filters.FilterSet):
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='receipt_number', lookup_expr='icontains', label="접수번호")
 
-    charge__charge_date__gt = django_filters.DateFilter(
+    charge__charge_date__gte = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='charge__charge_date', lookup_expr='gt', label="청구일(부터)")
-    charge__charge_date__lt = django_filters.DateFilter(
+        field_name='charge__charge_date', lookup_expr='gte', label="청구일(부터)")
+    charge__charge_date__lte = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='charge__charge_date', lookup_expr='lt', label="청구일(까지)")
+        field_name='charge__charge_date', lookup_expr='lte', label="청구일(까지)")
     deposit__deposit_date = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
         field_name='deposit__deposit_date', lookup_expr='exact', label="입금일")
@@ -139,15 +139,14 @@ class IncentiveFilter(django_filters.FilterSet):
     incentive_paid = django_filters.BooleanFilter(
         field_name='incentive_paid', label="지급여부",
         widget=OXBooleanWidget())
-    day_came_in__gt = django_filters.DateFilter(
+    day_came_in__gte = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='register__day_came_in', lookup_expr='gt', label="입고일(부터)")
-    day_came_in__ls = django_filters.DateFilter(
+        field_name='register__day_came_in', lookup_expr='gte', label="입고일(부터)")
+    day_came_in__lte = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        field_name='register__day_came_in', lookup_expr='lt', label="입고일(까지)")
+        field_name='register__day_came_in', lookup_expr='lte', label="입고일(까지)")
 
     class Meta:
-        label_suffix = ""
         model = Order
         fields = ["register__car_number",
                   "register__supporter", 'incentive_paid']

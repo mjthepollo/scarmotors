@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load custom_filters %}{% load static%} {% block css %} {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/deadline.css' %}">
+{% endblock css %} {% block content %}
+<form id="deadline_filter_search_form" method="GET">
+    <div id="deadline_filter">
+    {{deadline_filter.as_div}}
+    </div>
+    <div><input id="deadline_search_button" type="submit" value="검색" class="btn btn-dark"></div>
+</form>
+{% if deadline_info_of_period %}
+<table id="search_results" border="1">
+    <tr>
+        <th colspan="3"></th>
+        <th>개수</th>
+        <th>공임</th>
+        <th>부품</th>
+    </tr>
+    <tr>
+        <td rowspan="3">일반</td>
+        <td rowspan="3">일반경정비, 렌트일반, 인정</td>
+        <td>기간</td>
+        <td>{{deadline_info_of_period.numbers_of_car_for_general}}</td>
+        <td>{{deadline_info_of_period.component_turnover_of_general|thousand_format}}</td>
+        <td>{{deadline_info_of_period.wage_turnover_of_general|thousand_format}}</td>
+    </tr>
+    <tr>
+        <td>인정</td>
+        <td>{{deadline_info_of_period.numbers_of_car_for_recognized_sales}}</td>
+        <td>{{deadline_info_of_period.component_turnover_of_recognized_sales|thousand_format}}</td>
+        <td>{{deadline_info_of_period.wage_turnover_of_recognized_sales|thousand_format}}</td>
+    </tr>
+    <tr>
+        <td class='bold gray'>계</td>
+        <td class='bold gray'>{{deadline_info_of_period.numbers_of_car_for_recognized_sales|add:deadline_info_of_period.numbers_of_car_for_general}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_recognized_sales|add:deadline_info_of_period.component_turnover_of_general|thousand_format}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_recognized_sales|add:deadline_info_of_period.wage_turnover_of_general|thousand_format}}</td>
+    </tr>
+    <tr>
+        <td>렌터카</td>
+        <td>렌트판도</td>
+        <td class='bold gray'>계</td>
+        <td class='bold gray'>{{deadline_info_of_period.numbers_of_car_for_rent}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_rent|thousand_format}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_rent|thousand_format}}</td>
+    </tr>
+    <tr>
+        <td>국산</td>
+        <td>보험,일반판도/국산</td>
+        <td class='bold gray'>계</td>
+        <td class='bold gray'>{{deadline_info_of_period.numbers_of_car_for_domestic_insurance}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_domestic_insurance|thousand_format}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_domestic_insurance|thousand_format}}</td>
+    </tr>
+    <tr>
+        <td>수입</td>
+        <td>보험,일반판도/수입</td>
+        <td class='bold gray'>계</td>
+        <td class='bold gray'>{{deadline_info_of_period.numbers_of_car_for_abroad_insurance}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.component_turnover_of_abroad_insurance|thousand_format}}</td>
+        <td class='bold gray'>{{deadline_info_of_period.wage_turnover_of_abroad_insurance|thousand_format}}</td>
+    </tr>
+</table>
+{% endif %}
+{% endblock content %}
+{% block inline_javascript %}
+{% endblock inline_javascript %}

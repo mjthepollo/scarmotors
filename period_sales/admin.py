@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from period_sales.models import MonthlySales, StatisticSales
+from period_sales.models import MonthlySales
 
 PAID_SALES_LIST_DISPLAY = [
     "__str__",
@@ -24,9 +24,4 @@ PAID_SALES_LIST_DISPLAY = [
 
 # @admin.register(MonthlySales)
 class MonthlySalesAdmin(admin.ModelAdmin):
-    list_display = PAID_SALES_LIST_DISPLAY
-
-
-# @admin.register(StatisticSales)
-class StatisticSalesAdmin(admin.ModelAdmin):
     list_display = PAID_SALES_LIST_DISPLAY

@@ -500,7 +500,6 @@ class Register(TimeStampedModel):
 
 # region FOR HTML FUNCTIONS
 
-
     def get_status(self):
         orders = self.all_orders
         all_completed = True
@@ -641,11 +640,12 @@ class Order(Sales):
         except Exception as e:
             try:
                 print(
-                    f"Exception in __str__ of order : {str(self.register)}[{self.order_index}]")
-            except Exception:
+                    f"Exception in __str__ of order : REGISTER_{str(self.register.pk)}[{self.order_index}]")
+            except Exception as e:
                 print(
                     f"Double Exception in __str__ of order which has pk of {self.pk}")
-                return f"Order [pk:{self.pk}]"
+                print(self.order_index)
+                return f"Order [pk:{self.pk}], {e}"
             return f"{str(self.register)}[{self.order_index}]"
 
 

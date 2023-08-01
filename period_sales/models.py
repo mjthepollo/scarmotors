@@ -6,7 +6,7 @@ from django.db import models
 from core.models import TimeStampedModel
 from core.utility import print_colored
 from demand.key_models import ChargedCompany
-from demand.sales_models import ExtraSales, Order, RecognizedSales
+from demand.sales_models import ExtraSales, Order, RecognizedSales, Register
 from demand.utility import print_fields
 
 
@@ -354,11 +354,74 @@ def get_net_information(all_monthly_sales):
     return return_dict
 
 
-class StatisticSales(PeriodSales):
-    """
-    Statistic Sales는 일정 기간 동안의 매출 정보를 저장하는 Model이다.
-    이는 순간적으로 활용되며, 순간적인 활용 이후에는 바로 삭제된다.
-    """
+class DeadlineInfoOfPeriod():
+    def __init__(self, charge__charge_date__gte, charge__charge_date__lte):
+        self.charge__charge_date__gte = charge__charge_date__gte
+        self.charge__charge_date__lte = charge__charge_date__lte
+        all_recognized_sales = RecognizedSales.objects.filter(
+            real_day_came_out__range=(
+                charge__charge_date__gte, charge__charge_date__lte)
+        )
+        all_orders = Order.objects.filter(
+            charge__charge_date__range=(
+                charge__charge_date__gte, charge__charge_date__lte)
+        )
+        self.numbers_of_car_for_general = 0
+        self.numbers_of_car_for_recognized_sales = 0
+        self.numbers_of_car_for_rent = 0
+        self.numbers_of_car_for_domestic_insurance = 0
+        self.numbers_of_car_for_abroad_insurance = 0
 
-    def __str__(self):
-        return f"[{self.start_date}~{self.end_date}] 매출"
+        self.component_turnover_of_general = 0
+        self.component_turnover_of_recognized_sales = 0
+        self.component_turnover_of_rent = 0
+        self.component_turnover_of_domestic_insurance = 0
+        self.component_turnover_of_abroad_insurance = 0
+
+        self.wage_turnover_of_general = 0
+        self.wage_turnover_of_recognized_sales = 0
+        self.wage_turnover_of_rent = 0
+        self.wage_turnover_of_domestic_insurance = 0
+        self.wage_turnover_of_abroad_insurance = 0
+
+        pk_of_registers = all_orders.values_list(
+            "register__pk", flat=True).distinct()
+        all_registers = Register.objects.filter(pk__in=pk_of_registers)
+
+        for register in all_registers:
+            first_order = register.all_orders.first()
+            if first_order.charge_type == "일반경정비" or first_order.charge_type == "렌트일반":
+                self.numbers_of_car_for_general += 1
+            elif first_order.charge_type == "렌트판도":
+                self.numbers_of_car_for_rent += 1
+            elif first_order.charge_type == "보험" or first_order.charge_type == "일반판도":
+                if register.abroad_type == "국산":
+                    self.numbers_of_car_for_domestic_insurance += 1
+                elif register.abroad_type == "수입":
+                    self.numbers_of_car_for_abroad_insurance += 1
+                else:
+                    raise Exception("차량수 카운트에서 abroad_type이 잘못되었습니다.")
+            else:
+                raise Exception("차량수 카운트에서 charge_type이 잘못되었습니다.")
+
+        for order in all_orders:
+            if order.charge_type == "일반경정비" or order.charge_type == "렌트일반":
+                self.component_turnover_of_general += order.get_component_turnover()
+                self.wage_turnover_of_general += order.get_wage_turnover()
+            elif order.charge_type == "렌트판도":
+                self.component_turnover_of_rent += order.get_component_turnover()
+                self.wage_turnover_of_rent += order.get_wage_turnover()
+            elif order.charge_type == "보험" or order.charge_type == "일반판도":
+                if order.register.abroad_type == "국산":
+                    self.component_turnover_of_domestic_insurance += order.get_component_turnover()
+                elif order.register.abroad_type == "수입":
+                    self.component_turnover_of_abroad_insurance += order.get_component_turnover()
+                else:
+                    raise Exception("매출 계산에서 abroad_type이 잘못되었습니다.")
+            else:
+                raise Exception("매출 계산에서 abroad_type이 잘못되었습니다.")
+
+        for recognized_sales in all_recognized_sales:
+            self.numbers_of_car_for_recognized_sales += 1
+            self.component_turnover_of_recognized_sales += recognized_sales.get_component_turnover()
+            self.wage_turnover_of_recognized_sales += recognized_sales.get_wage_turnover()

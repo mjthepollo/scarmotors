@@ -17,6 +17,8 @@
             <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">기타 매출</a>
             {% url 'demand:search_recognized_sales' as url %}
             <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">인정 매출</a>
+            {% url 'demand:deadline' as url %}
+            <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">월 마감</a>
             {% if user.editable%}
             {% url 'differences' as url %}
             <a class="header_link {% if request.path == url %}active{% endif %}" href="{{url}}">비교</a>

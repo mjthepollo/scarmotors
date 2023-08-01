@@ -1,0 +1,61 @@
+@import url("./demand/search.css");
+@import url("../demand/hover_note.css");
+
+#deadline_filter_search_form {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 350px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+#deadline_filter input[type="date"],
+#deadline_filter select {
+  width: 130px;
+}
+#deadline_filter input {
+  width: 80px;
+}
+
+#deadline_filter select[name="incentive_paid"] {
+  width: 50px;
+}
+
+#deadline_filter > div > label {
+  display: flex;
+  justify-content: center;
+
+  margin-right: 0px;
+}
+
+#deadline_filter > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0px 5px;
+}
+
+#deadline_filter_search_form label {
+  margin-right: 20px;
+}
+#deadline_filter_search_form > div {
+  display: flex;
+  align-items: center;
+}
+
+#deadline_filter_search_form #deadline_search_button {
+  width: 60px;
+}
+
+#search_results {
+  width: 600px;
+}
+
+th.gray,
+td.gray {
+  background-color: #f2f2f2;
+}
