@@ -504,6 +504,8 @@ def edit_recognized_sales(request, pk):
 
 @login_required
 def deadline(request):
+    if request.path == request.get_full_path():
+        return redirect(reverse("demand:deadline")+f"?charge__charge_date__gte={date.today().replace(day=1)}&charge__charge_date__lte={date.today()}")
     deadline_filter = DeadlineFilter(request.GET)
     deadline_filter.label_suffix = ""
     if deadline_filter.is_valid():
