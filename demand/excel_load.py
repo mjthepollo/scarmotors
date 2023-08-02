@@ -428,10 +428,10 @@ def make_register_from_first_line(first_line):
             wasted=wasted,
             unrepaired=unrepaired,
         )
-        # created = datetime.combine(input_to_date(
-        #     first_line[DAY_CAME_IN]), datetime.now().time())
-        # register.created = make_aware(created)
-        # register.save()
+        created = datetime.combine(input_to_date(
+            first_line[DAY_CAME_IN]), datetime.now().time())
+        register.created = make_aware(created)
+        register.save()
         return register
     except Exception as e:
         print_colored(f"REGISTER CREATION FAILURE : {first_line}", "magenta")
