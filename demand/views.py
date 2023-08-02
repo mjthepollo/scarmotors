@@ -2,6 +2,7 @@ from datetime import date, datetime
 from io import BytesIO
 
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.forms import NumberInput, TextInput, modelformset_factory
@@ -518,4 +519,49 @@ def deadline(request):
     return render(request, "deadline.html", context={
         "deadline_filter": deadline_filter,
         "deadline_info_of_period": deadline_info_of_period,
+        "download_url": reverse("demand:deadline_to_excel")+"?"+request.GET.urlencode(),
     })
+
+
+@login_required
+def deadline_to_excel(request):
+    deadline_filter = DeadlineFilter(request.GET)
+    deadline_filter.label_suffix = ""
+    if deadline_filter.is_valid():
+        charge__charge_date__gte = deadline_filter.cleaned_data["charge__charge_date__gte"]
+        charge__charge_date__lte = deadline_filter.cleaned_data["charge__charge_date__lte"]
+    else:
+        raise ("DeadlineFilter is not valid!")
+    deadline_info_of_period = DeadlineInfoOfPeriod(
+        charge__charge_date__gte, charge__charge_date__lte)
+    lines_for_general = [order.to_excel_line()
+                         for register in deadline_info_of_period.registers_for_general for order in register.orders.all()]
+    lines_for_rent = [order.to_excel_line()
+                      for register in deadline_info_of_period.registers_for_rent for order in register.orders.all()]
+    lines_for_domestic_insurance = [order.to_excel_line()
+                                    for register in deadline_info_of_period.registers_for_domestic_insurance for order in register.orders.all()]
+    lines_for_abroad_insurance = [order.to_excel_line()
+                                  for register in deadline_info_of_period.registers_for_abroad_insurance for order in register.orders.all()]
+    lines_for_general.reverse()
+    lines_for_rent.reverse()
+    lines_for_domestic_insurance.reverse()
+    lines_for_abroad_insurance.reverse()
+    df_for_general = pd.DataFrame(lines_for_general, columns=INDEXES.values())
+    df_for_rent = pd.DataFrame(lines_for_rent, columns=INDEXES.values())
+    df_for_domestic_insurance = pd.DataFrame(
+        lines_for_domestic_insurance, columns=INDEXES.values())
+    df_for_abroad_insurance = pd.DataFrame(
+        lines_for_abroad_insurance, columns=INDEXES.values())
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df_for_general.to_excel(writer, index=False, sheet_name='일반')
+        df_for_rent.to_excel(writer, index=False, sheet_name='렌트')
+        df_for_domestic_insurance.to_excel(
+            writer, index=False, sheet_name='국내보험')
+        df_for_abroad_insurance.to_excel(
+            writer, index=False, sheet_name='해외보험')
+    output.seek(0)
+    response = FileResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{datetime.now()}.xlsx'
+    return response

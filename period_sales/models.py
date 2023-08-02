@@ -388,17 +388,26 @@ class DeadlineInfoOfPeriod():
             "register__pk", flat=True).distinct()
         all_registers = Register.objects.filter(pk__in=pk_of_registers)
 
+        self.registers_for_general = []
+        self.registers_for_rent = []
+        self.registers_for_domestic_insurance = []
+        self.registers_for_abroad_insurance = []
+
         for register in all_registers:
             first_order = register.orders.order_by("created").first()
             if first_order.charge_type == "일반경정비" or first_order.charge_type == "렌트일반":
                 self.numbers_of_car_for_general += 1
+                self.registers_for_general.append(register)
             elif first_order.charge_type == "렌트판도":
                 self.numbers_of_car_for_rent += 1
+                self.registers_for_rent.append(register)
             elif first_order.charge_type == "보험" or first_order.charge_type == "일반판도":
                 if register.abroad_type == "국산":
                     self.numbers_of_car_for_domestic_insurance += 1
+                    self.registers_for_domestic_insurance.append(register)
                 elif register.abroad_type == "수입":
                     self.numbers_of_car_for_abroad_insurance += 1
+                    self.registers_for_abroad_insurance.append(register)
                 else:
                     raise Exception("차량수 카운트에서 abroad_type이 잘못되었습니다.")
             else:
@@ -444,3 +453,13 @@ class DeadlineInfoOfPeriod():
         self.wage_turnover_of_recognized_sales = int(
             self.wage_turnover_of_recognized_sales)
         self.wage_turnover_of_rent = int(self.wage_turnover_of_rent)
+
+        self.total_number_of_cars = self.numbers_of_car_for_abroad_insurance+self.numbers_of_car_for_domestic_insurance + \
+            self.numbers_of_car_for_general + \
+            self.numbers_of_car_for_recognized_sales+self.numbers_of_car_for_rent
+        self.total_component_turnover = self.component_turnover_of_abroad_insurance+self.component_turnover_of_domestic_insurance + \
+            self.component_turnover_of_general + \
+            self.component_turnover_of_recognized_sales+self.component_turnover_of_rent
+        self.total_wage_turnover = self.wage_turnover_of_abroad_insurance+self.wage_turnover_of_domestic_insurance + \
+            self.wage_turnover_of_general + \
+            self.wage_turnover_of_recognized_sales+self.wage_turnover_of_rent
