@@ -552,6 +552,11 @@ def deadline_to_excel(request):
         lines_for_domestic_insurance, columns=INDEXES.values())
     df_for_abroad_insurance = pd.DataFrame(
         lines_for_abroad_insurance, columns=INDEXES.values())
+    lines_for_recognized_sales = [recognized_sales.to_excel_line()
+                                  for recognized_sales in deadline_info_of_period.all_recognized_sales]
+    lines_for_recognized_sales.reverse()
+    df_for_recognized_sales = pd.DataFrame(lines_for_recognized_sales, columns=[
+        "월", "입고", "출고", "차량번호", "요청부서", "공임", "부품", "수리금액", "비고", "공장매출"])
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df_for_general.to_excel(writer, index=False, sheet_name='일반')
@@ -560,6 +565,8 @@ def deadline_to_excel(request):
             writer, index=False, sheet_name='국내보험')
         df_for_abroad_insurance.to_excel(
             writer, index=False, sheet_name='수입보험')
+        df_for_recognized_sales.to_excel(
+            writer, index=False, sheet_name='인정매출')
     output.seek(0)
     response = FileResponse(
         output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

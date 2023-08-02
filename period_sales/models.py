@@ -358,7 +358,7 @@ class DeadlineInfoOfPeriod():
     def __init__(self, charge__charge_date__gte, charge__charge_date__lte):
         self.charge__charge_date__gte = charge__charge_date__gte
         self.charge__charge_date__lte = charge__charge_date__lte
-        all_recognized_sales = RecognizedSales.objects.filter(
+        self.all_recognized_sales = RecognizedSales.objects.filter(
             real_day_came_out__range=(
                 charge__charge_date__gte, charge__charge_date__lte)
         )
@@ -423,14 +423,16 @@ class DeadlineInfoOfPeriod():
             elif order.charge_type == "보험" or order.charge_type == "일반판도":
                 if order.register.abroad_type == "국산":
                     self.component_turnover_of_domestic_insurance += order.get_component_turnover()
+                    self.wage_turnover_of_domestic_insurance += order.get_wage_turnover()
                 elif order.register.abroad_type == "수입":
                     self.component_turnover_of_abroad_insurance += order.get_component_turnover()
+                    self.wage_turnover_of_abroad_insurance += order.get_wage_turnover()
                 else:
                     raise Exception("매출 계산에서 abroad_type이 잘못되었습니다.")
             else:
                 raise Exception("매출 계산에서 abroad_type이 잘못되었습니다.")
 
-        for recognized_sales in all_recognized_sales:
+        for recognized_sales in self.all_recognized_sales:
             self.numbers_of_car_for_recognized_sales += 1
             self.component_turnover_of_recognized_sales += recognized_sales.get_component_turnover()
             self.wage_turnover_of_recognized_sales += recognized_sales.get_wage_turnover()
