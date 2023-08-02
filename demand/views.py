@@ -559,7 +559,7 @@ def deadline_to_excel(request):
         df_for_domestic_insurance.to_excel(
             writer, index=False, sheet_name='국내보험')
         df_for_abroad_insurance.to_excel(
-            writer, index=False, sheet_name='해외보험')
+            writer, index=False, sheet_name='수입보험')
     output.seek(0)
     response = FileResponse(
         output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
