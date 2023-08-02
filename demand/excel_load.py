@@ -3,6 +3,7 @@ from datetime import date, datetime
 import numpy as np
 import pandas as pd
 from django.core.management import call_command
+from django.utils.timezone import make_aware
 
 from core.models import TimeStampedModel
 from core.utility import print_colored
@@ -404,7 +405,7 @@ def make_register_from_first_line(first_line):
     unrepaired = check_unrepaired_line(first_line)
 
     try:
-        return Register.objects.create(
+        register = Register.objects.create(
             RO_number=first_line[RO_NUMBER],
             car_number=first_line[CAR_NUMBER],
             day_came_in=input_to_date(first_line[DAY_CAME_IN]),
@@ -426,11 +427,12 @@ def make_register_from_first_line(first_line):
             note=None,  # Note is handled in create_order_from_line
             wasted=wasted,
             unrepaired=unrepaired,
-            created=datetime.combine(input_to_date(
-                first_line[DAY_CAME_IN]), datetime.min.time()),
-            updated=datetime.combine(input_to_date(
-                first_line[DAY_CAME_IN]), datetime.min.time())
         )
+        # created = datetime.combine(input_to_date(
+        #     first_line[DAY_CAME_IN]), datetime.now().time())
+        # register.created = make_aware(created)
+        # register.save()
+        return register
     except Exception as e:
         print_colored(f"REGISTER CREATION FAILURE : {first_line}", "magenta")
         raise e

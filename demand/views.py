@@ -351,14 +351,14 @@ def cancel_manually_complete(request, pk):
 @login_required
 def incentive(request):
     if request.path == request.get_full_path():
-        return redirect(reverse("demand:incentive")+f"?day_came_in__gt={date.today().replace(day=1)}&day_came_in__ls={date.today()}")
+        return redirect(reverse("demand:incentive")+f"?day_came_in__gte={date.today().replace(day=1)}&day_came_in__lte={date.today()}")
     incentive_filter = IncentiveFilter(
         request.GET, queryset=Order.objects.all())
     incentive_filter.form.label_suffix = ""
-    if request.GET.get("register__supporter", None):
-        orders = incentive_filter.qs
-    else:
+    if not request.GET.get("register__supporter", None) and not request.GET.get("register__car_number", None):
         orders = Order.objects.none()
+    else:
+        orders = incentive_filter.qs
     incentive_form_factory = modelformset_factory(
         Order, form=IncentiveForm, extra=0)
     supporter = orders.first().register.supporter if orders.exists() else None
