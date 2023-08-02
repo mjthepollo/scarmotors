@@ -78,7 +78,7 @@
         </td>
         <td>{{order.register.insurance_agent.name}}</td>
         <td>{{order.charged_company}}</td>
-        <td>{{order.fault_ratio}}</td>
+        <td>{{order.fault_ratio|none_to_dash}}</td>
         <td>{{order.order_type|none_to_dash}}</td>
         <td>{{order.formatted_wage_turnover}}</td>
         <td class="order {{order.get_deposit_class}}">입금</td>
