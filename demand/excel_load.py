@@ -547,6 +547,65 @@ def compare_order_with_line(order, line, equal, check_list):
     return equal, check_list
 
 
+def compare_extra_sales_with_line(extra_sales, line, equal, check_list):
+    temp_extra_sales = make_extra_sales_from_line(line)
+    except_list_for_extra_sales = ['charge', "deposit", "payment", "status"]
+
+    suffix = ""
+    equal, check_list = check_all_fields(
+        equal, check_list, extra_sales, temp_extra_sales, except_list_for_extra_sales, suffix)
+    if extra_sales.payment and temp_extra_sales.payment:
+        equal, check_list = check_all_fields(equal, check_list, extra_sales.payment,
+                                             temp_extra_sales.payment, [], suffix)
+    if bool(extra_sales.payment) != bool(temp_extra_sales.payment):
+        check_list[f"payment{suffix}"] = "다름"
+        equal = False
+    if extra_sales.charge and temp_extra_sales.charge:
+        equal, check_list = check_all_fields(equal, check_list, extra_sales.charge,
+                                             temp_extra_sales.charge, [], suffix)
+    if bool(extra_sales.charge) != bool(temp_extra_sales.charge):
+        check_list[f"charge{suffix}"] = "다름"
+        equal = False
+    if extra_sales.deposit and temp_extra_sales.deposit:
+        equal, check_list = check_all_fields(equal, check_list, extra_sales.deposit,
+                                             temp_extra_sales.deposit, ["deposit_note"], suffix)
+    if bool(extra_sales.deposit) != bool(temp_extra_sales.deposit):
+        check_list[f"deposit{suffix}"] = "다름"
+        equal = False
+    if temp_extra_sales.payment:
+        temp_extra_sales.payment.delete()
+    if temp_extra_sales.charge:
+        temp_extra_sales.charge.delete()
+    if temp_extra_sales.deposit:
+        temp_extra_sales.deposit.delete()
+    temp_extra_sales.delete()
+    return equal, check_list
+
+
+def compare_extra_sales_using_line_number(df, line_number_for_extra_sales):
+    """
+    튜플을 리턴. 첫번째 것은 입력값이 동일한지, 두 번째 것은 비교한 지점에 대한 str을 담은 리스트다.
+    (equal, check_list, car_number)를 리턴한다.
+    """
+    equal = True
+    check_list = {}
+    line = df.iloc[line_number_for_extra_sales, :].values.tolist()
+    car_number = line[CAR_NUMBER]
+    day_came_in = input_to_date(line[DAY_CAME_IN])
+    extra_sales = ExtraSales.objects.filter(
+        car_number=car_number, day_came_in=day_came_in)
+    if extra_sales.count() == 0:
+        check_list["CAR_NUMBER/DAY_CAME_IN"] = f"{car_number}/{day_came_in} 없음"
+        equal = False
+    elif extra_sales.count() == 1:
+        equal, check_list = compare_extra_sales_with_line(
+            extra_sales[0], line, equal, check_list)
+    else:
+        check_list["EXTRA_SALES"] = "중복 가능성 존재"
+        equal = False
+    return equal, check_list, f"{car_number}/{day_came_in}"
+
+
 def compare_register_using_line_numbers_for_register(df, line_numbers_for_register):
     """
     튜플을 리턴. 첫번째 것은 입력값이 동일한지, 두 번째 것은 비교한 지점에 대한 str을 담은 리스트다.
@@ -598,6 +657,16 @@ def get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registe
             df, line_nubmers_for_register)
         if not equal:
             list_of_check_list[RO_number] = check_list
+    return list_of_check_list
+
+
+def get_list_of_check_list_by_comparing_extra_sales_using_line_numbers_for_extra_sales(df, line_numbers_for_extra_sales):
+    list_of_check_list = {}
+    for line_nubmer_for_extra_sales in line_numbers_for_extra_sales:
+        equal, check_list, car_number_and_day_came_in = compare_extra_sales_using_line_number(
+            df, line_nubmer_for_extra_sales)
+        if not equal:
+            list_of_check_list[car_number_and_day_came_in] = check_list
     return list_of_check_list
 
 

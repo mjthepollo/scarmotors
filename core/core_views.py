@@ -12,7 +12,9 @@ from django.urls import reverse
 
 from core.utility import get_current_half, get_start_and_end_dates_of_half
 from demand.excel_load import (
-    get_effective_data_frame, get_line_numbers_for_registers,
+    get_effective_data_frame, get_line_numbers_for_extra_sales,
+    get_line_numbers_for_registers,
+    get_list_of_check_list_by_comparing_extra_sales_using_line_numbers_for_extra_sales,
     get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers)
 from demand.sales_models import Order, Register
 from period_sales.forms import PeriodFilter
@@ -110,23 +112,28 @@ def set_db(request):
 
 @login_required
 def differences(request):
+    default_sheet_name = "23년 본사 하반기"
     if request.method == "GET":
-        return render(request, "differences_get.html")
+        return render(request, "differences_get.html", context={"default_sheet_name": default_sheet_name})
     else:
-        try:
-            EXCEL = request.FILES.get("EXCEL")
-            excel_file = EXCEL.read()
-            sheet_name = request.POST.get("sheet_name")
-            sheet_name = sheet_name if sheet_name else "23년 본사 하반기"
-            excel_save_path = os.path.join(
-                settings.ROOT_DIR, "src/difference.xlsx")
-            with open(excel_save_path, "wb") as f:
-                f.write(excel_file)
-                df = get_effective_data_frame(excel_save_path, sheet_name)
-            line_numbers_for_registers = get_line_numbers_for_registers(df)
-            list_of_check_list = get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(
-                df, line_numbers_for_registers)
-            return render(request, "differences_post.html",
-                          context={"list_of_check_list": list_of_check_list, "sheet_name": sheet_name})
-        except Exception as e:
-            return render(request, "differences_get.html", context={"error": e})
+        EXCEL = request.FILES.get("EXCEL")
+        excel_file = EXCEL.read()
+        sheet_name = request.POST.get("sheet_name")
+        sheet_name = sheet_name if sheet_name else default_sheet_name
+        excel_save_path = os.path.join(
+            settings.ROOT_DIR, "src/difference.xlsx")
+        with open(excel_save_path, "wb") as f:
+            f.write(excel_file)
+            df = get_effective_data_frame(excel_save_path, sheet_name)
+        line_numbers_for_registers = get_line_numbers_for_registers(df)
+        list_of_register_check_list = get_list_of_check_list_by_comparing_registers_using_line_numbers_for_registers(
+            df, line_numbers_for_registers)
+        line_numbers_for_extra_sales = get_line_numbers_for_extra_sales(df)
+        list_of_extra_sales_check_list = get_list_of_check_list_by_comparing_extra_sales_using_line_numbers_for_extra_sales(
+            df, line_numbers_for_extra_sales)
+        return render(request, "differences_post.html",
+                      context={"list_of_register_check_list": list_of_register_check_list,
+                               "list_of_extra_sales_check_list": list_of_extra_sales_check_list,
+                               "sheet_name": sheet_name})
+        # except Exception as e:
+        #     return render(request, "differences_get.html", context={"error": e})

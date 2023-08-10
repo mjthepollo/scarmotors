@@ -19,14 +19,14 @@ table.payment td {
 }
 
 table.period_sales th {
-  background-color: yellow;
+  background-color: #ffff99;
 }
 
 table.insurance th {
-  background-color: green;
+  background-color: #c6e0b4;
 }
 table.payment th {
-  background-color: var(--blue);
+  background-color: #bdd7ee;
 }
 
 table.payment th.double {
@@ -34,5 +34,5 @@ table.payment th.double {
 }
 
 table td.disable {
-  background-color: #ccc;
+  background-color: #bfbfbf;
 }

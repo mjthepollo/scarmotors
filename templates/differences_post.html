@@ -8,15 +8,27 @@
 <div style='height:50px;'></div>
 <h1>비교 결과</h1>
 <div>
-{% for RO_number, check_list in list_of_check_list.items %} 
-    <h5 class="card-title" style="margin-top:15px;margin-bottom:5px;">RO_number : {{RO_number}}</h5>
-    <ul class="list-group">
-    {% for problem_point, value in check_list.items %}
-        <li class="list-group-item">{{problem_point}} | {{value}}</li>
+    <h2>RO</h2>
+    {% for RO_number, check_list in list_of_register_check_list.items %} 
+        <h5 class="card-title" style="margin-top:15px;margin-bottom:5px;">[RO {{RO_number}}]</h5>
+        <ul class="list-group">
+        {% for problem_point, value in check_list.items %}
+            <li class="list-group-item">{{problem_point}} | {{value}}</li>
+        {% endfor %}
+        </ul>
+    {% empty %}
+        <p>비교할 RO가 없습니다.</p>
     {% endfor %}
-    </ul>
-{% empty %}
-    <p>비교할 내용이 없습니다.</p>
-{% endfor %}
+    <h2>기타매출</h2>
+    {% for car_number_and_day_came_in, check_list in list_of_extra_sales_check_list.items %} 
+        <h5 class="card-title" style="margin-top:15px;margin-bottom:5px;">[{{car_number_and_day_came_in}}]</h5>
+        <ul class="list-group">
+        {% for problem_point, value in check_list.items %}
+            <li class="list-group-item">{{problem_point}} | {{value}}</li>
+        {% endfor %}
+        </ul>
+    {% empty %}
+        <p>비교할 기타매출이 없습니다.</p>
+    {% endfor %}
 </div>
 {% endblock content %}

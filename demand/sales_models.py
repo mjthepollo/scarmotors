@@ -90,6 +90,9 @@ class Sales(TimeStampedModel):
         else:
             return "-"
 
+    def formatted_net_payment(self):
+        return format(int(self.get_net_payment()), ",")
+
     def formatted_deposit_amount(self):
         if self.deposit:
             if self.deposit.deposit_amount:
