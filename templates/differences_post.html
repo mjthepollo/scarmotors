@@ -17,7 +17,7 @@
         {% endfor %}
         </ul>
     {% empty %}
-        <p>비교할 RO가 없습니다.</p>
+        <p>EXCEL과 정보가 일치하지 않는 RO가 없습니다.</p>
     {% endfor %}
     <h2>기타매출</h2>
     {% for car_number_and_day_came_in, check_list in list_of_extra_sales_check_list.items %} 
@@ -28,7 +28,7 @@
         {% endfor %}
         </ul>
     {% empty %}
-        <p>비교할 기타매출이 없습니다.</p>
+        <p>EXCEL과 정보가 일치하지 않는 기타매출이 없습니다.</p>
     {% endfor %}
 </div>
 {% endblock content %}
