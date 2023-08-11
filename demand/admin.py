@@ -103,6 +103,20 @@ class RegisterAdmin(admin.ModelAdmin):
     list_filter = ["day_came_in", "expected_day_came_out", "real_day_came_out"]
     search_fields = ["RO_number", "insurance_agent"]
 
+    fieldsets = (
+        ("핵심 정보", {"fields": ("RO_number", "created")}),
+        ("기타 정보", {
+            "fields": ("unrepaired", "wasted", "first_center_repaired",)
+        }),
+        ("등록 정보", {
+            "fields": ("day_came_in", "expected_day_came_out", "real_day_came_out",
+                       "car_number", "car_model", "abroad_type", "number_of_repair_works",
+                       "number_of_exchange_works", "supporter", "client_name", "insurance_agent", "phone_number",
+                       "rentcar_company_name", "note"
+                       )
+        }),
+    )
+
 
 # @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
