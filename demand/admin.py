@@ -101,7 +101,7 @@ class RegisterAdmin(admin.ModelAdmin):
     inlines = [OrderInline, ]
     list_display = ["RO_number", "car_number", "insurance_agent"]
     list_filter = ["day_came_in", "expected_day_came_out", "real_day_came_out"]
-    search_fields = ["RO_number", "insurance_agent"]
+    search_fields = ["RO_number", "insurance_agent__name"]
 
     fieldsets = (
         ("핵심 정보", {"fields": ("RO_number", "created")}),
