@@ -503,6 +503,7 @@ class Register(TimeStampedModel):
 
 # region FOR HTML FUNCTIONS
 
+
     def get_status(self):
         orders = self.all_orders
         all_completed = True
@@ -763,4 +764,7 @@ class RecognizedSales(TimeStampedModel):
         return self.component_amount if self.component_amount else 0
 
     def __str__(self):
-        return f"[{self.car_number}] {self.real_day_came_out.strftime('%Y/%m/%d')} 출고"
+        if self.real_day_came_out:
+            return f"[{self.car_number}] {self.real_day_came_out.strftime('%Y/%m/%d')} 출고"
+        else:
+            return f"[{self.car_number}]"
