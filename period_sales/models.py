@@ -366,6 +366,10 @@ class DeadlineInfoOfPeriod():
             charge__charge_date__range=(
                 charge__charge_date__gte, charge__charge_date__lte)
         )
+
+        all_orders_except_VAT = all_orders.exclude(
+            charged_company__name__icontains="부가세")
+
         self.numbers_of_car_for_general = 0
         self.numbers_of_car_for_recognized_sales = 0
         self.numbers_of_car_for_rent = 0
@@ -384,16 +388,17 @@ class DeadlineInfoOfPeriod():
         self.wage_turnover_of_domestic_insurance = 0
         self.wage_turnover_of_abroad_insurance = 0
 
-        pk_of_registers = all_orders.values_list(
+        pk_of_registers = all_orders_except_VAT.values_list(
             "register__pk", flat=True).distinct()
-        all_registers = Register.objects.filter(pk__in=pk_of_registers)
+        all_effective_registers = Register.objects.filter(
+            pk__in=pk_of_registers)
 
         self.registers_for_general = []
         self.registers_for_rent = []
         self.registers_for_domestic_insurance = []
         self.registers_for_abroad_insurance = []
 
-        for register in all_registers:
+        for register in all_effective_registers:
             first_order = register.orders.order_by("created").first()
             if first_order.charge_type == "일반경정비" or first_order.charge_type == "렌트일반":
                 self.numbers_of_car_for_general += 1
