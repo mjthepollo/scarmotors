@@ -567,6 +567,8 @@ class Register(TimeStampedModel):
             self.number_of_exchange_works = 0
         if self.number_of_repair_works == None:
             self.number_of_repair_works = 0
+        for order in self.all_orders:
+            order.save()
         super(Register, self).save(*args, **kwargs)
 
 
