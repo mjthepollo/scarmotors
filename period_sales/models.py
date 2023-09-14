@@ -398,15 +398,22 @@ class DeadlineInfoOfPeriod():
         self.registers_for_domestic_insurance = []
         self.registers_for_abroad_insurance = []
 
+        RO_number_set = set()
         for register in all_effective_registers:
-            first_order = register.orders.order_by("created").first()
-            if first_order.charge_type == "일반경정비" or first_order.charge_type == "렌트일반":
+            if not register.RO_number in RO_number_set:
+                RO_number_set.add(register.RO_number)
+            else:
+                continue
+            counting_order = register.orders.order_by("created").first()
+            if not counting_order.charge or not counting_order.charge.charge_date:
+                counting_order = register.orders.order_by("created")[1]
+            if counting_order.charge_type == "일반경정비" or counting_order.charge_type == "렌트일반":
                 self.numbers_of_car_for_general += 1
                 self.registers_for_general.append(register)
-            elif first_order.charge_type == "렌트판도":
+            elif counting_order.charge_type == "렌트판도":
                 self.numbers_of_car_for_rent += 1
                 self.registers_for_rent.append(register)
-            elif first_order.charge_type == "보험" or first_order.charge_type == "일반판도":
+            elif counting_order.charge_type == "보험" or counting_order.charge_type == "일반판도":
                 if register.abroad_type == "국산":
                     self.numbers_of_car_for_domestic_insurance += 1
                     self.registers_for_domestic_insurance.append(register)
