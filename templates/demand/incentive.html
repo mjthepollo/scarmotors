@@ -49,7 +49,7 @@
     {% for incentive_form in incentive_formset %}
     {% with incentive_form.instance as order %}
     <tr>
-        <td data-incentive="{{order.get_incentive}}" data-turnover="{{order.get_wage_turnover}}" class="incentive_check incentive"><input type='checkbox' {% if order.incentive_paid %}checked{% endif%}></td>
+        <td data-incentive="{{order.get_incentive}}" data-turnover="{{order.get_wage_turnover}}" class="incentive_check incentive"><input type='checkbox'></td>
         <td class="incentive_paid incentive">
             {% if not incentive_form.instance.incentive_paid %}
                 {% if user.editable %}

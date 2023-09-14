@@ -460,7 +460,8 @@ class Register(TimeStampedModel):
         InsuranceAgent, related_name="orders", null=True, on_delete=models.SET_NULL, verbose_name="보험 담당자")
     phone_number = models.CharField(
         null=True, blank=True, verbose_name="전화번호", max_length=15)
-
+    final_four_phone_number = models.CharField(
+        null=True, blank=True, verbose_name="전화번호 뒷자리", max_length=4)
     # 미수리출고와 폐차 여부는 출고시에 확정시킨다.
     unrepaired = models.BooleanField(default=False, verbose_name="미수리출고")
     wasted = models.BooleanField(default=False, verbose_name="폐차")
@@ -570,6 +571,9 @@ class Register(TimeStampedModel):
         if self.pk != None:
             for order in self.all_orders:
                 order.save()
+        if not self.final_four_phone_number:
+            if self.phone_number:
+                self.final_four_phone_number = self.phone_number[-4:]
         super(Register, self).save(*args, **kwargs)
 
 

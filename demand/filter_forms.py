@@ -102,6 +102,9 @@ class OrderFilter(django_filters.FilterSet):
     receipt_number = django_filters.CharFilter(
         widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
         field_name='receipt_number', lookup_expr='icontains', label="접수번호")
+    phone_number = django_filters.CharFilter(
+        widget=forms.TextInput(attrs={'placeholder': '포함 검색'}),
+        field_name='register__final_four_phone_number', lookup_expr='exact', label="핸드폰 뒷자리")
 
     charge__charge_date__gte = django_filters.DateFilter(
         widget=forms.DateInput(attrs={'type': 'date'}),
