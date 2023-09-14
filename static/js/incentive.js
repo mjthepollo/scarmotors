@@ -21,7 +21,6 @@ function setIncentiveInfo(e) {
 }
 
 function clickIncentivePaid(e) {
-  console.log("SEX");
   const incentivePaidCheck = e.currentTarget;
   const incentivePaidCheckInput = incentivePaidCheck.querySelector("input[type='checkbox']");
   const siblingIncentiveCheck = incentivePaidCheck.parentElement.querySelector(".incentive_check");
