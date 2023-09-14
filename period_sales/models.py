@@ -354,6 +354,13 @@ def get_net_information(all_monthly_sales):
     return return_dict
 
 
+def get_counting_order(register):
+    for order in register.orders.all().order_by('created'):
+        if order.charge != None and order.charge.charge_date != None:
+            return order
+    return None
+
+
 class DeadlineInfoOfPeriod():
     def __init__(self, charge__charge_date__gte, charge__charge_date__lte):
         self.charge__charge_date__gte = charge__charge_date__gte
@@ -404,9 +411,9 @@ class DeadlineInfoOfPeriod():
                 RO_number_set.add(register.RO_number)
             else:
                 continue
-            counting_order = register.orders.order_by("created").first()
-            if not counting_order.charge or not counting_order.charge.charge_date:
-                counting_order = register.orders.order_by("created")[1]
+            counting_order = get_counting_order(register)
+            if not counting_order:
+                continue
             if counting_order.charge_type == "일반경정비" or counting_order.charge_type == "렌트일반":
                 self.numbers_of_car_for_general += 1
                 self.registers_for_general.append(register)
