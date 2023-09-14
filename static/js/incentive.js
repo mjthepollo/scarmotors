@@ -25,10 +25,7 @@ function clickIncentivePaid(e) {
   const incentivePaidCheckInput = incentivePaidCheck.querySelector("input[type='checkbox']");
   const siblingIncentiveCheck = incentivePaidCheck.parentElement.querySelector(".incentive_check");
   const siblingIncentiveCheckInput = siblingIncentiveCheck.querySelector("input[type='checkbox']");
-  console.log(incentivePaidCheckInput, siblingIncentiveCheckInput);
-  console.log(incentivePaidCheckInput.checked, siblingIncentiveCheckInput.checked);
   siblingIncentiveCheckInput.checked = incentivePaidCheckInput.checked;
-  console.log(incentivePaidCheckInput.checked, siblingIncentiveCheckInput.checked);
   setIncentiveInfo();
 }
 
