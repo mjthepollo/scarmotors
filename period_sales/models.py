@@ -452,6 +452,10 @@ class DeadlineInfoOfPeriod():
                 raise Exception("매출 계산에서 abroad_type이 잘못되었습니다.")
 
         for recognized_sales in self.all_recognized_sales:
+            request_department = recognized_sales.request_department
+            if request_department:
+                if "2공장" in request_department.name:
+                    continue
             self.numbers_of_car_for_recognized_sales += 1
             self.component_turnover_of_recognized_sales += recognized_sales.get_component_turnover()
             self.wage_turnover_of_recognized_sales += recognized_sales.get_wage_turnover()
