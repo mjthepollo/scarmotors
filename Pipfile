@@ -18,6 +18,10 @@ argon2-cffi = "*"
 openpyxl = "*"
 django-filter = "*"
 gunicorn = "*"
+pyyaml = "*"
+ua-parser = "*"
+user-agents = "*"
+django-user-agents = "*"
 
 [dev-packages]
 django-debug-toolbar = "*"

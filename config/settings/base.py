@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'jquery',
     'djangoformsetjs',
     'django_filters',
+    'django_user_agents',
 ]
 
 LOCAL_APPS = [
@@ -148,6 +149,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_user_agents.middleware.UserAgentMiddleware',
 ]
 # STATIC
 # ------------------------------------------------------------------------------
