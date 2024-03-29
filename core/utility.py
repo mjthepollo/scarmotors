@@ -3,6 +3,8 @@ from datetime import date
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
+from demand.key_models import ChargedCompany
+
 
 def get_time(time):
     if time.hour < 12:
@@ -93,3 +95,9 @@ def get_start_and_end_dates_of_half(year, half):
             "half must be 'first' or 'second'"
         )
     return (start_date, end_date)
+
+
+def get_main_charged_company_pks():
+    return {"SAMSUNG": ChargedCompany.objects.get(name="삼성").pk,
+            "DB": ChargedCompany.objects.get(name="DB").pk,
+            "MERITZ": ChargedCompany.objects.get(name="메리츠").pk}

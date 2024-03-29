@@ -10,7 +10,8 @@ from django.http import FileResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from core.utility import get_current_half, get_start_and_end_dates_of_half
+from core.utility import (get_current_half, get_main_charged_company_pks,
+                          get_start_and_end_dates_of_half)
 from demand.excel_load import (
     get_effective_data_frame, get_line_numbers_for_extra_sales,
     get_line_numbers_for_registers,
@@ -63,6 +64,7 @@ def home(request):
                "monthly_sales": monthly_sales,
                "chunks": chunks}
     context.update(get_net_information(monthly_sales))
+    context.update(get_main_charged_company_pks())
     return render(request, "home.html", context=context)
 
 

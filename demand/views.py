@@ -10,7 +10,8 @@ from django.http import FileResponse  # Create your views here.
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from core.utility import go_to_previous_url_or_search_register, print_colored
+from core.utility import (get_main_charged_company_pks,
+                          go_to_previous_url_or_search_register)
 from demand.excel_line_info import INDEXES
 from demand.filter_forms import (IncentiveFilter, OrderFilter, RegisterFilter,
                                  RegisterFilterForOrderFilter)
@@ -309,18 +310,14 @@ def search_orders(request):
                            "orders": orders})
 
 
-SAMSUNG_INSURANCE = 85
-DB_INSURNACE = 84
-MERITZ_INSURNACE = 103
-
-
 @login_required
 def search_etc_insurances_orders(request):
     register_filter = RegisterFilterForOrderFilter(
         request.GET, queryset=Register.objects.all())
+    main_charged_company_pks = get_main_charged_company_pks().values()
     order_filter = OrderFilter(
         request.GET, queryset=Order.objects.filter(register__in=register_filter.qs).exclude(
-            charged_company__in=[SAMSUNG_INSURANCE, DB_INSURNACE, MERITZ_INSURNACE]))
+            charged_company__in=main_charged_company_pks))
     page_num = int(request.GET.get('page_num', 50))
     paginator = Paginator(order_filter.qs, page_num)
     page = request.GET.get('page')
