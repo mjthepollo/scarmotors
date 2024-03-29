@@ -15,7 +15,8 @@
       <th>보험</th>
       {% for monthly_sales in chunk %}
         <td>{{monthly_sales.paid_insurance_sales|thousand_format}}</td>
-        <td>{{monthly_sales.not_paid_insurance_sales|thousand_format}}</td>
+        <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=보험&status=미입금">
+          {{monthly_sales.not_paid_insurance_sales|thousand_format}}</a></td>
         <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=보험">
           {{monthly_sales.paid_insurance_sales|add:monthly_sales.not_paid_insurance_sales|thousand_format}}</a></td>
       {% endfor %}
@@ -24,7 +25,8 @@
       <th>렌트일반</th>
       {% for monthly_sales in chunk %}
       <td>{{monthly_sales.paid_general_rent|thousand_format}}</td>
-      <td>{{monthly_sales.not_paid_general_rent|thousand_format}}</td>
+      <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=렌트일반&status=미입금">
+        {{monthly_sales.not_paid_general_rent|thousand_format}}</a></td>
       <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=렌트일반">
         {{monthly_sales.paid_general_rent|add:monthly_sales.not_paid_general_rent|thousand_format}}</a></td>
     {% endfor %}
@@ -33,7 +35,8 @@
       <th>렌트판도</th>
       {% for monthly_sales in chunk %}
       <td>{{monthly_sales.paid_rent_pando|thousand_format}}</td>
-      <td>{{monthly_sales.not_paid_rent_pando|thousand_format}}</td>
+      <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=렌트판도&status=미입금">
+        {{monthly_sales.not_paid_rent_pando|thousand_format}}</a></td>
       <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=렌트판도">
         {{monthly_sales.paid_rent_pando|add:monthly_sales.not_paid_rent_pando|thousand_format}}</a></td>
     {% endfor %}
@@ -42,7 +45,8 @@
       <th>일반판도</th>
       {% for monthly_sales in chunk %}
       <td>{{monthly_sales.paid_general_pando|thousand_format}}</td>
-      <td>{{monthly_sales.not_paid_general_pando|thousand_format}}</td>
+      <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=일반판도&status=미입금">
+        {{monthly_sales.not_paid_general_pando|thousand_format}}</a></td>
       <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=일반판도">
         {{monthly_sales.paid_general_pando|add:monthly_sales.not_paid_general_pando|thousand_format}}</a></td>
     {% endfor %}
@@ -51,7 +55,8 @@
       <th>일반경정비</th>
       {% for monthly_sales in chunk %}
       <td>{{monthly_sales.paid_general_expense|thousand_format}}</td>
-      <td>{{monthly_sales.not_paid_general_expense|thousand_format}}</td>
+      <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=일반경정비&status=미입금">
+        {{monthly_sales.not_paid_general_expense|thousand_format}}</a></td>
       <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&charge_type=일반경정비">
         {{monthly_sales.paid_general_expense|add:monthly_sales.not_paid_general_expense|thousand_format}}</a></td>
     {% endfor %}
@@ -61,14 +66,16 @@
       {% for monthly_sales in chunk %}
       <td class="disable"></td>
       <td>{{monthly_sales.not_paid_recognized_sales|thousand_format}}</td>
-      <td><a target="_blank" href="{% url 'demand:search_recognized_sales' %}">{{monthly_sales.not_paid_recognized_sales|thousand_format}}</a></td>
+      <td><a target="_blank" href="{% url 'demand:search_recognized_sales' %}">
+        {{monthly_sales.not_paid_recognized_sales|thousand_format}}</a></td>
       {% endfor %}
     </tr>
     <tr>
       <th>계</th>
       {% for monthly_sales in chunk %}
       <td>{{monthly_sales.whole_paid_turnover|thousand_format}}</td>
-      <td>{{monthly_sales.whole_not_paid_turnover|thousand_format}}</td>
+      <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}&status=미입금">
+        {{monthly_sales.whole_not_paid_turnover|thousand_format}}</a></td>
       <td><a target="_blank" href="{% url 'demand:search_orders' %}?{{monthly_sales.get_date_query}}">{{monthly_sales.whole_paid_turnover|add:monthly_sales.whole_not_paid_turnover|thousand_format}}</a></td>
       {% endfor %}
     </tr>
