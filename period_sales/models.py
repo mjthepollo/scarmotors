@@ -338,6 +338,9 @@ class MonthlySales(PeriodSales):
         end_date = start_date + relativedelta(months=1) - relativedelta(days=1)
         return cls.create(start_date, end_date)
 
+    def get_date_query(self):
+        return f"charge__charge_date__gte={self.start_date.strftime('%Y-%m-%d')}&charge__charge_date__lte={self.end_date.strftime('%Y-%m-%d')}"
+
     def __str__(self):
         return f"[{self.start_date.year}년{self.start_date.month}월] 매출"
 

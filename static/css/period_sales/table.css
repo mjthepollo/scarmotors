@@ -18,6 +18,16 @@ table.payment td {
   vertical-align: middle;
 }
 
+table a{
+  font-weight: 700;
+  color: black;
+  text-decoration: underline;
+}
+table a:hover{
+  font-weight: 900;
+  color: black;
+  text-decoration: underline;
+}
 table.period_sales th {
   background-color: #ffff99;
 }

@@ -15,6 +15,8 @@ views_urlpatterns = [
     path("registers_to_excel/", views.registers_to_excel,
          name="registers_to_excel"),
     path("search_orders/", views.search_orders, name="search_orders"),
+    path("search_etc_insurances_orders/", views.search_etc_insurances_orders,
+         name="search_etc_insurances_orders"),
     path("search_orders_table_view/", views.search_orders_table_view,
          name="search_orders_table_view"),
     path("order/make_manually_complete/<int:pk>/",

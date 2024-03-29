@@ -309,6 +309,29 @@ def search_orders(request):
                            "orders": orders})
 
 
+SAMSUNG_INSURANCE = 85
+DB_INSURNACE = 84
+MERITZ_INSURNACE = 103
+
+
+@login_required
+def search_etc_insurances_orders(request):
+    register_filter = RegisterFilterForOrderFilter(
+        request.GET, queryset=Register.objects.all())
+    order_filter = OrderFilter(
+        request.GET, queryset=Order.objects.filter(register__in=register_filter.qs).exclude(
+            charged_company__in=[SAMSUNG_INSURANCE, DB_INSURNACE, MERITZ_INSURNACE]))
+    page_num = int(request.GET.get('page_num', 50))
+    paginator = Paginator(order_filter.qs, page_num)
+    page = request.GET.get('page')
+    orders = paginator.get_page(page)
+    return render(request, "demand/search_etc_insurances_orders.html",
+                  context={"register_filter": register_filter,
+                           "order_filter": order_filter,
+                           "page_num": page_num,
+                           "orders": orders})
+
+
 def search_orders_table_view(request):
     orders = get_orders_from_filter_and_page(request)
     lines = [order.to_excel_line() for order in orders]

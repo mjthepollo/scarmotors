@@ -55,7 +55,7 @@ class SupporterAdmin(admin.ModelAdmin):
 
 @admin.register(ChargedCompany)
 class ChargedCompanyAdmin(admin.ModelAdmin):
-    list_display = ["name", "active"]
+    list_display = ["name", "active", "pk"]
     list_filter = ["active"]
     search_fields = ["name"]
 
