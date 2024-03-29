@@ -42,6 +42,7 @@ class PeriodSales(TimeStampedModel):
         default=0, verbose_name="[미입금]일반판도")
     not_paid_general_expense = models.IntegerField(
         default=0, verbose_name="[미입금]일반경정비")
+
     not_paid_recognized_sales = models.IntegerField(
         default=0, verbose_name="[미입금]인정매출")
 
