@@ -217,6 +217,11 @@ class PeriodSales(TimeStampedModel):
         }
 
     @property
+    def orders(self):
+        return Order.objects.filter(
+            charge__charge_date__range=(self.start_date, self.end_date))
+
+    @property
     def rate_of_attempt(self):
         return self.attempted_amount / self.whole_turnover * 100
 
@@ -279,18 +284,22 @@ class PeriodSales(TimeStampedModel):
         return cls.objects.create(**kwargs)
 
     def update(self):
-        orders = Order.objects.filter(
-            charge__charge_date__range=(self.start_date, self.end_date))
         all_extra_sales = ExtraSales.objects.filter(
             charge__charge_date__range=(self.start_date, self.end_date))
         all_recognized_sales = RecognizedSales.objects.filter(
             real_day_came_out__range=(self.start_date, self.end_date)
         )
         kwargs = PeriodSales.get_kwargs(
-            orders, all_extra_sales, all_recognized_sales)
+            self.orders, all_extra_sales, all_recognized_sales)
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.save()
+
+    def get_orders_of(charge_type):
+        pass
+
+    def get_orders_of():
+        pass
 
 
 class MonthlySales(PeriodSales):
