@@ -345,7 +345,13 @@ class DemandModelTest(TestCase):
         self.assertEqual(self.register.get_number_of_works(), 3)
 
     def test_get_RO_number(self):
-        self.assertEqual(Register.get_RO_number(), f"{datetime.now().month}-1")
+        # Because of self.register has 4-
+        if datetime.now().date().month == 4:
+            self.assertEqual(Register.get_RO_number(),
+                             f"{datetime.now().month}-2")
+        else:
+            self.assertEqual(Register.get_RO_number(),
+                             f"{datetime.now().month}-1")
 
     def test_get_order_status(self):
         self.setUpOrderStatusTestCase()
