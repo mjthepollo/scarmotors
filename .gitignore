@@ -17,6 +17,8 @@ uwsgi.ini
 
 scarnote.md
 
+deploy.sh
+
 staticfiles/
 
 # cache

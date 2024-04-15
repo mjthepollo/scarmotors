@@ -8,6 +8,7 @@ from config.settings.base import env
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["www.scartech.site", "scartech.site",
+                 "www.scar-tech.site",  "scar-tech.site",
                  "azurewebsites.net", "20.196.198.30"]
 
 CSRF_TRUSTED_ORIGINS = ["https://scartech.site", "https://www.scartech.site"]
