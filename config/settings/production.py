@@ -13,7 +13,7 @@ ALLOWED_HOSTS = ["www.scartech.site", "scartech.site",
 
 CSRF_TRUSTED_ORIGINS = [
     "https://scartech.site", "https://www.scartech.site",
-    "www.scar-tech.site",  "scar-tech.site",
+    "https://www.scar-tech.site",  "https://scar-tech.site",
 ]
 
 # LOGGING
