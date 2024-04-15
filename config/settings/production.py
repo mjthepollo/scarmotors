@@ -11,7 +11,10 @@ ALLOWED_HOSTS = ["www.scartech.site", "scartech.site",
                  "www.scar-tech.site",  "scar-tech.site",
                  "azurewebsites.net", "20.196.198.30"]
 
-CSRF_TRUSTED_ORIGINS = ["https://scartech.site", "https://www.scartech.site"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://scartech.site", "https://www.scartech.site"
+    "www.scar-tech.site",  "scar-tech.site",
+]
 
 # LOGGING
 # ------------------------------------------------------------------------------
