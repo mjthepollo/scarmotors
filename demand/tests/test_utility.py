@@ -2,6 +2,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
+import pytest
 from django.test import TestCase
 
 from demand.utility import (check_car_number, fault_ratio_to_int,
@@ -9,6 +10,7 @@ from demand.utility import (check_car_number, fault_ratio_to_int,
                             str_or_none, string_to_date)
 
 
+@pytest.mark.unit_test
 class UtilityTest(TestCase):
     """
     이 테스트 클래스는 가장 기본적인 utility functions들을 테스트합니다.

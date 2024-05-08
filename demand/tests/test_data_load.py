@@ -20,6 +20,7 @@ from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import ExtraSales, Order, Register
 
 
+@pytest.mark.data_test
 class DataLoadTest(TestCase):
     """
     이 테스트 클래스는 data_loadxlsx 데이터를 불러와 모든 데이터가 제대로 불려지며, 어떤 위험 요소들이 있는지를 파악해주는 테스트입니다.

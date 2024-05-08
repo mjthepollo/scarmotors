@@ -1,3 +1,4 @@
+import pytest
 from django.test import TestCase
 
 from demand.test_utility import (createRandomCharge, createRandomDeposit,
@@ -5,6 +6,7 @@ from demand.test_utility import (createRandomCharge, createRandomDeposit,
                                  createRandomPayment, createRandomRegister)
 
 
+@pytest.mark.unit_test
 class PeriodSalesModelTest(TestCase):
     """
     PeriodSales 모델 테스트, 직접 테스트케이스를 만들어서 테스트함
@@ -22,7 +24,6 @@ class PeriodSalesModelTest(TestCase):
         """
         KeyModel들을 업데이트 할때도 Order의 updated가 업데이트 되는지 확인
         """
-        print("")
         print(f"ORDER UPDATED:{self.order.updated}  PAYMENT_UPDATED:{self.payment.updated}\
               CHARGE_UPDATED:{self.charge.updated}  DEPOSIT_UPDATED:{self.deposit.updated}")
         order_updated_before_payment_save = self.order.updated

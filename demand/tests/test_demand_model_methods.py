@@ -1,6 +1,7 @@
 from datetime import date
 from random import choice, randint
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 
@@ -11,6 +12,7 @@ from demand.test_utility import (createRandomCharge, createRandomDeposit,
                                  createRandomPayment, createRandomRegister)
 
 
+@pytest.mark.unit_test
 class DemandModelMethodTest(TestCase):
     """
     Demand 모델 테스트, 직접 테스트케이스를 만들어서 테스트함

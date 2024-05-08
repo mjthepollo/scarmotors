@@ -1,8 +1,10 @@
+import pytest
 from django.test import Client, TestCase
 
 from users.models import User
 
 
+@pytest.mark.view_test
 class CoreViewTest(TestCase):
 
     def setUp(self):
@@ -24,6 +26,3 @@ class CoreViewTest(TestCase):
             "password": "password",
         })
         self.assertRedirects(success_response, "/")
-
-    def test_home(self):
-        pass

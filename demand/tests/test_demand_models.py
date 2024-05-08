@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from random import choice, randint
 
+import pytest
 from django.test import TestCase
 
 from demand.key_models import (Charge, ChargedCompany, Deposit, InsuranceAgent,
@@ -13,6 +14,7 @@ from demand.test_utility import (createRandomExtraSales,
 from demand.utility import string_to_date
 
 
+@pytest.mark.unit_test
 class DemandModelTest(TestCase):
     """
     Demand 모델 테스트, 직접 테스트케이스를 만들어서 테스트함

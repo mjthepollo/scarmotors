@@ -1,4 +1,5 @@
 
+import pytest
 from django.test import TestCase
 
 from demand.excel_load import (
@@ -16,6 +17,7 @@ from demand.key_models import Charge, Deposit, Payment
 from demand.sales_models import ExtraSales, Order, Register
 
 
+@pytest.mark.data_test
 class ExcelLoadTest(TestCase):
     """
     이 테스트 클래스는 test.xlsx 데이터를 불러와 utility.py의 함수들과 model들이 전반적으로 잘 작동하는지에 대한 테스트입니다.

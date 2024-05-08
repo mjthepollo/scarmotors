@@ -6,13 +6,6 @@ from django.urls import reverse
 from demand.key_models import ChargedCompany
 
 
-def get_time(time):
-    if time.hour < 12:
-        return "morning"
-    else:
-        return "night"
-
-
 def print_colored(text, color):
     colors = {
         'black': '30',
